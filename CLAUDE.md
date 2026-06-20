@@ -33,6 +33,18 @@ This is a Next.js App Router project (once scaffolded). Key conventions:
 - Static assets go in `public/`
 - Environment variables are prefixed `NEXT_PUBLIC_` for client-side exposure
 
+## Memory & Harness Directories
+
+| Path | Purpose |
+|---|---|
+| `memory/` | Durable project knowledge (see `memory/README.md`) |
+| `plans/` | Implementation plans before coding (WISC "Write" step) |
+| `research/` | Long-form research findings |
+| `explanations/` | Local-only interactive HTML explanations (gitignored) |
+| `.claude/settings.json` | Project-level Claude Code permissions |
+
+The global SessionStart hook checks for `memory/README.md` and loads `memory/soul.md` + `memory/user.md` at the start of each session.
+
 ## Branch Strategy
 
 - `main` — production-ready code, protected; CI must pass before merge
