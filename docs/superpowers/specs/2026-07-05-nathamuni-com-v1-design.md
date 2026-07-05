@@ -81,8 +81,9 @@ provided; all 6 render with the placeholder card art until real thumbnails are s
 - `/videos/[slug]` — Video Detail: larger art, full description, tags, category, key lessons,
   "Watch on Instagram" button
 - `/about` — bio, content focus, social links
-- `/blog`, `/books`, `/projects` — static "coming soon" placeholder pages, linked from nav and
-  from the homepage's future-placeholders row
+- `/blog`, `/books`, `/projects` — static "coming soon" placeholder pages only: a heading,
+  one line of copy, and a link back home. No content model, no listing UI, no CMS hooks — do
+  not overbuild these for v1.
 
 ## Homepage
 
@@ -125,6 +126,11 @@ Behavior:
   desktops have touchscreens) so the effect is always alive without requiring interaction.
 - Decorative concentric glow rings are ported; smoke particle effect is **not** ported for v1
   (flagged as optional, not requested).
+- **Fallback**: WebM alpha-channel video is not reliably supported outside Chromium/WebKit
+  browsers. `KineticPortrait` must detect playback failure (or lack of `canPlayType` support
+  for `video/webm; codecs="vp9"` with alpha) and fall back to a static portrait image
+  (`public/images/portrait-fallback.png`, sourced from `asserts/profilepic/pic.png` in the
+  reference project) so the hero never shows a broken or black box.
 
 ## Visual system
 
@@ -163,7 +169,8 @@ without a structural rework, but no embed code ships in v1.
 - `/videos` lists all 6 videos with working search and filter
 - `/videos/[slug]` renders for all 6 ids with correct data and a working "Watch on Instagram"
   link
-- `/about`, `/blog`, `/books`, `/projects` render
+- `/about`, `/blog`, `/books`, `/projects` render (placeholders only — no listing UI or CMS)
+- Hero falls back to a static portrait image when alpha WebM playback isn't supported/fails
 - Lighthouse mobile score is reasonable (no specific number gated for v1, but no obvious
   performance regressions from the hero video — e.g. it must not block first paint)
 - `npm run lint` and `npm run type-check` pass
