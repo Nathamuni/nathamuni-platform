@@ -1,26 +1,188 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-base: #0a0a0f;
+  --color-glass: rgba(255, 255, 255, 0.06);
+  --color-glass-border: rgba(255, 255, 255, 0.12);
+  --color-accent: #8b5cf6;
+  --font-display: var(--font-outfit), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@utility glass-card {
+  @apply bg-glass border border-glass-border backdrop-blur-xl rounded-2xl;
+}
+
+@layer base {
+  body {
+    @apply bg-base text-white font-body min-h-screen;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .site-nav {
+    @apply glass-card sticky top-0 z-10 flex items-center justify-between px-4 py-3 mx-4 mt-4 sm:mx-8;
+  }
+  .site-nav-brand {
+    @apply font-display text-lg tracking-wide;
+  }
+  .site-nav-links {
+    @apply flex gap-4 text-sm overflow-x-auto;
+  }
+
+  .site-footer {
+    @apply mt-16 px-4 py-8 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/60;
+  }
+  .site-footer-social {
+    @apply flex gap-4;
+  }
+
+  .hero {
+    @apply flex flex-col-reverse sm:flex-row items-center gap-8 px-4 sm:px-8 py-12 max-w-5xl mx-auto;
+  }
+  .hero-copy {
+    @apply flex-1 flex flex-col gap-6 text-center sm:text-left;
+  }
+  .hero-bio {
+    @apply text-lg sm:text-xl leading-relaxed;
+  }
+  .hero-portrait {
+    @apply flex-shrink-0 w-64 h-64 sm:w-80 sm:h-80;
+  }
+
+  .kinetic-portrait {
+    @apply relative w-full h-full;
+  }
+  .kinetic-portrait-video {
+    @apply absolute inset-0 w-full h-full object-contain transition-opacity duration-150;
+  }
+  .kinetic-portrait-video-reverse {
+    @apply opacity-0 pointer-events-none;
+  }
+  .kinetic-portrait-fallback {
+    @apply w-full h-full object-contain rounded-full;
+  }
+
+  .section {
+    @apply px-4 sm:px-8 py-10 max-w-5xl mx-auto;
+  }
+  .section-title {
+    @apply text-2xl mb-6;
+  }
+
+  .video-explorer-controls {
+    @apply flex flex-col sm:flex-row gap-4 mb-8;
+  }
+  .search-bar {
+    @apply glass-card flex-1 px-4 py-2 bg-transparent outline-none placeholder-white/40;
+  }
+  .category-filter {
+    @apply flex flex-wrap gap-2;
+  }
+  .category-filter-btn {
+    @apply glass-card px-3 py-1 text-sm text-white/70 hover:text-white transition-colors;
+  }
+  .category-filter-btn.is-active {
+    @apply text-white border-accent;
+  }
+
+  .video-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  .video-grid-empty {
+    @apply text-white/60 text-center py-12;
+  }
+
+  .video-card {
+    @apply glass-card overflow-hidden flex flex-col;
+  }
+  .video-card-media {
+    @apply block aspect-video;
+  }
+  .video-card-thumbnail {
+    @apply w-full h-full object-cover;
+  }
+  .video-card-body {
+    @apply p-4 flex flex-col gap-2;
+  }
+  .video-card-category {
+    @apply text-xs uppercase tracking-wide text-accent;
+  }
+  .video-card-title {
+    @apply text-lg;
+  }
+  .video-card-description {
+    @apply text-sm text-white/70;
+  }
+  .video-card-tags {
+    @apply flex flex-wrap gap-2 mt-2;
+  }
+  .video-card-tag {
+    @apply text-xs text-white/50;
+  }
+
+  .placeholder-art {
+    @apply w-full h-full flex items-center justify-center;
+  }
+  .placeholder-art-label {
+    @apply text-white/80 font-display text-sm uppercase tracking-widest;
+  }
+
+  .social-buttons {
+    @apply flex flex-wrap gap-4 justify-center sm:justify-start;
+  }
+  .social-button {
+    @apply glass-card px-5 py-2 text-sm transition-colors;
+  }
+  .social-button-primary {
+    @apply border-accent text-white;
+  }
+  .social-button-secondary {
+    @apply text-white/60;
+  }
+
+  .about-preview,
+  .about-content,
+  .coming-soon,
+  .video-detail {
+    @apply glass-card p-6 sm:p-10;
+  }
+
+  .placeholders-grid {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-4;
+  }
+  .placeholder-card {
+    @apply glass-card p-6 text-center text-white/70 hover:text-white transition-colors;
+  }
+
+  .link-more {
+    @apply inline-block mt-4 text-accent;
+  }
+
+  .video-detail {
+    @apply flex flex-col sm:flex-row gap-8;
+  }
+  .video-detail-media {
+    @apply w-full sm:w-1/3 aspect-video rounded-xl overflow-hidden flex-shrink-0;
+  }
+  .video-detail-thumbnail {
+    @apply w-full h-full object-cover;
+  }
+  .video-detail-body {
+    @apply flex-1 flex flex-col gap-3;
+  }
+  .video-detail-title {
+    @apply text-2xl;
+  }
+  .video-detail-description {
+    @apply text-white/80 leading-relaxed;
+  }
+  .video-detail-lessons ul {
+    @apply list-disc list-inside text-white/70 mt-2;
+  }
 }
