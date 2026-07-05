@@ -1,0 +1,87 @@
+[
+  {
+    "id": "roast-of-dms",
+    "title": "The Roast Of My DMs",
+    "instagramUrl": "https://www.instagram.com/reel/DaS3P-Qxdkg/",
+    "thumbnail": null,
+    "category": "Humor",
+    "tags": ["comedy", "relatable", "instagram-dms"],
+    "problemSolved": "Turns the cringe, awkward DMs creators get into a lighthearted roast instead of ignoring them.",
+    "shortDescription": "A roast of the individual DMs that come my way — presented in a pretty unique way.",
+    "detailedDescription": "This is the roast of my individual DMs that come to me in a unique way. If you've ever wondered what creators actually get in their inbox, this is a lighthearted look at it.",
+    "featured": true,
+    "publishedDate": "2026-06-20"
+  },
+  {
+    "id": "generations-and-wisdom",
+    "title": "What Each Generation Gets Wrong (And Right)",
+    "instagramUrl": "https://www.instagram.com/reel/DaP6a3GxRRJ/",
+    "thumbnail": null,
+    "category": "Personal Growth",
+    "tags": ["wisdom", "parenting", "mindset", "generations"],
+    "problemSolved": "Helps you decide which lessons from your parents' generation to keep, and which fears not to carry forward.",
+    "shortDescription": "Every generation is shaped by its circumstances — understand the fears that shaped the last so wisdom can shape the next.",
+    "detailedDescription": "Every generation is shaped by its circumstances. Understand the fears that shaped the last, and let wisdom shape the next. The content here is built from my parents' words and what really matters to us — what to take from it, and what not to, based on my own experience.",
+    "keyLessons": [
+      "Fears passed down from your parents' generation aren't automatically your fears.",
+      "Take the wisdom, leave the fear that no longer applies to your circumstances."
+    ],
+    "featured": true,
+    "publishedDate": "2026-06-10"
+  },
+  {
+    "id": "workout-vibes",
+    "title": "My Workout Vibes",
+    "instagramUrl": "https://www.instagram.com/reel/DaMNoRESMGY/",
+    "thumbnail": null,
+    "category": "Fitness",
+    "tags": ["calisthenics", "workout", "motivation"],
+    "problemSolved": "A quick hit of training motivation and energy for anyone who needs a reason to move today.",
+    "shortDescription": "A glimpse into my workout energy and training vibe.",
+    "detailedDescription": "My workout vibes — a short glimpse into the energy and mindset I bring to training.",
+    "featured": false,
+    "publishedDate": "2026-05-28"
+  },
+  {
+    "id": "shortest-content",
+    "title": "The Shortest Video I've Ever Made",
+    "instagramUrl": "https://www.instagram.com/reel/DZ5boEOTCuW/",
+    "thumbnail": null,
+    "category": "Personal Growth",
+    "tags": ["short-form", "reflection"],
+    "problemSolved": "Proves a big idea doesn't need a long video to land — useful when you only have a few seconds to spare.",
+    "shortDescription": "My shortest piece of content yet — still packs a punch.",
+    "detailedDescription": "The shortest content I had ever made. Proof that an idea doesn't need three minutes to change how you think about something.",
+    "featured": false,
+    "publishedDate": "2026-05-15"
+  },
+  {
+    "id": "ready-to-not-quit",
+    "title": "Get Yourself Ready To Not Quit",
+    "instagramUrl": "https://www.instagram.com/reel/DZ26CClzpZx/",
+    "thumbnail": null,
+    "category": "Personal Growth",
+    "tags": ["discipline", "mindset", "consistency"],
+    "problemSolved": "Reframes how to mentally prepare for a goal so quitting halfway is never on the table.",
+    "shortDescription": "The core idea: get yourself ready mentally so quitting is never on the table.",
+    "detailedDescription": "Core concept: make yourself ready so that quitting isn't an option. Preparation isn't just physical — it's deciding, before you start, that you're not stopping halfway.",
+    "keyLessons": [
+      "Decide you won't quit before you start, not in the middle of the struggle."
+    ],
+    "featured": true,
+    "publishedDate": "2026-05-01"
+  },
+  {
+    "id": "poor-lighting-workout",
+    "title": "Even On Poor Lighting, Just With A Purpose",
+    "instagramUrl": "https://www.instagram.com/reel/DXirR2aETQO/",
+    "thumbnail": null,
+    "category": "Fitness",
+    "tags": ["workoutmotivation", "calisthenics", "instagood", "workout", "fitness"],
+    "problemSolved": "Shows that consistency matters more than perfect conditions, equipment, or lighting.",
+    "shortDescription": "Training with purpose even when the lighting — and everything else — isn't ideal.",
+    "detailedDescription": "Even on poor lighting, just with a purpose. The setup doesn't have to be perfect for the work to count.",
+    "featured": false,
+    "publishedDate": "2026-04-20"
+  }
+]
