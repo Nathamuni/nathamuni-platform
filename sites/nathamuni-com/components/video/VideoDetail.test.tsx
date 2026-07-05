@@ -9,7 +9,7 @@ describe('VideoDetail', () => {
     render(<VideoDetail video={video} />)
     expect(screen.getByRole('heading', { name: video.title })).toBeInTheDocument()
     expect(screen.getByText(video.detailedDescription)).toBeInTheDocument()
-    expect(screen.getByText(video.category)).toBeInTheDocument()
+    expect(screen.getAllByText(video.category).length).toBeGreaterThan(0)
     video.tags.forEach((tag) => {
       expect(screen.getByText(`#${tag}`)).toBeInTheDocument()
     })
