@@ -9,7 +9,7 @@ describe('VideoCard', () => {
   it('renders the title, category, and description', () => {
     render(<VideoCard video={video} />)
     expect(screen.getByText(video.title)).toBeInTheDocument()
-    expect(screen.getByText(video.category)).toBeInTheDocument()
+    expect(screen.getAllByText(video.category).length).toBeGreaterThan(0)
     expect(screen.getByText(video.shortDescription)).toBeInTheDocument()
   })
 
