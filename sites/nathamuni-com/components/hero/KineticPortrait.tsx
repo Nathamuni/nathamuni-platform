@@ -96,6 +96,11 @@ export function KineticPortrait() {
     reverse.play().catch(() => {})
   }
 
+  // Runtime fallback: canPlayType can't detect alpha-channel support (there's
+  // no MIME parameter for it), so a browser that decodes VP9 but can't
+  // actually render the transparent video will surface it here instead.
+  const handleError = () => setCanPlayAlpha(false)
+
   return (
     <div
       className="kinetic-portrait"
@@ -108,7 +113,8 @@ export function KineticPortrait() {
         src={FORWARD_SRC}
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
+        onError={handleError}
         className="kinetic-portrait-video"
         data-testid="portrait-forward"
       />
@@ -117,7 +123,8 @@ export function KineticPortrait() {
         src={REVERSE_SRC}
         muted
         playsInline
-        preload="auto"
+        preload="none"
+        onError={handleError}
         className="kinetic-portrait-video kinetic-portrait-video-reverse"
         data-testid="portrait-reverse"
       />

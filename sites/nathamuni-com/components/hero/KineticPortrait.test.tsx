@@ -32,4 +32,13 @@ describe('KineticPortrait', () => {
     fireEvent.mouseEnter(screen.getByTestId('kinetic-portrait'))
     expect(playSpy).toHaveBeenCalled()
   })
+
+  it('falls back to the static image if a video errors at runtime', () => {
+    vi.spyOn(mediaSupport, 'supportsAlphaWebm').mockReturnValue(true)
+    vi.spyOn(mediaSupport, 'prefersHoverInteraction').mockReturnValue(true)
+    render(<KineticPortrait />)
+    fireEvent.error(screen.getByTestId('portrait-forward'))
+    expect(screen.getByTestId('portrait-fallback')).toBeInTheDocument()
+    expect(screen.queryByTestId('kinetic-portrait')).not.toBeInTheDocument()
+  })
 })
