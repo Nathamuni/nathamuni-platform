@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sites/nathamuni-com
 
     steps:
       - name: Checkout
@@ -19,6 +22,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: sites/nathamuni-com/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -28,6 +32,9 @@ jobs:
 
       - name: Type check
         run: npm run type-check
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
