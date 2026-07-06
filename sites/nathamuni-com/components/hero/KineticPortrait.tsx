@@ -14,6 +14,10 @@ export function KineticPortrait() {
   const [hoverCapable, setHoverCapable] = useState(true)
 
   useEffect(() => {
+    // One-time browser capability detection on mount — document/window are
+    // unavailable during SSR/static export, so this can't be computed at
+    // render time without risking a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCanPlayAlpha(supportsAlphaWebm())
     setHoverCapable(prefersHoverInteraction())
   }, [])
