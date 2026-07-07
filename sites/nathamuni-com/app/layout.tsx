@@ -1,7 +1,10 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Outfit, Inter } from 'next/font/google'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
+import { SOCIAL_LINKS } from '@/lib/social'
+import { SITE_URL } from '@/lib/site'
+import { PROFILE } from '@/lib/profile'
 import './globals.css'
 
 const outfit = Outfit({
@@ -15,16 +18,54 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const defaultTitle = `${PROFILE.name} — Engineer, Author, Calisthenics, AI Architect`
+
 export const metadata: Metadata = {
-  title: 'Nathamuni — Distinguished Engineer, Author, AI Architect',
-  description:
-    "A searchable home for Nathamuni's videos on personal growth, calisthenics, and AI — organized by topic instead of an endless scroll.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: defaultTitle,
+    template: `%s — ${PROFILE.name}`,
+  },
+  description: PROFILE.metaDescription,
+  openGraph: {
+    type: 'website',
+    siteName: PROFILE.name,
+    url: SITE_URL,
+    title: defaultTitle,
+    description: PROFILE.metaDescription,
+    images: [{ url: '/images/portrait-fallback.png', width: 1080, height: 1080 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  alternates: {
+    canonical: '/',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#07070c',
+}
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: PROFILE.name,
+  url: SITE_URL,
+  image: `${SITE_URL}/images/portrait-fallback.png`,
+  jobTitle: PROFILE.jobTitle,
+  description: PROFILE.metaDescription,
+  sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
         <Nav />
         <main>{children}</main>
         <Footer />

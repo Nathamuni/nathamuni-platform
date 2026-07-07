@@ -34,7 +34,17 @@ export function KineticPortrait() {
       reverse.style.opacity = '0'
       forward.style.opacity = '1'
       forward.currentTime = 0
-      forward.play().catch(() => {})
+      forward.play().catch(() => {
+        // Strict autoplay policies (e.g. Brave shields, data-saver modes) can
+        // reject even muted playback until the user touches the page — retry
+        // the loop once on the first interaction. The painted first frame
+        // keeps the portrait visible either way.
+        const retry = () => {
+          if (!cancelled) forward.play().catch(() => {})
+        }
+        window.addEventListener('pointerdown', retry, { once: true })
+        window.addEventListener('touchstart', retry, { once: true })
+      })
     }
     const playReverse = () => {
       forward.style.opacity = '0'
@@ -82,6 +92,10 @@ export function KineticPortrait() {
     forward.style.opacity = '1'
     forward.currentTime = 0
     forward.play().catch(() => {})
+    // Warm the reverse clip while the forward one plays, so the first
+    // hover-out doesn't start from a cold, unbuffered element.
+    if (reverse.preload !== 'auto') reverse.preload = 'auto'
+    reverse.load()
   }
 
   const handleMouseLeave = () => {
@@ -94,6 +108,17 @@ export function KineticPortrait() {
     reverse.style.opacity = '1'
     reverse.currentTime = 0
     reverse.play().catch(() => {})
+  }
+
+  // preload="metadata" alone doesn't paint a frame in most browsers, which
+  // left the portrait invisible until playback. Seeking to the first frame
+  // forces a fetch+decode of just that frame (a few hundred KB, not the
+  // whole 4MB clip), so the portrait is visible immediately on load.
+  const handleForwardMetadata = () => {
+    const forward = forwardRef.current
+    if (forward && forward.paused && forward.currentTime === 0) {
+      forward.currentTime = 0.01
+    }
   }
 
   // Runtime fallback: canPlayType can't detect alpha-channel support (there's
@@ -114,6 +139,7 @@ export function KineticPortrait() {
         muted
         playsInline
         preload="metadata"
+        onLoadedMetadata={handleForwardMetadata}
         onError={handleError}
         className="kinetic-portrait-video"
         data-testid="portrait-forward"
@@ -123,7 +149,7 @@ export function KineticPortrait() {
         src={REVERSE_SRC}
         muted
         playsInline
-        preload="none"
+        preload="metadata"
         onError={handleError}
         className="kinetic-portrait-video kinetic-portrait-video-reverse"
         data-testid="portrait-reverse"
