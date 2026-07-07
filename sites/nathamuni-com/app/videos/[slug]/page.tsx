@@ -16,5 +16,8 @@ export default async function VideoDetailPage({
   if (!video) {
     notFound()
   }
-  return <VideoDetail video={video} />
+  const related = getAllVideos()
+    .filter((v) => v.category === video.category && v.id !== video.id)
+    .slice(0, 4)
+  return <VideoDetail video={video} related={related} />
 }

@@ -5,7 +5,7 @@ import { getAllVideos, getVideoBySlug } from '@/lib/videos'
 
 describe('VideoDetail', () => {
   it('renders the title, description, category, and tags', () => {
-    const video = getVideoBySlug('generations-and-wisdom')!
+    const video = getVideoBySlug('ready-to-not-quit')!
     render(<VideoDetail video={video} />)
     expect(screen.getByRole('heading', { name: video.title })).toBeInTheDocument()
     expect(screen.getByText(video.detailedDescription)).toBeInTheDocument()
@@ -16,13 +16,13 @@ describe('VideoDetail', () => {
   })
 
   it('links to Instagram', () => {
-    const video = getVideoBySlug('generations-and-wisdom')!
+    const video = getVideoBySlug('ready-to-not-quit')!
     render(<VideoDetail video={video} />)
     expect(screen.getByTestId('watch-on-instagram')).toHaveAttribute('href', video.instagramUrl)
   })
 
   it('renders key lessons when present', () => {
-    const video = getVideoBySlug('generations-and-wisdom')!
+    const video = getVideoBySlug('ready-to-not-quit')!
     render(<VideoDetail video={video} />)
     expect(screen.getByTestId('video-detail-lessons')).toBeInTheDocument()
   })

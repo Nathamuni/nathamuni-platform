@@ -20,7 +20,7 @@ describe('VideoCard', () => {
   })
 
   it('renders placeholder art when there is no thumbnail', () => {
-    render(<VideoCard video={video} />)
+    render(<VideoCard video={{ ...video, thumbnail: null }} />)
     expect(screen.getByTestId('placeholder-art')).toBeInTheDocument()
   })
 

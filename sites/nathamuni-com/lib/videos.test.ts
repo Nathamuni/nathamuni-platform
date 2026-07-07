@@ -4,12 +4,18 @@ import {
   getFeaturedVideos,
   getVideoBySlug,
   getAllCategories,
+  getCategoryCounts,
   searchAndFilterVideos,
 } from './videos'
 
 describe('videos data accessors', () => {
-  it('returns all 6 videos', () => {
-    expect(getAllVideos()).toHaveLength(6)
+  it('returns the full imported library', () => {
+    expect(getAllVideos().length).toBeGreaterThanOrEqual(79)
+  })
+
+  it('sorts videos newest first', () => {
+    const dates = getAllVideos().map((v) => v.publishedDate)
+    expect(dates).toEqual([...dates].sort().reverse())
   })
 
   it('returns only featured videos', () => {
@@ -19,7 +25,7 @@ describe('videos data accessors', () => {
   })
 
   it('finds a video by its slug', () => {
-    const video = getVideoBySlug('roast-of-dms')
+    const video = getVideoBySlug('the-roast-of-my-dms')
     expect(video?.title).toBe('The Roast Of My DMs')
   })
 
@@ -27,10 +33,22 @@ describe('videos data accessors', () => {
     expect(getVideoBySlug('does-not-exist')).toBeUndefined()
   })
 
+  it('has unique ids across the whole library', () => {
+    const ids = getAllVideos().map((v) => v.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
   it('returns deduplicated, sorted categories', () => {
     const categories = getAllCategories()
     expect(categories).toEqual([...categories].sort())
     expect(new Set(categories).size).toBe(categories.length)
+  })
+
+  it('returns per-category counts that sum to the library size', () => {
+    const counts = getCategoryCounts()
+    const total = counts.reduce((sum, c) => sum + c.count, 0)
+    expect(total).toBe(getAllVideos().length)
+    expect(counts.every((c) => c.count > 0)).toBe(true)
   })
 })
 
@@ -43,23 +61,31 @@ describe('searchAndFilterVideos', () => {
 
   it('matches by title, case-insensitively', () => {
     const results = searchAndFilterVideos(videos, 'ROAST', null)
-    expect(results.map((v) => v.id)).toContain('roast-of-dms')
+    expect(results.map((v) => v.id)).toContain('the-roast-of-my-dms')
   })
 
   it('matches by tag', () => {
     const results = searchAndFilterVideos(videos, 'calisthenics', null)
-    expect(results.map((v) => v.id)).toContain('poor-lighting-workout')
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.some((v) => v.tags.includes('calisthenics'))).toBe(true)
+  })
+
+  it('matches inside the detailed description', () => {
+    const target = videos.find((v) => v.detailedDescription.length > 80)!
+    const phrase = target.detailedDescription.split(/\s+/).slice(0, 3).join(' ')
+    const results = searchAndFilterVideos(videos, phrase, null)
+    expect(results.map((v) => v.id)).toContain(target.id)
   })
 
   it('filters by category', () => {
-    const results = searchAndFilterVideos(videos, '', 'Fitness')
-    expect(results.every((v) => v.category === 'Fitness')).toBe(true)
+    const results = searchAndFilterVideos(videos, '', 'Calisthenics & Fitness')
+    expect(results.every((v) => v.category === 'Calisthenics & Fitness')).toBe(true)
     expect(results.length).toBeGreaterThan(0)
   })
 
   it('combines query and category filters', () => {
-    const results = searchAndFilterVideos(videos, 'workout', 'Fitness')
-    expect(results.every((v) => v.category === 'Fitness')).toBe(true)
+    const results = searchAndFilterVideos(videos, 'workout', 'Calisthenics & Fitness')
+    expect(results.every((v) => v.category === 'Calisthenics & Fitness')).toBe(true)
   })
 
   it('returns an empty array when nothing matches', () => {

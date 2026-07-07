@@ -21,21 +21,23 @@ describe('VideoExplorer', () => {
   it('searches across the full set, including non-featured videos', async () => {
     const user = userEvent.setup()
     const featuredIds = videos.filter((v) => v.featured).map((v) => v.id)
-    const nonFeatured = videos.find((v) => !v.featured)!
+    const nonFeatured = videos.find(
+      (v) => !v.featured && v.title.split(' ')[0].length > 5
+    )!
     render(<VideoExplorer videos={videos} featuredIds={featuredIds} />)
 
     await user.type(screen.getByTestId('search-bar'), nonFeatured.title.split(' ')[0])
 
-    expect(screen.getByText(nonFeatured.title)).toBeInTheDocument()
+    expect(screen.getAllByText(nonFeatured.title).length).toBeGreaterThan(0)
   })
 
   it('filters by category', async () => {
     const user = userEvent.setup()
     render(<VideoExplorer videos={videos} />)
-    await user.click(screen.getByRole('button', { name: 'Fitness' }))
+    await user.click(screen.getByRole('button', { name: /Humor & Tamil/ }))
     const cards = screen.getAllByTestId('video-card')
-    const fitnessCount = videos.filter((v) => v.category === 'Fitness').length
-    expect(cards).toHaveLength(fitnessCount)
+    const humorCount = videos.filter((v) => v.category === 'Humor & Tamil').length
+    expect(cards).toHaveLength(humorCount)
   })
 
   it('shows the empty state when nothing matches', async () => {

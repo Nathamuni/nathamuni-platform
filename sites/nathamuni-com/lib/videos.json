@@ -1,68 +1,1284 @@
 [
   {
-    "id": "roast-of-dms",
-    "title": "The Roast Of My DMs",
-    "instagramUrl": "https://www.instagram.com/reel/DaS3P-Qxdkg/",
-    "thumbnail": null,
-    "category": "Humor",
-    "tags": ["comedy", "relatable", "instagram-dms"],
-    "problemSolved": "Turns the cringe, awkward DMs creators get into a lighthearted roast instead of ignoring them.",
-    "shortDescription": "A roast of the individual DMs that come my way — presented in a pretty unique way.",
-    "detailedDescription": "This is the roast of my individual DMs that come to me in a unique way. If you've ever wondered what creators actually get in their inbox, this is a lighthearted look at it.",
+    "id": "build-the-chain-why-systems-beat-motivation",
+    "title": "Build the Chain: Why Systems Beat Motivation",
+    "instagramUrl": "https://www.instagram.com/reel/DaczeEJRhpZ/",
+    "thumbnail": "/images/thumbnails/DaczeEJRhpZ.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "selfimprovement",
+      "atomichabits",
+      "systemsthinking",
+      "productivity"
+    ],
+    "shortDescription": "Most people try to change their life by changing everything at once. 🚀",
+    "detailedDescription": "Most people try to change their life by changing everything at once. 🚀\nThe problem? That kind of change rarely lasts. ⏳\nReal transformation happens when you connect one action to the next. 🔗\nInstead of relying on motivation, build a system where every step naturally leads to the next. 🧩\nWhen you know what to do, when to do it, and what comes next, consistency stops feeling like a struggle. 📅✅\nYour life doesn't change because you worked harder. 💪\nIt changes because your actions stopped competing and started working together. 🤝\nBuild the chain. ⛓️\nEverything else follows. ⚡🔥",
     "featured": true,
-    "publishedDate": "2026-06-20"
+    "publishedDate": "2026-07-06"
   },
   {
-    "id": "generations-and-wisdom",
+    "id": "no-gym-no-equipment-just-you-the-floor",
+    "title": "No Gym, No Equipment — Just You + The Floor",
+    "instagramUrl": "https://www.instagram.com/reel/DaXd0YKBy5X/",
+    "thumbnail": "/images/thumbnails/DaXd0YKBy5X.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "No gym. ❌🏋️",
+    "detailedDescription": "No gym. ❌🏋️\nNo equipment. ❌⚙️\nJust you + the floor. 🧘\nFollow for more fitness tips 💙",
+    "featured": true,
+    "publishedDate": "2026-07-04"
+  },
+  {
+    "id": "consistency-direction-momentum",
+    "title": "Consistency × Direction = Momentum",
+    "instagramUrl": "https://www.instagram.com/reel/DaVpSwrhxFG/",
+    "thumbnail": "/images/thumbnails/DaVpSwrhxFG.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Consistency without direction is repetition.👾",
+    "detailedDescription": "Consistency without direction is repetition.👾\nDirection without consistency is potential.🔥\nTogether, they become success.✨",
+    "featured": false,
+    "publishedDate": "2026-07-03"
+  },
+  {
+    "id": "the-roast-of-my-dms",
+    "title": "The Roast Of My DMs",
+    "instagramUrl": "https://www.instagram.com/reel/DaS3P-Qxdkg/",
+    "thumbnail": "/images/thumbnails/DaS3P-Qxdkg.jpg",
+    "category": "Humor & Tamil",
+    "tags": [
+      "humor",
+      "tamil"
+    ],
+    "shortDescription": "Pavam Illaya Nanu..!😉",
+    "detailedDescription": "Pavam Illaya Nanu..!😉",
+    "featured": true,
+    "publishedDate": "2026-07-02"
+  },
+  {
+    "id": "what-each-generation-gets-wrong-and-right",
     "title": "What Each Generation Gets Wrong (And Right)",
     "instagramUrl": "https://www.instagram.com/reel/DaP6a3GxRRJ/",
-    "thumbnail": null,
-    "category": "Personal Growth",
-    "tags": ["wisdom", "parenting", "mindset", "generations"],
-    "problemSolved": "Helps you decide which lessons from your parents' generation to keep, and which fears not to carry forward.",
-    "shortDescription": "Every generation is shaped by its circumstances — understand the fears that shaped the last so wisdom can shape the next.",
-    "detailedDescription": "Every generation is shaped by its circumstances. Understand the fears that shaped the last, and let wisdom shape the next. The content here is built from my parents' words and what really matters to us — what to take from it, and what not to, based on my own experience.",
-    "keyLessons": [
-      "Fears passed down from your parents' generation aren't automatically your fears.",
-      "Take the wisdom, leave the fear that no longer applies to your circumstances."
+    "thumbnail": "/images/thumbnails/DaP6a3GxRRJ.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
     ],
+    "shortDescription": "🕊️ Every generation is shaped by its circumstances. Understand the fears that shaped the last, and let wisdom shape the next. 🌱",
+    "detailedDescription": "🕊️ Every generation is shaped by its circumstances. Understand the fears that shaped the last, and let wisdom shape the next. 🌱\nFOLLOW ME for more 😘",
+    "featured": false,
+    "publishedDate": "2026-07-01"
+  },
+  {
+    "id": "50-thinkers-6-months-separating-action-from-reaction",
+    "title": "50 Thinkers, 6 Months: Separating Action From Reaction",
+    "instagramUrl": "https://www.instagram.com/reel/DaNZL_ahW7G/",
+    "thumbnail": "/images/thumbnails/DaNZL_ahW7G.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "personaldevelopment",
+      "mindsetshift",
+      "humanbehavior",
+      "mentalmodels",
+      "actionandreaction"
+    ],
+    "shortDescription": "On January 1st, I set out on a mission.",
+    "detailedDescription": "On January 1st, I set out on a mission. \nI gathered the core life philosophies of over 50 incredible thinkers and spent the last six months putting their ideologies to the test in my own life.🤍\nOut of all 50, only five completely transformed the way I operate, think, and make decisions.\nToday is Monday, and I’m kicking off a brand-new series to break them down for you. 🫰🏻\nIn this FIRST video, we are looking at the ultimate baseline: Separating Action from Reaction.⭐\nIf you’ve ever felt like you’re constantly firefighting life instead of building it, this is the exact shift you need.\nWatch the full breakdown now.\n Let’s get into it. 👇\n     NewSeries",
     "featured": true,
+    "publishedDate": "2026-06-30"
+  },
+  {
+    "id": "my-workout-vibes",
+    "title": "My Workout Vibes",
+    "instagramUrl": "https://www.instagram.com/reel/DaMNoRESMGY/",
+    "thumbnail": "/images/thumbnails/DaMNoRESMGY.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "✨",
+    "detailedDescription": "✨",
+    "featured": false,
+    "publishedDate": "2026-06-30"
+  },
+  {
+    "id": "50-thinkers-series-the-baseline-shift",
+    "title": "50 Thinkers Series: The Baseline Shift",
+    "instagramUrl": "https://www.instagram.com/reel/DaKxC_dRGG5/",
+    "thumbnail": "/images/thumbnails/DaKxC_dRGG5.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "personaldevelopment",
+      "mindsetshift",
+      "humanbehavior",
+      "mentalmodels",
+      "actionandreaction"
+    ],
+    "shortDescription": "On January 1st, I set out on a mission.",
+    "detailedDescription": "On January 1st, I set out on a mission. \nI gathered the core life philosophies of over 50 incredible thinkers and spent the last six months putting their ideologies to the test in my own life.🤍\nOut of all 50, only five completely transformed the way I operate, think, and make decisions.\nToday is Monday, and I’m kicking off a brand-new series to break them down for you. 🫰🏻\nIn this FIRST video, we are looking at the ultimate baseline: Separating Action from Reaction.⭐\nIf you’ve ever felt like you’re constantly firefighting life instead of building it, this is the exact shift you need.\nWatch the full breakdown now.\n Let’s get into it. 👇\n     NewSeries",
+    "featured": false,
+    "publishedDate": "2026-06-29"
+  },
+  {
+    "id": "the-shortest-video-i-ve-ever-made",
+    "title": "The Shortest Video I've Ever Made",
+    "instagramUrl": "https://www.instagram.com/reel/DZ5boEOTCuW/",
+    "thumbnail": "/images/thumbnails/DZ5boEOTCuW.jpg",
+    "category": "Humor & Tamil",
+    "tags": [
+      "humor",
+      "tamil"
+    ],
+    "shortDescription": "Followwe🙂‍↔️",
+    "detailedDescription": "Followwe🙂‍↔️",
+    "featured": false,
+    "publishedDate": "2026-06-22"
+  },
+  {
+    "id": "anda-follow-button-a-click-panidunga",
+    "title": "Anda Follow Button-a Click Panidunga",
+    "instagramUrl": "https://www.instagram.com/reel/DZxvFx7zkkp/",
+    "thumbnail": "/images/thumbnails/DZxvFx7zkkp.jpg",
+    "category": "Humor & Tamil",
+    "tags": [
+      "humor",
+      "tamil"
+    ],
+    "shortDescription": "Eba sola maranten🥱",
+    "detailedDescription": "Eba sola maranten🥱\nAnda FOLLOW button aa click panidunga ba✨🫂",
+    "featured": false,
+    "publishedDate": "2026-06-19"
+  },
+  {
+    "id": "true-facts-you-did-not-ask-for",
+    "title": "True Facts You Did Not Ask For",
+    "instagramUrl": "https://www.instagram.com/reel/DZvP4B1zadU/",
+    "thumbnail": "/images/thumbnails/DZvP4B1zadU.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Follow for more TRUE FACTS✨",
+    "detailedDescription": "Follow for more TRUE FACTS✨",
+    "featured": false,
+    "publishedDate": "2026-06-19"
+  },
+  {
+    "id": "the-reality-behind-our-teenagers-early-20s",
+    "title": "The Reality Behind Our Teenagers & Early 20s",
+    "instagramUrl": "https://www.instagram.com/reel/DZsEGFtTs09/",
+    "thumbnail": "/images/thumbnails/DZsEGFtTs09.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "lifelessons",
+      "tamil",
+      "lifestyle",
+      "ai",
+      "buildinpublic"
+    ],
+    "shortDescription": "The Reality Behind Our Teenagers & For Early 20's🙂",
+    "detailedDescription": "The Reality Behind Our Teenagers & For Early 20's🙂",
+    "featured": false,
+    "publishedDate": "2026-06-17"
+  },
+  {
+    "id": "what-do-you-want-to-see-next",
+    "title": "What Do You Want To See Next?",
+    "instagramUrl": "https://www.instagram.com/reel/DZdz4GOB5Ki/",
+    "thumbnail": "/images/thumbnails/DZdz4GOB5Ki.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life",
+      "tamilmovies",
+      "tamilmotivation"
+    ],
+    "shortDescription": "What do you want to see next... comment bellow 👇🏻",
+    "detailedDescription": "What do you want to see next... comment bellow 👇🏻\nFollow 😌",
+    "featured": false,
+    "publishedDate": "2026-06-12"
+  },
+  {
+    "id": "the-greatest-discovery-coming-soon",
+    "title": "The Greatest Discovery — Coming Soon",
+    "instagramUrl": "https://www.instagram.com/reel/DZagdkGznAs/",
+    "thumbnail": "/images/thumbnails/DZagdkGznAs.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds"
+    ],
+    "shortDescription": "The greatest discovery will be uploaded soon in the next reel",
+    "detailedDescription": "The greatest discovery will be uploaded soon in the next reel\nStay tuned ❤️",
+    "featured": false,
     "publishedDate": "2026-06-10"
   },
   {
-    "id": "workout-vibes",
-    "title": "My Workout Vibes",
-    "instagramUrl": "https://www.instagram.com/reel/DaMNoRESMGY/",
-    "thumbnail": null,
-    "category": "Fitness",
-    "tags": ["calisthenics", "workout", "motivation"],
-    "problemSolved": "A quick hit of training motivation and energy for anyone who needs a reason to move today.",
-    "shortDescription": "A glimpse into my workout energy and training vibe.",
-    "detailedDescription": "My workout vibes — a short glimpse into the energy and mindset I bring to training.",
+    "id": "top-5-push-ups-that-i-do",
+    "title": "Top 5 Push-Ups That I Do",
+    "instagramUrl": "https://www.instagram.com/reel/DZXqRDwzQxD/",
+    "thumbnail": "/images/thumbnails/DZXqRDwzQxD.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "Top 5 push-ups that I do ✨",
+    "detailedDescription": "Top 5 push-ups that I do ✨",
     "featured": false,
-    "publishedDate": "2026-05-28"
+    "publishedDate": "2026-06-09"
   },
   {
-    "id": "shortest-content",
-    "title": "The Shortest Video I've Ever Made",
-    "instagramUrl": "https://www.instagram.com/reel/DZ5boEOTCuW/",
-    "thumbnail": null,
-    "category": "Personal Growth",
-    "tags": ["short-form", "reflection"],
-    "problemSolved": "Proves a big idea doesn't need a long video to land — useful when you only have a few seconds to spare.",
-    "shortDescription": "My shortest piece of content yet — still packs a punch.",
-    "detailedDescription": "The shortest content I had ever made. Proof that an idea doesn't need three minutes to change how you think about something.",
+    "id": "too-tired-did-it-anyway",
+    "title": "Too Tired, Did It Anyway",
+    "instagramUrl": "https://www.instagram.com/reel/DZVe1vKTGvb/",
+    "thumbnail": "/images/thumbnails/DZVe1vKTGvb.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "Too tired but.. any how done it late night 🙂",
+    "detailedDescription": "Too tired but.. any how done it late night 🙂\nFor you💕",
     "featured": false,
-    "publishedDate": "2026-05-15"
+    "publishedDate": "2026-06-09"
+  },
+  {
+    "id": "life-rules-4-6-the-art-of-asking",
+    "title": "Life Rules 4–6: The Art of Asking",
+    "instagramUrl": "https://www.instagram.com/reel/DZS32kuzY3E/",
+    "thumbnail": "/images/thumbnails/DZS32kuzY3E.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "tamilquotes",
+      "tamilmotivation",
+      "lifequote",
+      "motivationtamil",
+      "lifelessons"
+    ],
+    "shortDescription": "(Refer previous reel for 1-3)",
+    "detailedDescription": "(Refer previous reel for 1-3)\n4. The art of asking! 🗣️\n5. Taking the blame is taking the responsibility 🫣\n6. You build connections by asking for help,\n ....not by offering it 🗿\n(VERY IMPORTANT 7 AND 8 ) soon🔜",
+    "featured": false,
+    "publishedDate": "2026-06-08"
+  },
+  {
+    "id": "life-rules-1-3-value-addition",
+    "title": "Life Rules 1–3: Value Addition",
+    "instagramUrl": "https://www.instagram.com/reel/DZSPvY4TbdN/",
+    "thumbnail": "/images/thumbnails/DZSPvY4TbdN.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "1. People want you for their value addition 😌",
+    "detailedDescription": "1. People want you for their value addition 😌\n2. Just because you can do something, that doesn't mean you should🫣\n3. You can outsource THINKING, but you can't also UNDERSTANDING 🤍",
+    "featured": false,
+    "publishedDate": "2026-06-07"
+  },
+  {
+    "id": "where-humans-still-beat-ai",
+    "title": "Where Humans Still Beat AI",
+    "instagramUrl": "https://www.instagram.com/reel/DZN0cxSzcs6/",
+    "thumbnail": "/images/thumbnails/DZN0cxSzcs6.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds",
+      "lifestyle",
+      "world",
+      "instagood",
+      "automation"
+    ],
+    "shortDescription": "The Human Capabilities exceed AI...🗿",
+    "detailedDescription": "The Human Capabilities exceed AI...🗿\n1.  Conviction: Inner drive and passion.\n2.  Judgment: Making sound, experienced decisions.\n3.  Taste: Creative, customer-aligned choices.\n4.  Commercial Outcomes: Building trust, closing sales.\n5.  Improving the System: Refining and upgrading workflows.",
+    "featured": false,
+    "publishedDate": "2026-06-06"
+  },
+  {
+    "id": "open-for-your-comments",
+    "title": "Open For Your Comments",
+    "instagramUrl": "https://www.instagram.com/reel/DZLG6kczEFO/",
+    "thumbnail": "/images/thumbnails/DZLG6kczEFO.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Open for your comments💥",
+    "detailedDescription": "Open for your comments💥",
+    "featured": false,
+    "publishedDate": "2026-06-04"
+  },
+  {
+    "id": "for-you-a-tamil-motivation-drop",
+    "title": "For You: A Tamil Motivation Drop",
+    "instagramUrl": "https://www.instagram.com/reel/DZIlXMCzuL2/",
+    "thumbnail": "/images/thumbnails/DZIlXMCzuL2.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "motivation",
+      "tamilmotivationalquotes",
+      "tamil",
+      "tamilmemes"
+    ],
+    "shortDescription": "I believe you love this video",
+    "detailedDescription": "I believe you love this video\nPlease comment your opinions \n,love you all 🤍",
+    "featured": false,
+    "publishedDate": "2026-06-04"
+  },
+  {
+    "id": "instauser-understanding-try-it-and-thank-me-later",
+    "title": "Instauser Understanding — Try It And Thank Me Later",
+    "instagramUrl": "https://www.instagram.com/reel/DZFS6szhiVH/",
+    "thumbnail": "/images/thumbnails/DZFS6szhiVH.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds",
+      "lifestyle",
+      "fitnessmotivation",
+      "buildinpublic"
+    ],
+    "shortDescription": "Try it and thank me later.🗿",
+    "detailedDescription": "Try it and thank me later.🗿\nLink in the bio 😉 \nParavailaa ingaye podren :  https://instauser-understanding.vercel.app/",
+    "featured": false,
+    "publishedDate": "2026-06-02"
+  },
+  {
+    "id": "legendary-content-incoming",
+    "title": "Legendary Content Incoming",
+    "instagramUrl": "https://www.instagram.com/reel/DZEAeWxhrut/",
+    "thumbnail": "/images/thumbnails/DZEAeWxhrut.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life",
+      "entrepreneur",
+      "tamil",
+      "ai",
+      "lifestyle"
+    ],
+    "shortDescription": "Legendary contains are on the way 🤍",
+    "detailedDescription": "Legendary contains are on the way 🤍\nFollow 🙂🕊️",
+    "featured": false,
+    "publishedDate": "2026-06-02"
+  },
+  {
+    "id": "grateful-srirangam",
+    "title": "Grateful — Srirangam",
+    "instagramUrl": "https://www.instagram.com/reel/DZA3FEHTy5o/",
+    "thumbnail": "/images/thumbnails/DZA3FEHTy5o.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life",
+      "srirangam",
+      "tamil"
+    ],
+    "shortDescription": "I am happy and grateful for all your presence 🤍",
+    "detailedDescription": "I am happy and grateful for all your presence 🤍",
+    "featured": false,
+    "publishedDate": "2026-06-01"
+  },
+  {
+    "id": "surprise-at-the-end",
+    "title": "Surprise At The End",
+    "instagramUrl": "https://www.instagram.com/reel/DY9b38QRDZT/",
+    "thumbnail": "/images/thumbnails/DY9b38QRDZT.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds"
+    ],
+    "shortDescription": "Surprise on the last",
+    "detailedDescription": "Surprise on the last \nThe Application Link on the bio",
+    "featured": false,
+    "publishedDate": "2026-05-30"
+  },
+  {
+    "id": "if-you-think-it-s-ai-prove-it",
+    "title": "If You Think It's AI… Prove It",
+    "instagramUrl": "https://www.instagram.com/reel/DY9IVltRKQ-/",
+    "thumbnail": "/images/thumbnails/DY9IVltRKQ-.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds"
+    ],
+    "shortDescription": "If you think its AI..😏",
+    "detailedDescription": "If you think its AI..😏\nAsk it to make photo with \"egyopaveetham\"\nVaipilaraja😉",
+    "featured": false,
+    "publishedDate": "2026-05-30"
+  },
+  {
+    "id": "strategy-wisdom-sharings",
+    "title": "Strategy & Wisdom Sharings",
+    "instagramUrl": "https://www.instagram.com/reel/DYz5yoWTUYl/",
+    "thumbnail": "/images/thumbnails/DYz5yoWTUYl.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "strategy",
+      "lifestyle",
+      "knowledge",
+      "wisdom",
+      "tamil"
+    ],
+    "shortDescription": "Follow for such insightful sharings✨",
+    "detailedDescription": "Follow for such insightful sharings✨\n.",
+    "featured": false,
+    "publishedDate": "2026-05-26"
+  },
+  {
+    "id": "calisthenics-no-words-needed",
+    "title": "Calisthenics, No Words Needed",
+    "instagramUrl": "https://www.instagram.com/reel/DYtu2G5R4Wa/",
+    "thumbnail": "/images/thumbnails/DYtu2G5R4Wa.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "workoutmotivation",
+      "lifestyle"
+    ],
+    "shortDescription": "🗿",
+    "detailedDescription": "🗿",
+    "featured": false,
+    "publishedDate": "2026-05-24"
+  },
+  {
+    "id": "understanding-to-the-core",
+    "title": "Understanding To The Core",
+    "instagramUrl": "https://www.instagram.com/reel/DYsDc_jT3Qn/",
+    "thumbnail": "/images/thumbnails/DYsDc_jT3Qn.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Let's understand something to the CORE🙂",
+    "detailedDescription": "Let's understand something to the CORE🙂",
+    "featured": false,
+    "publishedDate": "2026-05-23"
+  },
+  {
+    "id": "thanks-for-viewing",
+    "title": "Thanks For Viewing",
+    "instagramUrl": "https://www.instagram.com/reel/DYmzlYEzVdw/",
+    "thumbnail": "/images/thumbnails/DYmzlYEzVdw.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Thanks for viewing 🙂‍↕️",
+    "detailedDescription": "Thanks for viewing 🙂‍↕️",
+    "featured": false,
+    "publishedDate": "2026-05-21"
+  },
+  {
+    "id": "remember-who-you-are",
+    "title": "Remember Who You Are",
+    "instagramUrl": "https://www.instagram.com/reel/DYcw3x-TZoX/",
+    "thumbnail": "/images/thumbnails/DYcw3x-TZoX.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Just take a moment to remember.... Who you are 🤍",
+    "detailedDescription": "Just take a moment to remember.... Who you are 🤍",
+    "featured": false,
+    "publishedDate": "2026-05-18"
+  },
+  {
+    "id": "pain-with-a-purpose",
+    "title": "Pain With A Purpose",
+    "instagramUrl": "https://www.instagram.com/reel/DYU84S7zfND/",
+    "thumbnail": "/images/thumbnails/DYU84S7zfND.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "Pain with a purpose ✨",
+    "detailedDescription": "Pain with a purpose ✨",
+    "featured": false,
+    "publishedDate": "2026-05-14"
+  },
+  {
+    "id": "give-luck-a-chance-to-find-you",
+    "title": "Give Luck A Chance To Find You",
+    "instagramUrl": "https://www.instagram.com/reel/DYSBcVux8hN/",
+    "thumbnail": "/images/thumbnails/DYSBcVux8hN.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Let's give some opportunity for luck to find us 🤍",
+    "detailedDescription": "Let's give some opportunity for luck to find us 🤍",
+    "featured": false,
+    "publishedDate": "2026-05-13"
+  },
+  {
+    "id": "tired-but-here-s-value-anyway",
+    "title": "Tired, But Here's Value Anyway",
+    "instagramUrl": "https://www.instagram.com/reel/DYNQbCVzWEy/",
+    "thumbnail": "/images/thumbnails/DYNQbCVzWEy.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Bit tired today, but anyhow wanna deliver some value to you all",
+    "detailedDescription": "Bit tired today, but anyhow wanna deliver some value to you all\nThanks for your presence 💙",
+    "featured": false,
+    "publishedDate": "2026-05-11"
+  },
+  {
+    "id": "follow-for-more",
+    "title": "Follow For More",
+    "instagramUrl": "https://www.instagram.com/reel/DYFk1b5T745/",
+    "thumbnail": "/images/thumbnails/DYFk1b5T745.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Follow for more 🤍",
+    "detailedDescription": "Follow for more 🤍",
+    "featured": false,
+    "publishedDate": "2026-05-08"
+  },
+  {
+    "id": "your-opinions",
+    "title": "Your Opinions?",
+    "instagramUrl": "https://www.instagram.com/reel/DX9z4FXzZcv/",
+    "thumbnail": "/images/thumbnails/DX9z4FXzZcv.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Please comment your opinions 🫡",
+    "detailedDescription": "Please comment your opinions 🫡",
+    "featured": false,
+    "publishedDate": "2026-05-05"
+  },
+  {
+    "id": "acting-with-intention-the-5-questions",
+    "title": "Acting With Intention: The 5 Questions",
+    "instagramUrl": "https://www.instagram.com/reel/DX3Q4pWxl5m/",
+    "thumbnail": "/images/thumbnails/DX3Q4pWxl5m.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "See fully",
+    "detailedDescription": "See fully\n1. Am I acting with intention, or just reacting to the moment?\n2. Is this choice aligned with what I said I would do today?\n3. Am I choosing what matters, or what feels comfortable right now?\n4. Is this a decision my future self would respect?\n5. Am I doing this deliberately, or drifting into it?\nMake questions less harsh and more self-aware instead of judgmental.",
+    "featured": false,
+    "publishedDate": "2026-05-03"
+  },
+  {
+    "id": "updated-upgraded",
+    "title": "Updated & Upgraded",
+    "instagramUrl": "https://www.instagram.com/reel/DXykD98RX3A/",
+    "thumbnail": "/images/thumbnails/DXykD98RX3A.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "I'll keep you updated,",
+    "detailedDescription": "I'll keep you updated,\nI also make you upgraded ✨",
+    "featured": false,
+    "publishedDate": "2026-05-01"
+  },
+  {
+    "id": "busy-but-delivered",
+    "title": "Busy, But Delivered",
+    "instagramUrl": "https://www.instagram.com/reel/DXxEP1fzfQm/",
+    "thumbnail": "/images/thumbnails/DXxEP1fzfQm.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Follow",
+    "detailedDescription": "Follow \nSomehow managed to edit and give you some valuable content anyhow..\n😮‍💨 Busyyy..pa",
+    "featured": false,
+    "publishedDate": "2026-05-01"
+  },
+  {
+    "id": "need-fitness-help-dm-me",
+    "title": "Need Fitness Help? DM Me",
+    "instagramUrl": "https://www.instagram.com/reel/DXolE5rkdrZ/",
+    "thumbnail": "/images/thumbnails/DXolE5rkdrZ.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "tamilfitness",
+      "diet",
+      "workout",
+      "fitfam"
+    ],
+    "shortDescription": "If you want any assistance feel free to dm be (topics i know refer to my bio 😉)",
+    "detailedDescription": "If you want any assistance feel free to dm be (topics i know refer to my bio 😉)",
+    "featured": false,
+    "publishedDate": "2026-04-27"
+  },
+  {
+    "id": "even-on-poor-lighting-just-with-a-purpose",
+    "title": "Even On Poor Lighting, Just With A Purpose",
+    "instagramUrl": "https://www.instagram.com/reel/DXirR2aETQO/",
+    "thumbnail": "/images/thumbnails/DXirR2aETQO.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workoutmotivation",
+      "instagood",
+      "workout"
+    ],
+    "shortDescription": "EVEN ON POOR LIGHTING 👀👀",
+    "detailedDescription": "EVEN ON POOR LIGHTING 👀👀\n JUST WITH A PURPOSE ✨",
+    "featured": false,
+    "publishedDate": "2026-04-25"
+  },
+  {
+    "id": "responsibility-is-a-privilege",
+    "title": "Responsibility Is A Privilege",
+    "instagramUrl": "https://www.instagram.com/reel/DXhoDS8E_Zk/",
+    "thumbnail": "/images/thumbnails/DXhoDS8E_Zk.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Spitting some real truths🙂",
+    "detailedDescription": "Spitting some real truths🙂\nIts a privilege to undertake responsibility",
+    "featured": false,
+    "publishedDate": "2026-04-25"
+  },
+  {
+    "id": "thanks-for-visiting",
+    "title": "Thanks For Visiting",
+    "instagramUrl": "https://www.instagram.com/reel/DXgxif_EULG/",
+    "thumbnail": "/images/thumbnails/DXgxif_EULG.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "instagood",
+      "fitnessmotivation"
+    ],
+    "shortDescription": "Thanks for visiting 🙂‍↕️",
+    "detailedDescription": "Thanks for visiting 🙂‍↕️",
+    "featured": false,
+    "publishedDate": "2026-04-24"
+  },
+  {
+    "id": "run-with-me",
+    "title": "Run With Me",
+    "instagramUrl": "https://www.instagram.com/reel/DXeLAmLkR6S/",
+    "thumbnail": "/images/thumbnails/DXeLAmLkR6S.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "running",
+      "tamilmemes",
+      "instagood"
+    ],
+    "shortDescription": "Follow for similar content 🗿",
+    "detailedDescription": "Follow for similar content 🗿",
+    "featured": false,
+    "publishedDate": "2026-04-23"
+  },
+  {
+    "id": "the-physique-is-the-goal-the-lifestyle-is-the-bundle",
+    "title": "The Physique Is The Goal, The Lifestyle Is The Bundle",
+    "instagramUrl": "https://www.instagram.com/reel/DXZGHCckfLO/",
+    "thumbnail": "/images/thumbnails/DXZGHCckfLO.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "life",
+      "tamilfitness"
+    ],
+    "shortDescription": "The physique is the goal, but the lifestyle is the bundle.✨",
+    "detailedDescription": "The physique is the goal, but the lifestyle is the bundle.✨",
+    "featured": true,
+    "publishedDate": "2026-04-21"
+  },
+  {
+    "id": "run-day-vibes",
+    "title": "Run Day Vibes",
+    "instagramUrl": "https://www.instagram.com/reel/DXWiZ4UBoyp/",
+    "thumbnail": "/images/thumbnails/DXWiZ4UBoyp.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "running",
+      "tamilmemes"
+    ],
+    "shortDescription": "😌",
+    "detailedDescription": "😌",
+    "featured": false,
+    "publishedDate": "2026-04-20"
+  },
+  {
+    "id": "cardio-day",
+    "title": "Cardio Day",
+    "instagramUrl": "https://www.instagram.com/reel/DXTONFAkeNh/",
+    "thumbnail": "/images/thumbnails/DXTONFAkeNh.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "cardio",
+      "running"
+    ],
+    "shortDescription": "😅",
+    "detailedDescription": "😅",
+    "featured": false,
+    "publishedDate": "2026-04-19"
+  },
+  {
+    "id": "solradhukku-onnum-illa",
+    "title": "Solradhukku Onnum Illa",
+    "instagramUrl": "https://www.instagram.com/reel/DXRmC8KkQCI/",
+    "thumbnail": "/images/thumbnails/DXRmC8KkQCI.jpg",
+    "category": "Humor & Tamil",
+    "tags": [
+      "humor",
+      "tamil"
+    ],
+    "shortDescription": "Solarathu onum ila😏",
+    "detailedDescription": "Solarathu onum ila😏\nComments venum naa kalainga\nOnu prachana ila😮‍💨😁",
+    "featured": false,
+    "publishedDate": "2026-04-18"
+  },
+  {
+    "id": "core-value-factors-identity-first",
+    "title": "Core Value Factors: Identity First",
+    "instagramUrl": "https://www.instagram.com/reel/DXQwRHSkZUc/",
+    "thumbnail": "/images/thumbnails/DXQwRHSkZUc.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "When you start taking the responsibility, the change will chase you..!",
+    "detailedDescription": "When you start taking the responsibility, the change will chase you..!\nCore Value Factors 🤍\n1. Your identity (what defines you)\n2. Environment (the effect of the circumstances on you)\n3. The system (logical breakdown of strategic steps) \n4. The social circle (who you're following and likely to be with)\n5. Your belief (what is the belief system you are operating on)......\ndetailed explain in the upcomming videos 🙂‍↕️.",
+    "featured": false,
+    "publishedDate": "2026-04-18"
+  },
+  {
+    "id": "processing-information-integration",
+    "title": "Processing: Information Integration",
+    "instagramUrl": "https://www.instagram.com/reel/DXLeAa6Eaa_/",
+    "thumbnail": "/images/thumbnails/DXLeAa6Eaa_.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": ".",
+    "detailedDescription": ".\n✨The information is being processed for the purpose of integrating it with other pieces of information.",
+    "featured": false,
+    "publishedDate": "2026-04-16"
+  },
+  {
+    "id": "what-is-a-system-really",
+    "title": "What Is A System, Really?",
+    "instagramUrl": "https://www.instagram.com/reel/DXJU5lMEXeB/",
+    "thumbnail": "/images/thumbnails/DXJU5lMEXeB.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "✨",
+    "detailedDescription": "✨\nA system is a structured, repeatable framework that integrates specific inputs, measurable processes, and feedback loops to transform a high-level goal into a series of predictable, immediate actions.\nBy defining your \"exact position\" through objective checkpoints and aligning every step with your personal story or objective, it functions as a cognitive architecture that eliminates decision fatigue and ensures consistency effectively serving as the bridge that converts potential (the idea) into a tangible output (the result) while actively minimizing the friction of distractions.\n✨",
+    "featured": false,
+    "publishedDate": "2026-04-15"
+  },
+  {
+    "id": "discovery-is-the-duty-of-the-uninspired",
+    "title": "Discovery Is The Duty Of The Uninspired",
+    "instagramUrl": "https://www.instagram.com/reel/DXBE0UDEWOs/",
+    "thumbnail": "/images/thumbnails/DXBE0UDEWOs.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Discovery is the duty of the uninspired.💥",
+    "detailedDescription": "Discovery is the duty of the uninspired.💥\nThe ultimate freedom is not the absence of struggle, but the right to choose which struggle defines you✨",
+    "featured": false,
+    "publishedDate": "2026-04-12"
+  },
+  {
+    "id": "cringe-is-the-process",
+    "title": "Cringe Is The Process",
+    "instagramUrl": "https://www.instagram.com/reel/DW-KpEgJzzN/",
+    "thumbnail": "/images/thumbnails/DW-KpEgJzzN.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Most people call it cringe; I call it the process.🏃🏻‍♂️",
+    "detailedDescription": "Most people call it cringe; I call it the process.🏃🏻‍♂️\n⚠️Building walls protect you from opinions, but they also stop the improvement. Embrace the embarrassment with open ears🤍 that’s where the power resides ✨",
+    "featured": false,
+    "publishedDate": "2026-04-11"
+  },
+  {
+    "id": "ask-me-for-personal-tips",
+    "title": "Ask Me For Personal Tips",
+    "instagramUrl": "https://www.instagram.com/reel/DW249vGEe5i/",
+    "thumbnail": "/images/thumbnails/DW249vGEe5i.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "For any personal tips comment 😊😊",
+    "detailedDescription": "For any personal tips comment 😊😊",
+    "featured": false,
+    "publishedDate": "2026-04-08"
+  },
+  {
+    "id": "self-experience-facts-free",
+    "title": "Self-Experience Facts, Free",
+    "instagramUrl": "https://www.instagram.com/reel/DW0UrFBkcoz/",
+    "thumbnail": "/images/thumbnails/DW0UrFBkcoz.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "Most important self experience to facts in this video for you for free 🙂‍↕️😌",
+    "detailedDescription": "Most important self experience to facts in this video for you for free 🙂‍↕️😌",
+    "featured": false,
+    "publishedDate": "2026-04-07"
+  },
+  {
+    "id": "the-pain-that-transforms",
+    "title": "The Pain That Transforms",
+    "instagramUrl": "https://www.instagram.com/reel/DWxpCQHESZJ/",
+    "thumbnail": "/images/thumbnails/DWxpCQHESZJ.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline"
+    ],
+    "shortDescription": "The quote that i believe",
+    "detailedDescription": "The quote that i believe \nYou will transform when the pain of being the same is greater than the pain of the change itself 🙂‍↕️\nFollow me🤍",
+    "featured": false,
+    "publishedDate": "2026-04-06"
+  },
+  {
+    "id": "an-honest-opinion-from-experience",
+    "title": "An Honest Opinion, From Experience",
+    "instagramUrl": "https://www.instagram.com/reel/DWqniz5kRp5/",
+    "thumbnail": "/images/thumbnails/DWqniz5kRp5.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "I feel my opinion might help you vro..",
+    "detailedDescription": "I feel my opinion might help you vro..\nHonestly i wish to not get this kinda pain personal\nI don't think whether others need these or not\nI don't even know my ideas are right or wrong\nI don't know.....\nBut all i can do is just take a step to improve my or my people's standards \nThankyou 🙂",
+    "featured": false,
+    "publishedDate": "2026-04-03"
+  },
+  {
+    "id": "fahhh-loww",
+    "title": "FAHHH...LOWW!",
+    "instagramUrl": "https://www.instagram.com/reel/DWoou73kfOB/",
+    "thumbnail": "/images/thumbnails/DWoou73kfOB.jpg",
+    "category": "Humor & Tamil",
+    "tags": [
+      "humor",
+      "tamil"
+    ],
+    "shortDescription": "🫡 FAHHH...LOWW..!",
+    "detailedDescription": "🫡 FAHHH...LOWW..!",
+    "featured": false,
+    "publishedDate": "2026-04-02"
+  },
+  {
+    "id": "morning-walk-conversations",
+    "title": "Morning Walk Conversations",
+    "instagramUrl": "https://www.instagram.com/reel/DWdpzjqEXFg/",
+    "thumbnail": "/images/thumbnails/DWdpzjqEXFg.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "trauma",
+      "wellbeing",
+      "tamil",
+      "psychologytoday",
+      "selfhelp"
+    ],
+    "shortDescription": "Just started recording our daily deep conversations on our morning walk 😁",
+    "detailedDescription": "Just started recording our daily deep conversations on our morning walk 😁 \nFollow to improve your standards ♾️",
+    "featured": false,
+    "publishedDate": "2026-03-29"
+  },
+  {
+    "id": "workout-anywhere-even-out-of-station",
+    "title": "Workout Anywhere — Even Out Of Station",
+    "instagramUrl": "https://www.instagram.com/reel/DWMPuqskW_n/",
+    "thumbnail": "/images/thumbnails/DWMPuqskW_n.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "Follow for more",
+    "detailedDescription": "Follow for more\nCan do your daily routine workout even on an out of station like me\nImproves the quality of your resting as well 😴🔇📵",
+    "featured": false,
+    "publishedDate": "2026-03-22"
+  },
+  {
+    "id": "just-a-try",
+    "title": "Just A Try",
+    "instagramUrl": "https://www.instagram.com/reel/DV_JDfRkcW_/",
+    "thumbnail": "/images/thumbnails/DV_JDfRkcW_.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Just a try 🤍",
+    "detailedDescription": "Just a try 🤍",
+    "featured": false,
+    "publishedDate": "2026-03-17"
+  },
+  {
+    "id": "kalari",
+    "title": "Kalari ⚔️",
+    "instagramUrl": "https://www.instagram.com/reel/DVtjU6Ok-Z2/",
+    "thumbnail": "/images/thumbnails/DVtjU6Ok-Z2.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness"
+    ],
+    "shortDescription": "Kalari⚔️🛡️🔥",
+    "detailedDescription": "Kalari⚔️🛡️🔥",
+    "featured": false,
+    "publishedDate": "2026-03-10"
+  },
+  {
+    "id": "self-safari-ride",
+    "title": "Self Safari Ride",
+    "instagramUrl": "https://www.instagram.com/reel/DVrDwiGE9kA/",
+    "thumbnail": "/images/thumbnails/DVrDwiGE9kA.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Self Safari Rideuu..💖",
+    "detailedDescription": "Self Safari Rideuu..💖",
+    "featured": false,
+    "publishedDate": "2026-03-09"
+  },
+  {
+    "id": "miss-you-all",
+    "title": "Miss You All",
+    "instagramUrl": "https://www.instagram.com/reel/DVcbfrzk7m6/",
+    "thumbnail": "/images/thumbnails/DVcbfrzk7m6.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Miss you all guys 💖",
+    "detailedDescription": "Miss you all guys 💖",
+    "featured": false,
+    "publishedDate": "2026-03-04"
+  },
+  {
+    "id": "follow",
+    "title": "Follow 😅",
+    "instagramUrl": "https://www.instagram.com/reel/DVPnsB9E3qj/",
+    "thumbnail": "/images/thumbnails/DVPnsB9E3qj.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Follow 😅",
+    "detailedDescription": "Follow 😅",
+    "featured": false,
+    "publishedDate": "2026-02-27"
+  },
+  {
+    "id": "enna-da-panni-vechirukinga",
+    "title": "Enna Da Panni Vechirukinga",
+    "instagramUrl": "https://www.instagram.com/reel/DVOWnxEERPS/",
+    "thumbnail": "/images/thumbnails/DVOWnxEERPS.jpg",
+    "category": "Humor & Tamil",
+    "tags": [
+      "humor",
+      "tamil"
+    ],
+    "shortDescription": "Ena da panni vechirukinga 😅",
+    "detailedDescription": "Ena da panni vechirukinga 😅",
+    "featured": false,
+    "publishedDate": "2026-02-26"
+  },
+  {
+    "id": "calisthenics-flow",
+    "title": "Calisthenics Flow",
+    "instagramUrl": "https://www.instagram.com/reel/DU4xxz1ERp7/",
+    "thumbnail": "/images/thumbnails/DU4xxz1ERp7.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "workout",
+      "fitnessmotivation",
+      "fitfam"
+    ],
+    "shortDescription": "🤍",
+    "detailedDescription": "🤍",
+    "featured": false,
+    "publishedDate": "2026-02-18"
+  },
+  {
+    "id": "free-app-access-for-testers",
+    "title": "Free App Access For Testers",
+    "instagramUrl": "https://www.instagram.com/reel/DU11wxXEUbZ/",
+    "thumbnail": "/images/thumbnails/DU11wxXEUbZ.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds"
+    ],
+    "shortDescription": "DM for the free application access 🔑",
+    "detailedDescription": "DM for the free application access 🔑\nDear TESTERS Thankyou for ur support 🤍",
+    "featured": false,
+    "publishedDate": "2026-02-17"
+  },
+  {
+    "id": "latest-release-teaser",
+    "title": "Latest Release Teaser 🧠",
+    "instagramUrl": "https://www.instagram.com/reel/DUfdpOoESDD/",
+    "thumbnail": "/images/thumbnails/DUfdpOoESDD.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds"
+    ],
+    "shortDescription": "Stay tuned for the - Latest Release 🧠",
+    "detailedDescription": "Stay tuned for the - Latest Release 🧠\nDM for special access ❤️",
+    "featured": false,
+    "publishedDate": "2026-02-08"
+  },
+  {
+    "id": "cool-stuff-incoming",
+    "title": "Cool Stuff Incoming",
+    "instagramUrl": "https://www.instagram.com/reel/DT7CnegEW_-/",
+    "thumbnail": "/images/thumbnails/DT7CnegEW_-.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Follow for cool stuffs🫂",
+    "detailedDescription": "Follow for cool stuffs🫂",
+    "featured": false,
+    "publishedDate": "2026-01-25"
+  },
+  {
+    "id": "nerdy-applications",
+    "title": "Nerdy Applications",
+    "instagramUrl": "https://www.instagram.com/reel/DT4XdglkeJI/",
+    "thumbnail": "/images/thumbnails/DT4XdglkeJI.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds",
+      "song",
+      "music",
+      "love",
+      "singer",
+      "instagood",
+      "cover"
+    ],
+    "shortDescription": "Follow for Nerdy Applications😉",
+    "detailedDescription": "Follow for Nerdy Applications😉\n, , , , , , , , , , , , , , , , , , ,",
+    "featured": false,
+    "publishedDate": "2026-01-24"
+  },
+  {
+    "id": "my-local-ai-app-chat-habits-personas",
+    "title": "My Local AI App: Chat, Habits & Personas",
+    "instagramUrl": "https://www.instagram.com/reel/DT2gaRdkWx8/",
+    "thumbnail": "/images/thumbnails/DT2gaRdkWx8.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds",
+      "mobileai",
+      "localai",
+      "ondeviceai",
+      "aidevelopment",
+      "indiedeveloper",
+      "buildinpublic"
+    ],
+    "shortDescription": "DM me to try it for free.",
+    "detailedDescription": "DM me to try it for free.\nThis is a local mobile Al app combining chat, persona role-play, habit & routine tracking, journaling, and health-focused games-all in one place.",
+    "featured": true,
+    "publishedDate": "2026-01-23"
+  },
+  {
+    "id": "your-phone-just-got-a-brain-upgrade",
+    "title": "Your Phone Just Got A Brain Upgrade",
+    "instagramUrl": "https://www.instagram.com/reel/DTfEq-IkQwf/",
+    "thumbnail": "/images/thumbnails/DTfEq-IkQwf.jpg",
+    "category": "AI & Builds",
+    "tags": [
+      "ai",
+      "builds",
+      "brainboxai",
+      "localai",
+      "offlinellm",
+      "privacymatters",
+      "ondeviceai",
+      "saasdevelopment"
+    ],
+    "shortDescription": "Think different 😉",
+    "detailedDescription": "Think different 😉\nYour phone just got a brain upgrade. 🧠🚀 Offline AI, private workouts, and smart habits—all in one place. No cloud, no tracking, just pure logic. 📲🔒",
+    "featured": false,
+    "publishedDate": "2026-01-14"
+  },
+  {
+    "id": "the-anti-snooze-protocol",
+    "title": "The Anti-Snooze Protocol",
+    "instagramUrl": "https://www.instagram.com/reel/DTfDZVokVqv/",
+    "thumbnail": "/images/thumbnails/DTfDZVokVqv.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "lifestyle",
+      "instagood",
+      "logicandlaunch",
+      "saas",
+      "buildinpublic",
+      "morningroutine"
+    ],
+    "shortDescription": "Invented the new \"Anti-Snooze\" Protocol😁",
+    "detailedDescription": "Invented the new \"Anti-Snooze\" Protocol😁\nDare if you can win ✨",
+    "featured": false,
+    "publishedDate": "2026-01-14"
+  },
+  {
+    "id": "gym-day-energy",
+    "title": "Gym Day Energy",
+    "instagramUrl": "https://www.instagram.com/reel/DTUMKaoESaG/",
+    "thumbnail": "/images/thumbnails/DTUMKaoESaG.jpg",
+    "category": "Calisthenics & Fitness",
+    "tags": [
+      "calisthenics",
+      "fitness",
+      "gym",
+      "workout",
+      "fitnessmotivation",
+      "fit",
+      "motivation"
+    ],
+    "shortDescription": "❤️",
+    "detailedDescription": "❤️",
+    "featured": false,
+    "publishedDate": "2026-01-10"
+  },
+  {
+    "id": "go-far-together-6-months-of-growth",
+    "title": "Go Far Together: 6 Months Of Growth",
+    "instagramUrl": "https://www.instagram.com/reel/DTSIqY4kRzl/",
+    "thumbnail": "/images/thumbnails/DTSIqY4kRzl.jpg",
+    "category": "Mind & Discipline",
+    "tags": [
+      "mindset",
+      "discipline",
+      "selfimprovement",
+      "growthmindset",
+      "6monthjourney",
+      "personalgrowth",
+      "trialanderror",
+      "levelup"
+    ],
+    "shortDescription": "“If you want to go fast, go alone.",
+    "detailedDescription": "“If you want to go fast, go alone.\nIf you want to go far, go together.”\nChoosing growth.\n6 months of trial, error, and self-improvement.\nAlways open to direction.✨",
+    "featured": false,
+    "publishedDate": "2026-01-09"
+  },
+  {
+    "id": "danushkodi-days",
+    "title": "Danushkodi Days",
+    "instagramUrl": "https://www.instagram.com/reel/DQW5NKgCFqt/",
+    "thumbnail": "/images/thumbnails/DQW5NKgCFqt.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life"
+    ],
+    "shortDescription": "Just another day, Danushkoti way ❤️",
+    "detailedDescription": "Just another day, Danushkoti way ❤️",
+    "featured": false,
+    "publishedDate": "2025-10-28"
+  },
+  {
+    "id": "new-place-same-pace",
+    "title": "New Place, Same Pace",
+    "instagramUrl": "https://www.instagram.com/reel/DQTzc35EVZW/",
+    "thumbnail": "/images/thumbnails/DQTzc35EVZW.jpg",
+    "category": "Life & Moments",
+    "tags": [
+      "life",
+      "mellakottai"
+    ],
+    "shortDescription": "New place, same pace.  ⛰️",
+    "detailedDescription": "New place, same pace.  ⛰️",
+    "featured": false,
+    "publishedDate": "2025-10-27"
   },
   {
     "id": "ready-to-not-quit",
     "title": "Get Yourself Ready To Not Quit",
     "instagramUrl": "https://www.instagram.com/reel/DZ26CClzpZx/",
     "thumbnail": null,
-    "category": "Personal Growth",
-    "tags": ["discipline", "mindset", "consistency"],
-    "problemSolved": "Reframes how to mentally prepare for a goal so quitting halfway is never on the table.",
+    "category": "Mind & Discipline",
+    "tags": [
+      "discipline",
+      "mindset",
+      "consistency"
+    ],
     "shortDescription": "The core idea: get yourself ready mentally so quitting is never on the table.",
     "detailedDescription": "Core concept: make yourself ready so that quitting isn't an option. Preparation isn't just physical — it's deciding, before you start, that you're not stopping halfway.",
     "keyLessons": [
@@ -70,18 +1286,5 @@
     ],
     "featured": true,
     "publishedDate": "2026-05-01"
-  },
-  {
-    "id": "poor-lighting-workout",
-    "title": "Even On Poor Lighting, Just With A Purpose",
-    "instagramUrl": "https://www.instagram.com/reel/DXirR2aETQO/",
-    "thumbnail": null,
-    "category": "Fitness",
-    "tags": ["workoutmotivation", "calisthenics", "instagood", "workout", "fitness"],
-    "problemSolved": "Shows that consistency matters more than perfect conditions, equipment, or lighting.",
-    "shortDescription": "Training with purpose even when the lighting — and everything else — isn't ideal.",
-    "detailedDescription": "Even on poor lighting, just with a purpose. The setup doesn't have to be perfect for the work to count.",
-    "featured": false,
-    "publishedDate": "2026-04-20"
   }
 ]
