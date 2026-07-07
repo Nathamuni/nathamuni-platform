@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-base: #0a0a0f;
-  --color-glass: rgba(255, 255, 255, 0.06);
-  --color-glass-border: rgba(255, 255, 255, 0.12);
+  --color-base: #07070c;
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
   --color-accent: #8b5cf6;
   --font-display: var(--font-outfit), sans-serif;
   --font-body: var(--font-inter), sans-serif;
@@ -16,43 +16,101 @@
 @layer base {
   body {
     @apply bg-base text-white font-body min-h-screen;
+    background-image:
+      radial-gradient(1200px 600px at 85% -10%, rgba(139, 92, 246, 0.14), transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, rgba(6, 182, 212, 0.08), transparent 55%),
+      radial-gradient(700px 500px at 60% 110%, rgba(244, 63, 94, 0.06), transparent 60%);
+    background-attachment: fixed;
   }
   h1,
   h2,
   h3 {
     @apply font-display;
   }
+  ::selection {
+    background: rgba(139, 92, 246, 0.5);
+  }
 }
 
 @layer components {
+  /* ---------- motion ---------- */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(12px, -18px) scale(1.06); }
+  }
+  .anim-fade-up {
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .anim-delay-1 { animation-delay: 0.08s; }
+  .anim-delay-2 { animation-delay: 0.16s; }
+  .anim-delay-3 { animation-delay: 0.24s; }
+  .anim-delay-4 { animation-delay: 0.32s; }
+  @media (prefers-reduced-motion: reduce) {
+    .anim-fade-up { animation: none; }
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+
+  /* ---------- shell ---------- */
   .site-nav {
-    @apply glass-card sticky top-0 z-10 flex items-center justify-between px-4 py-3 mx-4 mt-4 sm:mx-8;
+    @apply glass-card sticky top-0 z-20 flex items-center justify-between px-4 py-3 mx-4 mt-4 sm:mx-8;
   }
   .site-nav-brand {
     @apply font-display text-lg tracking-wide;
+    background: linear-gradient(90deg, #fff, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .site-nav-links {
     @apply flex gap-4 text-sm overflow-x-auto;
   }
+  .site-nav-links a {
+    @apply text-white/70 hover:text-white transition-colors;
+  }
 
   .site-footer {
-    @apply mt-16 px-4 py-8 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/60;
+    @apply mt-20 px-4 py-8 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/50;
   }
   .site-footer-social {
     @apply flex gap-4;
   }
+  .site-footer-social a {
+    @apply hover:text-white transition-colors;
+  }
 
+  /* ---------- hero ---------- */
   .hero {
-    @apply flex flex-col-reverse sm:flex-row items-center gap-8 px-4 sm:px-8 py-12 max-w-5xl mx-auto;
+    @apply relative flex flex-col-reverse sm:flex-row items-center gap-8 px-4 sm:px-8 pt-12 pb-8 max-w-6xl mx-auto;
   }
   .hero-copy {
-    @apply flex-1 flex flex-col gap-6 text-center sm:text-left;
+    @apply flex-1 flex flex-col gap-5 text-center sm:text-left;
+  }
+  .hero-title {
+    @apply text-3xl sm:text-5xl leading-tight font-display;
+    background: linear-gradient(100deg, #ffffff 30%, #a78bfa 70%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .hero-bio {
-    @apply text-lg sm:text-xl leading-relaxed;
+    @apply text-base sm:text-lg leading-relaxed text-white/75;
+  }
+  .hero-promise {
+    @apply text-sm text-white/50;
   }
   .hero-portrait {
-    @apply flex-shrink-0 w-64 h-64 sm:w-80 sm:h-80;
+    @apply relative flex-shrink-0 w-60 h-60 sm:w-80 sm:h-80;
+  }
+  .hero-portrait::before {
+    content: '';
+    @apply absolute -inset-8 rounded-full;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.28), transparent 65%);
+    animation: drift 9s ease-in-out infinite;
+    pointer-events: none;
   }
 
   .kinetic-portrait {
@@ -68,107 +126,196 @@
     @apply w-full h-full object-contain rounded-full;
   }
 
-  .section {
-    @apply px-4 sm:px-8 py-10 max-w-5xl mx-auto;
+  .hero-search {
+    @apply glass-card flex items-center gap-3 px-5 py-3 mt-1 text-white/50 hover:text-white/80 transition-all;
   }
-  .section-title {
-    @apply text-2xl mb-6;
+  .hero-search:hover {
+    border-color: rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 32px -8px rgba(139, 92, 246, 0.5);
   }
 
+  /* ---------- sections ---------- */
+  .section {
+    @apply px-4 sm:px-8 py-10 max-w-6xl mx-auto;
+  }
+  .section-title {
+    @apply text-2xl mb-2;
+  }
+  .section-sub {
+    @apply text-sm text-white/50 mb-7;
+  }
+  .section-head-row {
+    @apply flex items-end justify-between;
+  }
+
+  /* ---------- category tiles ---------- */
+  .category-tiles {
+    @apply grid grid-cols-2 lg:grid-cols-5 gap-4;
+  }
+  .category-tile {
+    @apply glass-card relative overflow-hidden p-5 flex flex-col gap-1 transition-all duration-300;
+    border-color: hsla(var(--cat), 70%, 60%, 0.25);
+  }
+  .category-tile:hover {
+    transform: translateY(-4px);
+    border-color: hsla(var(--cat), 80%, 65%, 0.7);
+    box-shadow: 0 12px 40px -12px hsla(var(--cat), 80%, 55%, 0.45);
+  }
+  .category-tile::after {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: radial-gradient(120% 90% at 85% 0%, hsla(var(--cat), 80%, 55%, 0.18), transparent 55%);
+  }
+  .category-tile-icon {
+    @apply text-2xl;
+  }
+  .category-tile-name {
+    @apply font-display text-sm sm:text-base leading-snug;
+  }
+  .category-tile-count {
+    @apply text-xs;
+    color: hsla(var(--cat), 85%, 72%, 1);
+  }
+
+  /* ---------- explorer controls ---------- */
   .video-explorer-controls {
-    @apply flex flex-col sm:flex-row gap-4 mb-8;
+    @apply flex flex-col gap-4 mb-8;
   }
   .search-bar {
-    @apply glass-card flex-1 px-4 py-2 bg-transparent outline-none placeholder-white/40;
+    @apply glass-card w-full px-5 py-3 bg-transparent outline-none placeholder-white/35 transition-all;
+  }
+  .search-bar:focus {
+    border-color: rgba(139, 92, 246, 0.7);
+    box-shadow: 0 0 28px -8px rgba(139, 92, 246, 0.55);
   }
   .category-filter {
     @apply flex flex-wrap gap-2;
   }
   .category-filter-btn {
-    @apply glass-card px-3 py-1 text-sm text-white/70 hover:text-white transition-colors;
+    @apply glass-card px-3.5 py-1.5 text-sm text-white/65 hover:text-white transition-all cursor-pointer;
+  }
+  .category-filter-btn:hover {
+    @apply border-white/30;
   }
   .category-filter-btn.is-active {
     @apply text-white border-accent;
+    background: rgba(139, 92, 246, 0.16);
+    box-shadow: 0 0 22px -8px rgba(139, 92, 246, 0.6);
+  }
+  .explorer-count {
+    @apply text-xs text-white/40;
   }
 
+  /* ---------- video grid & cards ---------- */
   .video-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6;
+    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5;
   }
   .video-grid-empty {
-    @apply text-white/60 text-center py-12;
+    @apply text-white/55 text-center py-14;
   }
 
   .video-card {
-    @apply glass-card overflow-hidden flex flex-col;
+    @apply glass-card overflow-hidden flex flex-col transition-all duration-300;
+  }
+  .video-card:hover {
+    transform: translateY(-5px);
+    border-color: hsla(var(--cat, 262), 80%, 65%, 0.55);
+    box-shadow: 0 16px 44px -14px hsla(var(--cat, 262), 80%, 55%, 0.4);
   }
   .video-card-media {
-    @apply block aspect-video;
+    @apply block relative overflow-hidden;
+    aspect-ratio: 9 / 12;
   }
   .video-card-thumbnail {
-    @apply w-full h-full object-cover;
+    @apply w-full h-full object-cover transition-transform duration-500;
+  }
+  .video-card:hover .video-card-thumbnail {
+    transform: scale(1.06);
+  }
+  .video-card-media::after {
+    content: '';
+    @apply absolute inset-x-0 bottom-0 h-1/3 pointer-events-none;
+    background: linear-gradient(to top, rgba(7, 7, 12, 0.8), transparent);
   }
   .video-card-body {
-    @apply p-4 flex flex-col gap-2;
+    @apply p-3.5 flex flex-col gap-1.5 flex-1;
   }
   .video-card-category {
-    @apply text-xs uppercase tracking-wide text-accent;
+    @apply text-[0.65rem] uppercase tracking-widest font-semibold;
+    color: hsla(var(--cat, 262), 85%, 72%, 1);
   }
   .video-card-title {
-    @apply text-lg;
+    @apply text-sm sm:text-base leading-snug;
+  }
+  .video-card-title a {
+    @apply hover:text-white transition-colors;
   }
   .video-card-description {
-    @apply text-sm text-white/70;
+    @apply text-xs text-white/55 leading-relaxed;
+  }
+  .video-card-date {
+    @apply text-[0.65rem] text-white/35 mt-auto pt-1;
   }
   .video-card-tags {
-    @apply flex flex-wrap gap-2 mt-2;
+    @apply flex flex-wrap gap-1.5 mt-1;
   }
   .video-card-tag {
-    @apply text-xs text-white/50;
+    @apply text-[0.65rem] text-white/45 hover:text-white/90 transition-colors;
   }
 
   .placeholder-art {
     @apply w-full h-full flex items-center justify-center;
   }
   .placeholder-art-label {
-    @apply text-white/80 font-display text-sm uppercase tracking-widest;
+    @apply text-white/80 font-display text-xs uppercase tracking-widest text-center px-2;
   }
 
+  /* ---------- social ---------- */
   .social-buttons {
     @apply flex flex-wrap gap-4 justify-center sm:justify-start;
   }
   .social-button {
-    @apply glass-card px-5 py-2 text-sm transition-colors;
+    @apply glass-card px-5 py-2 text-sm transition-all;
   }
   .social-button-primary {
     @apply border-accent text-white;
+    background: linear-gradient(120deg, rgba(139, 92, 246, 0.25), rgba(217, 70, 160, 0.18));
+  }
+  .social-button-primary:hover {
+    box-shadow: 0 0 30px -8px rgba(139, 92, 246, 0.7);
+    transform: translateY(-2px);
   }
   .social-button-secondary {
-    @apply text-white/60;
+    @apply text-white/60 hover:text-white;
   }
 
+  /* ---------- misc panels ---------- */
   .about-preview,
   .about-content,
-  .coming-soon,
-  .video-detail {
+  .coming-soon {
     @apply glass-card p-6 sm:p-10;
   }
-
   .placeholders-grid {
     @apply grid grid-cols-1 sm:grid-cols-3 gap-4;
   }
   .placeholder-card {
-    @apply glass-card p-6 text-center text-white/70 hover:text-white transition-colors;
+    @apply glass-card p-6 text-center text-white/70 hover:text-white transition-all;
   }
-
+  .placeholder-card:hover {
+    transform: translateY(-3px);
+    @apply border-white/30;
+  }
   .link-more {
-    @apply inline-block mt-4 text-accent;
+    @apply inline-block mt-4 text-accent hover:brightness-125 transition-all;
   }
 
+  /* ---------- video detail ---------- */
   .video-detail {
-    @apply flex flex-col sm:flex-row gap-8;
+    @apply glass-card p-6 sm:p-10 flex flex-col sm:flex-row gap-8;
   }
   .video-detail-media {
-    @apply w-full sm:w-1/3 aspect-video rounded-xl overflow-hidden flex-shrink-0;
+    @apply w-full sm:w-72 rounded-xl overflow-hidden flex-shrink-0;
+    aspect-ratio: 9 / 14;
   }
   .video-detail-thumbnail {
     @apply w-full h-full object-cover;
@@ -177,12 +324,32 @@
     @apply flex-1 flex flex-col gap-3;
   }
   .video-detail-title {
-    @apply text-2xl;
+    @apply text-2xl sm:text-3xl;
   }
   .video-detail-description {
-    @apply text-white/80 leading-relaxed;
+    @apply text-white/80 leading-relaxed whitespace-pre-line;
+  }
+  .video-detail-date {
+    @apply text-xs text-white/40;
   }
   .video-detail-lessons ul {
     @apply list-disc list-inside text-white/70 mt-2;
+  }
+  .detail-category-chip {
+    @apply inline-block text-xs uppercase tracking-widest font-semibold px-3 py-1 rounded-full border transition-all w-fit;
+    color: hsla(var(--cat, 262), 85%, 72%, 1);
+    border-color: hsla(var(--cat, 262), 70%, 60%, 0.4);
+    background: hsla(var(--cat, 262), 80%, 55%, 0.1);
+  }
+  .detail-category-chip:hover {
+    border-color: hsla(var(--cat, 262), 80%, 65%, 0.8);
+  }
+  .detail-tag {
+    @apply glass-card px-2.5 py-1 text-xs text-white/60 hover:text-white hover:border-white/40 transition-all;
+  }
+
+  /* ---------- related videos ---------- */
+  .related-grid {
+    @apply grid grid-cols-2 sm:grid-cols-4 gap-4;
   }
 }

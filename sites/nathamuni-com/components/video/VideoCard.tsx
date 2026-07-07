@@ -1,14 +1,30 @@
 import Link from 'next/link'
 import type { Video } from '@/lib/videos'
+import { getCategoryMeta } from '@/lib/categoryMeta'
 import { PlaceholderArt } from './PlaceholderArt'
 
+function formatDate(iso: string): string {
+  const d = new Date(iso + 'T00:00:00')
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 export function VideoCard({ video }: { video: Video }) {
+  const meta = getCategoryMeta(video.category)
   return (
-    <article className="video-card" data-testid="video-card">
+    <article
+      className="video-card"
+      data-testid="video-card"
+      style={{ '--cat': meta.hue } as React.CSSProperties}
+    >
       <Link href={`/videos/${video.id}`} className="video-card-media">
         {video.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={video.thumbnail} alt={video.title} className="video-card-thumbnail" />
+          <img
+            src={video.thumbnail}
+            alt={video.title}
+            loading="lazy"
+            className="video-card-thumbnail"
+          />
         ) : (
           <PlaceholderArt category={video.category} />
         )}
@@ -20,12 +36,15 @@ export function VideoCard({ video }: { video: Video }) {
         </h3>
         <p className="video-card-description">{video.shortDescription}</p>
         <ul className="video-card-tags">
-          {video.tags.map((tag) => (
-            <li key={tag} className="video-card-tag">
-              #{tag}
+          {video.tags.slice(0, 4).map((tag) => (
+            <li key={tag}>
+              <Link href={`/videos?tag=${encodeURIComponent(tag)}`} className="video-card-tag">
+                #{tag}
+              </Link>
             </li>
           ))}
         </ul>
+        <span className="video-card-date">{formatDate(video.publishedDate)}</span>
       </div>
     </article>
   )

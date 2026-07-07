@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getAllCategories, searchAndFilterVideos, type Video } from '@/lib/videos'
 import { SearchBar } from './SearchBar'
 import { CategoryFilter } from './CategoryFilter'
@@ -16,6 +16,21 @@ export function VideoExplorer({
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<string | null>(null)
   const categories = useMemo(() => getAllCategories(), [])
+
+  // Deep-link support on a static export: category tiles and tag pills link
+  // to /videos?category=... / ?tag=... / ?q=..., read client-side on mount.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const cat = params.get('category')
+    const tag = params.get('tag')
+    const q = params.get('q')
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (cat && categories.includes(cat)) setCategory(cat)
+    if (tag) setQuery(tag)
+    else if (q) setQuery(q)
+  }, [categories])
+
   const isBrowsing = query.trim().length > 0 || category !== null
 
   const results = useMemo(() => {
@@ -30,6 +45,11 @@ export function VideoExplorer({
       <div className="video-explorer-controls">
         <SearchBar value={query} onChange={setQuery} />
         <CategoryFilter categories={categories} selected={category} onSelect={setCategory} />
+        {isBrowsing && (
+          <span className="explorer-count" data-testid="explorer-count">
+            {results.length} video{results.length === 1 ? '' : 's'} found
+          </span>
+        )}
       </div>
       <VideoGrid videos={results} />
     </div>
