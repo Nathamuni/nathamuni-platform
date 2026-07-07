@@ -14,6 +14,9 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-base text-white font-body min-h-screen;
     background-image:
@@ -29,6 +32,13 @@
   }
   ::selection {
     background: rgba(139, 92, 246, 0.5);
+  }
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.9);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 
@@ -66,10 +76,14 @@
     color: transparent;
   }
   .site-nav-links {
-    @apply flex gap-4 text-sm overflow-x-auto;
+    @apply flex gap-3 sm:gap-4 text-xs sm:text-sm overflow-x-auto;
   }
   .site-nav-links a {
-    @apply text-white/70 hover:text-white transition-colors;
+    @apply text-white/70 hover:text-white transition-colors py-1 whitespace-nowrap;
+  }
+  .site-nav-links a.is-active {
+    @apply text-white;
+    box-shadow: inset 0 -2px 0 0 rgba(139, 92, 246, 0.9);
   }
 
   .site-footer {
@@ -82,9 +96,61 @@
     @apply hover:text-white transition-colors;
   }
 
+  /* ---------- 3D tilt system ---------- */
+  .tilt-card {
+    @apply relative block h-full;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.25s ease-out;
+  }
+  .tilt-card > * {
+    @apply h-full;
+  }
+  .tilt-glare {
+    @apply absolute inset-0 pointer-events-none rounded-2xl;
+    opacity: var(--glare-o, 0);
+    background: radial-gradient(
+      340px circle at var(--glare-x, 50%) var(--glare-y, 50%),
+      rgba(255, 255, 255, 0.14),
+      transparent 60%
+    );
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
   /* ---------- hero ---------- */
   .hero {
-    @apply relative flex flex-col-reverse sm:flex-row items-center gap-8 px-4 sm:px-8 pt-12 pb-8 max-w-6xl mx-auto;
+    @apply relative flex flex-col-reverse sm:flex-row items-center gap-8 px-4 sm:px-8 pt-12 pb-8 max-w-6xl mx-auto overflow-visible;
+    --par-x: 0;
+    --par-y: 0;
+  }
+  .hero-orb {
+    @apply absolute rounded-full pointer-events-none;
+    filter: blur(60px);
+  }
+  .hero-orb-1 {
+    width: 320px;
+    height: 320px;
+    top: -10%;
+    right: 4%;
+    background: rgba(139, 92, 246, 0.22);
+    transform: translate3d(calc(var(--par-x) * -34px), calc(var(--par-y) * -26px), 0);
+  }
+  .hero-orb-2 {
+    width: 220px;
+    height: 220px;
+    bottom: -12%;
+    left: 8%;
+    background: rgba(6, 182, 212, 0.16);
+    transform: translate3d(calc(var(--par-x) * 24px), calc(var(--par-y) * 20px), 0);
+  }
+  .hero-orb-3 {
+    width: 150px;
+    height: 150px;
+    top: 30%;
+    left: 42%;
+    background: rgba(244, 63, 94, 0.12);
+    transform: translate3d(calc(var(--par-x) * -14px), calc(var(--par-y) * 18px), 0);
   }
   .hero-copy {
     @apply flex-1 flex flex-col gap-5 text-center sm:text-left;
@@ -104,6 +170,16 @@
   }
   .hero-portrait {
     @apply relative flex-shrink-0 w-60 h-60 sm:w-80 sm:h-80;
+    transform: translate3d(calc(var(--par-x) * 12px), calc(var(--par-y) * 9px), 0);
+  }
+  .hero-stats {
+    @apply flex flex-wrap gap-2.5 justify-center sm:justify-start;
+  }
+  .hero-stat {
+    @apply glass-card px-3.5 py-1.5 text-xs text-white/65;
+  }
+  .hero-stat strong {
+    @apply text-white font-display;
   }
   .hero-portrait::before {
     content: '';
@@ -151,6 +227,11 @@
   /* ---------- category tiles ---------- */
   .category-tiles {
     @apply grid grid-cols-2 lg:grid-cols-5 gap-4;
+  }
+  /* On the 2-column mobile grid, let the 5th tile span the full row instead
+     of leaving an orphaned half-width tile. */
+  .category-tiles > :nth-child(5):last-child {
+    @apply col-span-2 lg:col-span-1;
   }
   .category-tile {
     @apply glass-card relative overflow-hidden p-5 flex flex-col gap-1 transition-all duration-300;
@@ -216,6 +297,9 @@
 
   .video-card {
     @apply glass-card overflow-hidden flex flex-col transition-all duration-300;
+    /* Skip rendering work for cards far off-screen — matters with 79 in the grid. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 420px;
   }
   .video-card:hover {
     transform: translateY(-5px);
@@ -257,10 +341,10 @@
     @apply text-[0.65rem] text-white/35 mt-auto pt-1;
   }
   .video-card-tags {
-    @apply flex flex-wrap gap-1.5 mt-1;
+    @apply flex flex-wrap gap-x-2 gap-y-1 mt-1;
   }
   .video-card-tag {
-    @apply text-[0.65rem] text-white/45 hover:text-white/90 transition-colors;
+    @apply inline-block text-[0.65rem] text-white/45 hover:text-white/90 transition-colors py-1;
   }
 
   .placeholder-art {

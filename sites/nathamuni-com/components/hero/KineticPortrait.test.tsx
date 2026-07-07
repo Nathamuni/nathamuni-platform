@@ -41,4 +41,13 @@ describe('KineticPortrait', () => {
     expect(screen.getByTestId('portrait-fallback')).toBeInTheDocument()
     expect(screen.queryByTestId('kinetic-portrait')).not.toBeInTheDocument()
   })
+
+  it('seeks to the first frame once metadata loads, so the portrait paints without playing', () => {
+    vi.spyOn(mediaSupport, 'supportsAlphaWebm').mockReturnValue(true)
+    vi.spyOn(mediaSupport, 'prefersHoverInteraction').mockReturnValue(true)
+    render(<KineticPortrait />)
+    const forward = screen.getByTestId('portrait-forward') as HTMLVideoElement
+    fireEvent.loadedMetadata(forward)
+    expect(forward.currentTime).toBeCloseTo(0.01)
+  })
 })

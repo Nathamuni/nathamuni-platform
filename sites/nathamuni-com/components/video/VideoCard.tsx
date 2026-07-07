@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Video } from '@/lib/videos'
 import { getCategoryMeta } from '@/lib/categoryMeta'
+import { TiltCard } from '@/components/fx/TiltCard'
 import { PlaceholderArt } from './PlaceholderArt'
 
 function formatDate(iso: string): string {
@@ -11,6 +12,7 @@ function formatDate(iso: string): string {
 export function VideoCard({ video }: { video: Video }) {
   const meta = getCategoryMeta(video.category)
   return (
+    <TiltCard>
     <article
       className="video-card"
       data-testid="video-card"
@@ -47,5 +49,6 @@ export function VideoCard({ video }: { video: Video }) {
         <span className="video-card-date">{formatDate(video.publishedDate)}</span>
       </div>
     </article>
+    </TiltCard>
   )
 }
