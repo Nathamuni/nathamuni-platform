@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Outfit, Inter } from 'next/font/google'
 import { Nav } from '@/components/layout/Nav'
+import { ScrollReveal } from '@/components/fx/ScrollReveal'
 import { Footer } from '@/components/layout/Footer'
 import { SOCIAL_LINKS } from '@/lib/social'
 import { SITE_URL } from '@/lib/site'
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
         <Nav />
+        <ScrollReveal />
         <main>{children}</main>
         <Footer />
       </body>

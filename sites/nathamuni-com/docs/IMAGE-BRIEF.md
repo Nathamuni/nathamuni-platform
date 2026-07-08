@@ -15,6 +15,24 @@ of your face each time), and where each file lands. Total: **9 images.**
 - Drop finished files in `sites/nathamuni-com/public/images/generated/` with
   the exact filenames below — then tell me, and I do the rest.
 
+## Exact specs at a glance
+
+| # | File name | Aspect ratio | Target size (px) | Face? | Used for |
+|---|---|---|---|---|---|
+| 1 | `cat-mind.jpg` | 4:5 portrait | 1080 × 1350 | ✅ | Mind & Discipline tile |
+| 2 | `cat-fitness.jpg` | 4:5 portrait | 1080 × 1350 | ✅ | Calisthenics & Fitness tile |
+| 3 | `cat-ai.jpg` | 4:5 portrait | 1080 × 1350 | ✅ | AI & Builds tile |
+| 4 | `cat-humor.jpg` | 4:5 portrait | 1080 × 1350 | ✅ | Humor & Tamil tile |
+| 5 | `cat-life.jpg` | 4:5 portrait | 1080 × 1350 | ✅ | Life & Moments tile |
+| 6 | `hero-bg.jpg` | 16:9 landscape | 1920 × 1080 | ❌ | Homepage hero background |
+| 7 | `about-portrait.jpg` | 4:5 portrait | 1080 × 1350 | ✅ | About page portrait |
+| 8 | `og-banner.jpg` | 1.91:1 landscape | 1200 × 630 exactly | ✅ | Link-share card (WhatsApp/LinkedIn) |
+| 9 | `books-teaser.jpg` | 3:2 landscape | 1500 × 1000 | ✅ | Books/Blog coming-soon visual |
+
+Delivery: JPEG (or PNG), largest quality ChatGPT offers — I downscale/compress.
+Drop all files into `sites/nathamuni-com/public/images/generated/` and say "images are in".
+An HTML version of this brief: `docs/image-brief.html` (open in any browser).
+
 ## The 9 images
 
 ### 1–5. Category hero cards (the clickable tiles you described)

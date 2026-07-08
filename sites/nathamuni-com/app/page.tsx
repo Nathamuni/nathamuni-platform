@@ -6,7 +6,7 @@ import { HeroParallax } from '@/components/hero/HeroParallax'
 import { SocialButtons } from '@/components/layout/SocialButtons'
 import { CategoryTiles } from '@/components/home/CategoryTiles'
 import { VideoCard } from '@/components/video/VideoCard'
-import { MomentsRing } from '@/components/home/MomentsRing'
+import { MomentsStrip } from '@/components/home/MomentsStrip'
 import { AboutPreview } from '@/components/about/AboutPreview'
 import { PlaceholdersRow } from '@/components/layout/PlaceholdersRow'
 
@@ -35,7 +35,7 @@ export default function HomePage() {
         </div>
       </HeroParallax>
 
-      <section className="section" aria-labelledby="pillars-heading">
+      <section className="section" aria-labelledby="pillars-heading" data-reveal>
         <h2 id="pillars-heading" className="section-title">
           Pick your pillar
         </h2>
@@ -43,7 +43,7 @@ export default function HomePage() {
         <CategoryTiles />
       </section>
 
-      <section className="section" aria-labelledby="featured-heading">
+      <section className="section" aria-labelledby="featured-heading" data-reveal>
         <h2 id="featured-heading" className="section-title">
           Start here
         </h2>
@@ -57,7 +57,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="latest-heading">
+      <section className="section" aria-labelledby="latest-heading" data-reveal>
         <div className="section-head-row">
           <div>
             <h2 id="latest-heading" className="section-title">
@@ -76,7 +76,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <MomentsRing />
+      <MomentsStrip />
       <AboutPreview />
       <PlaceholdersRow />
     </>
