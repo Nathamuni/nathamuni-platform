@@ -19,6 +19,9 @@ export function VideoCard({ video }: { video: Video }) {
       style={{ '--cat': meta.hue } as React.CSSProperties}
     >
       <Link href={`/videos/${video.id}`} className="video-card-media">
+        {(video.mediaType ?? 'reel') === 'post' && (
+          <span className="media-type-badge" aria-label="Photo post">📷</span>
+        )}
         {video.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

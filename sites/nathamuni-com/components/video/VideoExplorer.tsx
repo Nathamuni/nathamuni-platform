@@ -15,6 +15,7 @@ export function VideoExplorer({
 }) {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<string | null>(null)
+  const [mediaType, setMediaType] = useState<'all' | 'reel' | 'post'>('all')
   const categories = useMemo(() => getAllCategories(), [])
 
   // Deep-link support on a static export: category tiles and tag pills link
@@ -31,23 +32,37 @@ export function VideoExplorer({
     else if (q) setQuery(q)
   }, [categories])
 
-  const isBrowsing = query.trim().length > 0 || category !== null
+  const isBrowsing = query.trim().length > 0 || category !== null || mediaType !== 'all'
 
   const results = useMemo(() => {
     if (!isBrowsing && featuredIds) {
       return videos.filter((video) => featuredIds.includes(video.id))
     }
-    return searchAndFilterVideos(videos, query, category)
-  }, [videos, query, category, isBrowsing, featuredIds])
+    const matched = searchAndFilterVideos(videos, query, category)
+    if (mediaType === 'all') return matched
+    return matched.filter((v) => (v.mediaType ?? 'reel') === mediaType)
+  }, [videos, query, category, mediaType, isBrowsing, featuredIds])
 
   return (
     <div className="video-explorer" data-testid="video-explorer">
       <div className="video-explorer-controls">
         <SearchBar value={query} onChange={setQuery} />
         <CategoryFilter categories={categories} selected={category} onSelect={setCategory} />
+        <div className="type-filter" role="group" aria-label="Filter by type" data-testid="type-filter">
+          {(['all', 'reel', 'post'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={mediaType === t ? 'category-filter-btn is-active' : 'category-filter-btn'}
+              onClick={() => setMediaType(t)}
+            >
+              {t === 'all' ? 'Everything' : t === 'reel' ? '🎬 Reels' : '📷 Posts'}
+            </button>
+          ))}
+        </div>
         {isBrowsing && (
           <span className="explorer-count" data-testid="explorer-count">
-            {results.length} video{results.length === 1 ? '' : 's'} found
+            {results.length} result{results.length === 1 ? '' : 's'} found
           </span>
         )}
       </div>

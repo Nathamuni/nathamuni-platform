@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getAllVideos, getFeaturedVideos, getCategoryCounts } from '@/lib/videos'
+import { getAllVideos, getFeaturedVideos } from '@/lib/videos'
 import { PROFILE, rolesLine } from '@/lib/profile'
 import { KineticPortrait } from '@/components/hero/KineticPortrait'
 import { HeroParallax } from '@/components/hero/HeroParallax'
@@ -12,9 +12,7 @@ import { PlaceholdersRow } from '@/components/layout/PlaceholdersRow'
 export default function HomePage() {
   const videos = getAllVideos()
   const featured = getFeaturedVideos()
-  const latest = videos.slice(0, 4)
-  const categoryCount = getCategoryCounts().length
-  const tagCount = new Set(videos.flatMap((v) => v.tags)).size
+  const latest = videos.filter((v) => (v.mediaType ?? 'reel') === 'reel').slice(0, 4)
 
   return (
     <>
@@ -27,23 +25,10 @@ export default function HomePage() {
           <p className="hero-bio">
             {PROFILE.mark} {rolesLine()}
           </p>
-          <p className="hero-promise">
-            {videos.length} videos — {PROFILE.promise}
-          </p>
-          <div className="hero-stats" data-testid="hero-stats">
-            <span className="hero-stat">
-              <strong>{videos.length}</strong> videos
-            </span>
-            <span className="hero-stat">
-              <strong>{categoryCount}</strong> pillars
-            </span>
-            <span className="hero-stat">
-              <strong>{tagCount}</strong> topics
-            </span>
-          </div>
+          <p className="hero-promise">{PROFILE.promise}</p>
           <Link href="/videos" className="hero-search" data-testid="hero-search-link">
             <span aria-hidden>🔍</span>
-            <span>Search the library — try &ldquo;discipline&rdquo; or &ldquo;push-ups&rdquo;</span>
+            <span>Search all {videos.length} — try &ldquo;discipline&rdquo; or &ldquo;push-ups&rdquo;</span>
           </Link>
           <SocialButtons />
         </div>

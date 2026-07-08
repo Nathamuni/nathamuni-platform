@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-base: #07070c;
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-base: #0d0a1f;
+  --color-glass: rgba(148, 112, 255, 0.08);
+  --color-glass-border: rgba(178, 148, 255, 0.18);
   --color-accent: #8b5cf6;
   --font-display: var(--font-outfit), sans-serif;
   --font-body: var(--font-inter), sans-serif;
@@ -20,9 +20,10 @@
   body {
     @apply bg-base text-white font-body min-h-screen;
     background-image:
-      radial-gradient(1200px 600px at 85% -10%, rgba(139, 92, 246, 0.14), transparent 60%),
-      radial-gradient(900px 500px at -10% 30%, rgba(6, 182, 212, 0.08), transparent 55%),
-      radial-gradient(700px 500px at 60% 110%, rgba(244, 63, 94, 0.06), transparent 60%);
+      radial-gradient(1300px 700px at 85% -10%, rgba(139, 92, 246, 0.32), transparent 62%),
+      radial-gradient(1000px 600px at -15% 25%, rgba(34, 211, 238, 0.18), transparent 58%),
+      radial-gradient(900px 600px at 55% 115%, rgba(236, 72, 153, 0.2), transparent 60%),
+      radial-gradient(600px 400px at 25% 70%, rgba(52, 211, 153, 0.09), transparent 60%);
     background-attachment: fixed;
   }
   h1,
@@ -101,7 +102,7 @@
     @apply relative block h-full;
     transform-style: preserve-3d;
     will-change: transform;
-    transition: transform 0.25s ease-out;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .tilt-card > * {
     @apply h-full;
@@ -120,7 +121,7 @@
 
   /* ---------- hero ---------- */
   .hero {
-    @apply relative flex flex-col-reverse sm:flex-row items-center gap-8 px-4 sm:px-8 pt-12 pb-8 max-w-6xl mx-auto overflow-visible;
+    @apply relative flex flex-col-reverse sm:flex-row items-center gap-5 sm:gap-8 px-4 sm:px-8 pt-8 sm:pt-12 pb-8 max-w-6xl mx-auto overflow-visible;
     --par-x: 0;
     --par-y: 0;
   }
@@ -153,11 +154,11 @@
     transform: translate3d(calc(var(--par-x) * -14px), calc(var(--par-y) * 18px), 0);
   }
   .hero-copy {
-    @apply flex-1 flex flex-col gap-5 text-center sm:text-left;
+    @apply flex-1 flex flex-col gap-3.5 sm:gap-5 text-center sm:text-left;
   }
   .hero-title {
-    @apply text-3xl sm:text-5xl leading-tight font-display;
-    background: linear-gradient(100deg, #ffffff 30%, #a78bfa 70%, #22d3ee 100%);
+    @apply text-[1.7rem] sm:text-5xl leading-tight font-display;
+    background: linear-gradient(100deg, #ffffff 15%, #c4b5fd 45%, #f0abfc 72%, #67e8f9 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -169,7 +170,7 @@
     @apply text-sm text-white/50;
   }
   .hero-portrait {
-    @apply relative flex-shrink-0 w-60 h-60 sm:w-80 sm:h-80;
+    @apply relative flex-shrink-0 w-48 h-48 sm:w-80 sm:h-80;
     transform: translate3d(calc(var(--par-x) * 12px), calc(var(--par-y) * 9px), 0);
   }
   .hero-stats {
@@ -237,10 +238,10 @@
     @apply glass-card relative overflow-hidden p-5 flex flex-col gap-1 transition-all duration-300;
     border-color: hsla(var(--cat), 70%, 60%, 0.25);
   }
+  .tilt-card:hover .category-tile,
   .category-tile:hover {
-    transform: translateY(-4px);
-    border-color: hsla(var(--cat), 80%, 65%, 0.7);
-    box-shadow: 0 12px 40px -12px hsla(var(--cat), 80%, 55%, 0.45);
+    border-color: hsla(var(--cat), 85%, 70%, 0.8);
+    box-shadow: 0 14px 44px -12px hsla(var(--cat), 85%, 60%, 0.55);
   }
   .category-tile::after {
     content: '';
@@ -255,7 +256,7 @@
   }
   .category-tile-count {
     @apply text-xs;
-    color: hsla(var(--cat), 85%, 72%, 1);
+    color: hsla(var(--cat), 90%, 76%, 1);
   }
 
   /* ---------- explorer controls ---------- */
@@ -301,10 +302,10 @@
     content-visibility: auto;
     contain-intrinsic-size: auto 420px;
   }
+  .tilt-card:hover .video-card,
   .video-card:hover {
-    transform: translateY(-5px);
-    border-color: hsla(var(--cat, 262), 80%, 65%, 0.55);
-    box-shadow: 0 16px 44px -14px hsla(var(--cat, 262), 80%, 55%, 0.4);
+    border-color: hsla(var(--cat, 262), 85%, 70%, 0.65);
+    box-shadow: 0 18px 48px -14px hsla(var(--cat, 262), 85%, 60%, 0.5);
   }
   .video-card-media {
     @apply block relative overflow-hidden;
@@ -347,6 +348,15 @@
     @apply inline-block text-[0.65rem] text-white/45 hover:text-white/90 transition-colors py-1;
   }
 
+  .media-type-badge {
+    @apply absolute top-2 right-2 z-10 text-xs rounded-full px-1.5 py-0.5;
+    background: rgba(13, 10, 31, 0.65);
+    backdrop-filter: blur(6px);
+  }
+  .type-filter {
+    @apply flex flex-wrap gap-2;
+  }
+
   .placeholder-art {
     @apply w-full h-full flex items-center justify-center;
   }
@@ -363,7 +373,7 @@
   }
   .social-button-primary {
     @apply border-accent text-white;
-    background: linear-gradient(120deg, rgba(139, 92, 246, 0.25), rgba(217, 70, 160, 0.18));
+    background: linear-gradient(120deg, rgba(139, 92, 246, 0.45), rgba(236, 72, 153, 0.35));
   }
   .social-button-primary:hover {
     box-shadow: 0 0 30px -8px rgba(139, 92, 246, 0.7);

@@ -6,7 +6,14 @@ import { prefersHoverInteraction, supportsAlphaWebm } from '@/lib/mediaSupport'
 const FORWARD_SRC = '/video/portrait-forward.webm'
 const REVERSE_SRC = '/video/portrait-reverse.webm'
 const FALLBACK_SRC = '/images/portrait-fallback.png'
+const STATIC_SRC = '/images/portrait-static.webp'
 
+/**
+ * Desktop (hover-capable): dual alpha-WebM portrait — forward clip on hover,
+ * reverse on leave, first frame painted immediately via a metadata seek.
+ * Touch devices: a 24KB static portrait instead of megabytes of video —
+ * mobile visitors get speed, desktop gets the signature effect.
+ */
 export function KineticPortrait() {
   const forwardRef = useRef<HTMLVideoElement>(null)
   const reverseRef = useRef<HTMLVideoElement>(null)
@@ -22,54 +29,6 @@ export function KineticPortrait() {
     setHoverCapable(prefersHoverInteraction())
   }, [])
 
-  useEffect(() => {
-    if (!canPlayAlpha || hoverCapable) return
-    const forward = forwardRef.current
-    const reverse = reverseRef.current
-    if (!forward || !reverse) return
-
-    let cancelled = false
-
-    const playForward = () => {
-      reverse.style.opacity = '0'
-      forward.style.opacity = '1'
-      forward.currentTime = 0
-      forward.play().catch(() => {
-        // Strict autoplay policies (e.g. Brave shields, data-saver modes) can
-        // reject even muted playback until the user touches the page — retry
-        // the loop once on the first interaction. The painted first frame
-        // keeps the portrait visible either way.
-        const retry = () => {
-          if (!cancelled) forward.play().catch(() => {})
-        }
-        window.addEventListener('pointerdown', retry, { once: true })
-        window.addEventListener('touchstart', retry, { once: true })
-      })
-    }
-    const playReverse = () => {
-      forward.style.opacity = '0'
-      reverse.style.opacity = '1'
-      reverse.currentTime = 0
-      reverse.play().catch(() => {})
-    }
-    const onForwardEnded = () => {
-      if (!cancelled) playReverse()
-    }
-    const onReverseEnded = () => {
-      if (!cancelled) playForward()
-    }
-
-    forward.addEventListener('ended', onForwardEnded)
-    reverse.addEventListener('ended', onReverseEnded)
-    playForward()
-
-    return () => {
-      cancelled = true
-      forward.removeEventListener('ended', onForwardEnded)
-      reverse.removeEventListener('ended', onReverseEnded)
-    }
-  }, [canPlayAlpha, hoverCapable])
-
   if (!canPlayAlpha) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -82,8 +41,19 @@ export function KineticPortrait() {
     )
   }
 
+  if (!hoverCapable) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={STATIC_SRC}
+        alt="Nathamuni portrait"
+        className="kinetic-portrait-fallback"
+        data-testid="portrait-static"
+      />
+    )
+  }
+
   const handleMouseEnter = () => {
-    if (!hoverCapable) return
     const forward = forwardRef.current
     const reverse = reverseRef.current
     if (!forward || !reverse) return
@@ -99,7 +69,6 @@ export function KineticPortrait() {
   }
 
   const handleMouseLeave = () => {
-    if (!hoverCapable) return
     const forward = forwardRef.current
     const reverse = reverseRef.current
     if (!forward || !reverse) return
