@@ -60,10 +60,10 @@ export function VideoDetail({ video, related = [] }: { video: Video; related?: V
             href={video.instagramUrl}
             target="_blank"
             rel="noreferrer"
-            className="social-button social-button-primary"
+            className="social-button social-button-primary detail-cta"
             data-testid="watch-on-instagram"
           >
-            Watch on Instagram
+            {(video.mediaType ?? 'reel') === 'post' ? '📷 View on Instagram' : '🎬 Watch on Instagram'}
           </a>
         </div>
       </article>
