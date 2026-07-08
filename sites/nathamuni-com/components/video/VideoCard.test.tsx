@@ -8,9 +8,11 @@ describe('VideoCard', () => {
 
   it('renders the title, category, and description', () => {
     render(<VideoCard video={video} />)
-    expect(screen.getByText(video.title)).toBeInTheDocument()
+    // Title and shortDescription can be identical (caption-derived entries),
+    // so tolerate multiple text matches.
+    expect(screen.getAllByText(video.title).length).toBeGreaterThan(0)
     expect(screen.getAllByText(video.category).length).toBeGreaterThan(0)
-    expect(screen.getByText(video.shortDescription)).toBeInTheDocument()
+    expect(screen.getAllByText(video.shortDescription).length).toBeGreaterThan(0)
   })
 
   it('links to the video detail page', () => {

@@ -1,0 +1,45 @@
+name: Instagram Sync
+
+on:
+  schedule:
+    - cron: '30 2 * * *' # daily ~08:00 IST
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: instagram-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sites/nathamuni-com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pull new reels from Instagram
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node scripts/instagram-sync.mjs
+
+      - name: Commit and push if the library changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes — already in sync."
+            exit 0
+          fi
+          git config user.name "instagram-sync[bot]"
+          git config user.email "actions@github.com"
+          git add lib/videos.json public/images/thumbnails
+          git commit -m "FEAT: auto-sync new reels from Instagram"
+          git push
