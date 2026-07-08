@@ -1,11 +1,32 @@
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi, afterEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { VideoExplorer } from './VideoExplorer'
 import { getAllVideos } from '@/lib/videos'
 
 describe('VideoExplorer', () => {
   const videos = getAllVideos()
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('blends semantic results from /api/search after keyword hits', async () => {
+    const target = videos.find((v) => !v.featured)!
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ results: [{ id: target.id }] }),
+      })
+    )
+    const user = userEvent.setup()
+    render(<VideoExplorer videos={videos} />)
+    await user.type(screen.getByTestId('search-bar'), 'zzzznomatch')
+    await waitFor(() => {
+      expect(screen.getAllByText(target.title).length).toBeGreaterThan(0)
+    })
+  })
 
   it('shows only featured videos by default when featuredIds is passed', () => {
     const featuredIds = videos.filter((v) => v.featured).map((v) => v.id)
