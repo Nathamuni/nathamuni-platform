@@ -1,0 +1,104 @@
+# nathamuni.com — Consolidated Requirements
+
+Everything Nathamuni has asked for across the whole project, in one place.
+Status marks: ✅ shipped & verified live · 🔨 in progress · ⏳ waiting on owner input · 🗓️ planned.
+
+## 1. Purpose & positioning
+
+- ✅ nathamuni.com is the **organized, searchable home** for all content — Instagram is
+  where content is posted; the site is where people *find* it without endless scrolling.
+- ✅ Personal brand hub for: Distinguished Engr | Author | Calisthenics | Meditation |
+  Memer | AI Architect | Generalist ("☬ Fear lives in one place only... Thats in you Mind🗿").
+- ✅ Free-first: no paid hosting, no database, no auth. Cloudflare (Workers static assets)
+  on the apex domain, deployed automatically from `main`.
+- Future: platform monorepo also hosts business sites (sundaram-coffee etc.) on subdomains.
+
+## 2. Content & data
+
+- ✅ **Complete Instagram library on the site**: all reels AND photo posts (161+ items),
+  each with thumbnail, title, category, tags, description, date, link to Instagram.
+- ✅ **Zero manual URL work**: owner never supplies per-video URLs again — the Instagram
+  API (Meta developer app, Development mode) is the source of truth.
+- ✅ **Auto-sync**: new posts/reels appear on the site automatically (daily GitHub Action
+  + manual Run-workflow button). Draft titles/categories derived from captions.
+- ✅ **Stories/“highlights”**: Instagram deletes stories in 24h and has no highlights API →
+  the site keeps its own permanent archive (41 backfilled from Meta export; daily sync
+  captures new ones). Shown on the homepage strip + /moments page.
+- ✅ 5 curated categories with accent colors: Mind & Discipline, Calisthenics & Fitness,
+  AI & Builds, Humor & Tamil, Life & Moments.
+- ⏳ **Owner refinement loop**: review Excel (`~/Downloads/nathamuni-video-review-v2.xlsx`,
+  all 161 rows, clickable links + empty description column). Owner fills after watching;
+  agent bulk-imports. Extra detail (better titles, key lessons, categorization) welcome
+  any time — the more provided, the richer detail pages become.
+- 🗓️ Future sections the site must keep room for: **Blog, Books/Writings, Projects**
+  (placeholder pages exist; owner will supply book content later).
+
+## 3. Search
+
+- ✅ Instant keyword search across title/description/category/tags, with synonym
+  expansion (e.g. “exercise” → workout/calisthenics/fitness), word matching, ranking.
+- ✅ **Natural-language semantic search** on Cloudflare Workers AI (`bge-m3`,
+  multilingual — English AND Tamil queries), zero API keys, zero visitor download,
+  blended into results after keyword hits. Clickable tags/categories deep-link
+  (`/videos?category=…&tag=…&q=…`).
+
+## 4. Design & UX (the standing bar)
+
+- **Mobile responsiveness is non-negotiable — “no compromising that.”** Every change is
+  judged from a real phone user's perspective first.
+- ✅ Vibrant, colorful identity (owner rejected flat black): deep indigo base + aurora
+  gradients (violet/magenta/cyan), per-category accent colors, gradient hero text.
+- ✅ Premium glassmorphism, hover-lift cards with category-hued glows, 3D pointer tilt +
+  glare (desktop), parallax hero orbs, entrance animations — all `prefers-reduced-motion` safe.
+- ✅ Hero video portrait ("kinetic portrait"): dual alpha-WebM hover effect on desktop;
+  **mobile gets a 24KB static image** (owner flagged video too heavy — resolved).
+- 🔨 **v6 (current)**: mobile is still “fully jammed” → decongest layout; moments strip
+  must be **cards (square-ish, flowing), not circles**; animation quality raised;
+  colors/gradients “picture perfect”; everything fast, easy to look at, easy to follow.
+- ✅ SEO/go-public layer: per-item share cards (real thumbnails), sitemap, robots,
+  canonical URLs, Person + VideoObject structured data; lightweight loading
+  (lazy images, content-visibility, KB-scale hero).
+
+## 5. Automation & operations
+
+- ✅ Meta developer app (Development mode — correct permanent state; **never** submit
+  App Review / advanced access / Live mode: that's what caused the API block).
+- ✅ Instagram token: 60-day expiry defeated — weekly workflow refreshes and re-stores
+  it using the owner's GitHub PAT. Verified end-to-end. PAT renewal due ~Jul 2027.
+- ✅ Repo/scripts: `instagram-sync.mjs` (media+stories), `import-export-stories.mjs`
+  (export backfill), CI (lint/type-check/test/build) gating every merge.
+- ⏳ **/admin panel** (edit titles/categories/featured/thumbnails from phone): planned
+  via Sveltia CMS; needs owner to create a GitHub OAuth app (2-min, guided) first.
+- Owner-facing rule of thumb: GitHub mobile app = current admin (Run workflow, edit files).
+
+## 6. Owner-generated imagery (planned integration)
+
+- ⏳ Owner will generate 9 AI images (with own face) per `sites/nathamuni-com/docs/IMAGE-BRIEF.md`
+  (exact prompts, aspect ratios, filenames; also viewable as HTML). Drop into
+  `sites/nathamuni-com/public/images/generated/` → agent wires: category tiles become
+  clickable image cards, hero background, about portrait, OG share banner, books teaser.
+- Custom per-video thumbnails may replace auto-extracted frames later (same filename swap).
+
+## 7. Explicit owner questions — answered
+
+- **“Will I need to fix things on the Meta site again?”** No — recurring visits are NOT
+  needed. Development mode + the self-refreshing token is the permanent steady state.
+  Only two ways it breaks, both self-inflicted and now documented: clicking into App
+  Review/Live/advanced-access flows (don't), or revoking the app. One exception:
+  ~July 2027 the GitHub PAT needs one regeneration.
+- **“How long after I post does it appear?”** Automatically: within 24h (daily sync,
+  ~08:00 IST). Instantly on demand: GitHub app → Actions → Instagram Sync → Run
+  workflow (~3 min to live). No extra information required per post — caption is enough;
+  richer captions ⇒ better auto-titles/categories.
+- **“Do reels/stories/highlights have proper detail & categorization?”** Reels/posts:
+  yes — auto-drafted from captions (category guess + tags + title), owner-refinable via
+  the Excel loop. Stories: date + poster + playable clip (Instagram provides no captions
+  for stories; owner can add titles later if desired).
+
+## 8. Standing working agreements
+
+- Ship via feature branch → tests → PR → CI green → merge → verify LIVE on nathamuni.com.
+- Never expand Meta permissions; never scrape; visitor traffic never touches the
+  Instagram API. Secrets only in GitHub encrypted secrets.
+- Documentation lives in `sites/nathamuni-com/docs/` (roadmap, playbooks, brand system,
+  growth ideas, tech backlog, image brief); progress ledger in `.superpowers/sdd/`.

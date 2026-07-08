@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Brief — nathamuni.com</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0d0a1f;
+    background-image:
+      radial-gradient(900px 500px at 85% -10%, rgba(139,92,246,.3), transparent 60%),
+      radial-gradient(700px 450px at -10% 30%, rgba(34,211,238,.15), transparent 55%),
+      radial-gradient(700px 500px at 60% 110%, rgba(236,72,153,.18), transparent 60%);
+    background-attachment: fixed;
+    color: #ece9f8; line-height: 1.55; padding: 24px 16px 80px;
+  }
+  main { max-width: 860px; margin: 0 auto; }
+  h1 {
+    font-size: 1.7rem; margin: 8px 0 4px;
+    background: linear-gradient(100deg,#fff 15%,#c4b5fd 50%,#67e8f9 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: #ffffff99; font-size: .95rem; margin-bottom: 26px; }
+  h2 { font-size: 1.15rem; margin: 34px 0 10px; color: #d8ccff; }
+  .card {
+    background: rgba(148,112,255,.08); border: 1px solid rgba(178,148,255,.2);
+    border-radius: 16px; padding: 18px; margin: 14px 0;
+  }
+  .card h3 { font-size: 1rem; margin-bottom: 6px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+  .chip {
+    font-size: .72rem; padding: 3px 10px; border-radius: 999px;
+    background: rgba(139,92,246,.18); border: 1px solid rgba(178,148,255,.35);
+  }
+  .chip.b { background: rgba(236,72,153,.15); border-color: rgba(236,72,153,.4); }
+  .prompt {
+    background: rgba(0,0,0,.35); border: 1px solid rgba(178,148,255,.18);
+    border-radius: 10px; padding: 12px 14px; font-size: .85rem;
+    white-space: pre-wrap; overflow-x: auto;
+  }
+  .label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: #a78bfa; margin-bottom: 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .tablewrap { overflow-x: auto; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(178,148,255,.15); white-space: nowrap; }
+  th { color: #c4b5fd; font-weight: 600; }
+  code { background: rgba(139,92,246,.18); border-radius: 6px; padding: 1px 6px; font-size: .82em; }
+  .rules li { margin: 6px 0 6px 18px; font-size: .9rem; }
+  .hue { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Image Brief — nathamuni.com</h1>
+  <p class="sub">9 AI images to generate with your face in ChatGPT. Paste each prompt, attach 1–2 clear photos of yourself, save with the exact filename, drop everything in <code>sites/nathamuni-com/public/images/generated/</code>, then say “images are in”.</p>
+
+  <h2>Rules for every prompt</h2>
+  <ul class="rules">
+    <li>Attach your face photos and add: <em>“Use this person's exact face and hair. Do not alter facial features.”</em></li>
+    <li>Dark, moody backgrounds — the site is deep indigo <code>#0d0a1f</code> with neon accents.</li>
+    <li>Ask for <strong>no text</strong> in the image. Export the largest size offered.</li>
+  </ul>
+
+  <h2>Specs at a glance</h2>
+  <div class="card tablewrap">
+    <table>
+      <tr><th>File</th><th>Ratio</th><th>Size (px)</th><th>Face</th><th>Used for</th></tr>
+      <tr><td><code>cat-mind.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Mind &amp; Discipline tile</td></tr>
+      <tr><td><code>cat-fitness.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Fitness tile</td></tr>
+      <tr><td><code>cat-ai.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>AI &amp; Builds tile</td></tr>
+      <tr><td><code>cat-humor.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Humor &amp; Tamil tile</td></tr>
+      <tr><td><code>cat-life.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Life &amp; Moments tile</td></tr>
+      <tr><td><code>hero-bg.jpg</code></td><td>16:9</td><td>1920×1080</td><td>❌</td><td>Hero background</td></tr>
+      <tr><td><code>about-portrait.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>About page</td></tr>
+      <tr><td><code>og-banner.jpg</code></td><td>1.91:1</td><td>1200×630 exact</td><td>✅</td><td>Link-share card</td></tr>
+      <tr><td><code>books-teaser.jpg</code></td><td>3:2</td><td>1500×1000</td><td>✅</td><td>Books/Blog teaser</td></tr>
+    </table>
+  </div>
+
+  <h2>Category tiles (1–5) — append this style suffix to each</h2>
+  <div class="card"><div class="label">Shared suffix</div><div class="prompt">...cinematic portrait, dark indigo studio background (#0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, subject centered with space above the head, moody premium aesthetic, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
+
+  <div class="card"><h3><span class="hue" style="background:#8b5cf6"></span>1 · cat-mind.jpg — Mind &amp; Discipline (violet)</h3>
+    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
+    <div class="prompt">This man seated in deep meditation posture, eyes closed, calm intensity, violet-purple neon rim light, faint glowing geometric mandala behind his head...</div></div>
+
+  <div class="card"><h3><span class="hue" style="background:#34d399"></span>2 · cat-fitness.jpg — Calisthenics &amp; Fitness (emerald)</h3>
+    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
+    <div class="prompt">This man mid calisthenics move (straddle planche or muscle-up on a bar), athletic physique, emerald-green neon rim light, chalk dust in the air...</div></div>
+
+  <div class="card"><h3><span class="hue" style="background:#22d3ee"></span>3 · cat-ai.jpg — AI &amp; Builds (cyan)</h3>
+    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
+    <div class="prompt">This man as a futuristic engineer, holographic code and circuit diagrams floating around his hands, cyan-blue neon rim light, cyberpunk laboratory...</div></div>
+
+  <div class="card"><h3><span class="hue" style="background:#f59e0b"></span>4 · cat-humor.jpg — Humor &amp; Tamil (amber)</h3>
+    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
+    <div class="prompt">This man laughing with a mischievous wink at camera, playful expression, warm amber-gold neon rim light, film-poster energy, slight caricature vibrance...</div></div>
+
+  <div class="card"><h3><span class="hue" style="background:#fb7185"></span>5 · cat-life.jpg — Life &amp; Moments (rose)</h3>
+    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
+    <div class="prompt">This man from behind on a scooter/temple street at dusk, warm rose-pink light, South Indian street atmosphere, nostalgic cinematic travel photo...</div></div>
+
+  <h2>Site visuals (6–9)</h2>
+  <div class="card"><h3>6 · hero-bg.jpg — Hero background</h3>
+    <div class="meta"><span class="chip">16:9 · 1920×1080</span><span class="chip">no face</span></div>
+    <div class="prompt">Abstract dark background, deep indigo #0d0a1f, flowing aurora ribbons of violet, magenta and cyan light, subtle grain, very dark edges suitable for white text overlay, premium tech-brand wallpaper, no objects, no text.</div></div>
+
+  <div class="card"><h3>7 · about-portrait.jpg — About page</h3>
+    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
+    <div class="prompt">Confident editorial half-body portrait of this man, arms crossed, slight smile, dark indigo backdrop with soft violet gradient light from the left, shot on 85mm, shallow depth of field, magazine cover quality, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
+
+  <div class="card"><h3>8 · og-banner.jpg — Link-share banner</h3>
+    <div class="meta"><span class="chip">1.91:1 · 1200×630 EXACT</span><span class="chip b">face required</span></div>
+    <div class="prompt">Wide banner: this man on the right third looking toward empty space on the left (text goes there later), dark indigo background with aurora light streaks, cinematic, premium personal-brand website banner, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
+
+  <div class="card"><h3>9 · books-teaser.jpg — Books/Blog teaser</h3>
+    <div class="meta"><span class="chip">3:2 · 1500×1000</span><span class="chip b">face required</span></div>
+    <div class="prompt">This man reading in a dark room lit by a single warm lamp, floating glowing book pages and Tamil + English letters dissolving into violet light around him, contemplative, magical-realism editorial photo, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
+
+  <h2>What happens after you deliver</h2>
+  <div class="card"><ul class="rules">
+    <li>Category tiles become full image cards with your face, category-hued gradient overlay, still directly clickable.</li>
+    <li>Hero gets the aurora texture; About shows your portrait; every shared link shows the banner.</li>
+    <li>Books/Blog placeholders get the teaser. Later batches (book covers, blog headers, logo) come after.</li>
+  </ul></div>
+</main>
+</body>
+</html>

@@ -16,11 +16,19 @@ describe('Nav', () => {
     })
   })
 
-  it('marks the current route as active', () => {
+  it('marks the current route as active in both the top nav and tab bar', () => {
     render(<Nav />)
-    const videosLink = screen.getByRole('link', { name: 'Videos' })
-    expect(videosLink).toHaveAttribute('aria-current', 'page')
-    const homeLink = screen.getByRole('link', { name: 'Home' })
-    expect(homeLink).not.toHaveAttribute('aria-current')
+    const videosLinks = screen.getAllByRole('link', { name: /Videos/ })
+    expect(videosLinks.length).toBeGreaterThanOrEqual(2)
+    expect(videosLinks.every((l) => l.getAttribute('aria-current') === 'page')).toBe(true)
+    const homeLinks = screen.getAllByRole('link', { name: /Home/ })
+    expect(homeLinks.every((l) => !l.hasAttribute('aria-current'))).toBe(true)
+  })
+
+  it('renders the mobile tab bar with the four primary sections', () => {
+    render(<Nav />)
+    const tabBar = screen.getByTestId('tab-bar')
+    expect(tabBar).toBeInTheDocument()
+    expect(tabBar.querySelectorAll('a')).toHaveLength(4)
   })
 })
