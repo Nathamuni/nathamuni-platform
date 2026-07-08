@@ -6,6 +6,7 @@ import { HeroParallax } from '@/components/hero/HeroParallax'
 import { SocialButtons } from '@/components/layout/SocialButtons'
 import { CategoryTiles } from '@/components/home/CategoryTiles'
 import { VideoCard } from '@/components/video/VideoCard'
+import { MomentsRing } from '@/components/home/MomentsRing'
 import { AboutPreview } from '@/components/about/AboutPreview'
 import { PlaceholdersRow } from '@/components/layout/PlaceholdersRow'
 
@@ -75,6 +76,7 @@ export default function HomePage() {
         </Link>
       </section>
 
+      <MomentsRing />
       <AboutPreview />
       <PlaceholdersRow />
     </>

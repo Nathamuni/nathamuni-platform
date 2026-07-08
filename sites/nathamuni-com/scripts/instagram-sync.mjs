@@ -10,12 +10,15 @@
  * Usage:
  *   IG_ACCESS_TOKEN=... node scripts/instagram-sync.mjs [--dry-run]
  */
+import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const SITE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const VIDEOS_JSON = join(SITE_ROOT, 'lib', 'videos.json')
+const STORIES_JSON = join(SITE_ROOT, 'lib', 'stories.json')
+const STORIES_DIR = join(SITE_ROOT, 'public', 'stories')
 const THUMBS_DIR = join(SITE_ROOT, 'public', 'images', 'thumbnails')
 const API = 'https://graph.instagram.com/v21.0'
 
@@ -159,9 +162,87 @@ for (const m of syncable) {
 if (additions.length === 0) {
   console.log('Nothing new — library is in sync.')
 } else if (DRY_RUN) {
-  console.log(`DRY RUN: would add ${additions.length} new reel(s).`)
+  console.log(`DRY RUN: would add ${additions.length} new item(s).`)
 } else {
   mkdirSync(THUMBS_DIR, { recursive: true })
   writeFileSync(VIDEOS_JSON, JSON.stringify([...videos, ...additions], null, 2) + '\n')
-  console.log(`Added ${additions.length} new reel(s) to videos.json.`)
+  console.log(`Added ${additions.length} new item(s) to videos.json.`)
 }
+
+// ---- Stories: archive today's active stories before Instagram deletes them ----
+// Instagram exposes stories only while live (24h) and never again, so each
+// run downloads what's currently up. Requires ffmpeg for compression; falls
+// back to storing the original file if unavailable.
+
+function hasFfmpeg() {
+  try {
+    execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' })
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function syncStories() {
+  const res = await fetch(
+    `${API}/me/stories?fields=id,media_type,media_url,timestamp&access_token=${TOKEN}`
+  )
+  const data = await res.json()
+  if (data.error) {
+    console.warn(`stories fetch failed (non-fatal): ${data.error.message}`)
+    return
+  }
+  const active = (data.data ?? []).filter((s) => s.media_type === 'VIDEO' && s.media_url)
+  if (active.length === 0) {
+    console.log('No active stories right now.')
+    return
+  }
+
+  const stories = existsSync(STORIES_JSON) ? JSON.parse(readFileSync(STORIES_JSON, 'utf8')) : []
+  const knownStories = new Set(stories.map((s) => s.id))
+  const ffmpeg = hasFfmpeg()
+  mkdirSync(STORIES_DIR, { recursive: true })
+  let added = 0
+
+  for (const s of active) {
+    if (knownStories.has(s.id)) continue
+    const mediaRes = await fetch(s.media_url)
+    if (!mediaRes.ok) continue
+    const raw = Buffer.from(await mediaRes.arrayBuffer())
+    const video = join(STORIES_DIR, `${s.id}.mp4`)
+    const poster = join(STORIES_DIR, `${s.id}.jpg`)
+    if (DRY_RUN) {
+      console.log(`DRY RUN: would archive story ${s.id}`)
+      continue
+    }
+    if (ffmpeg) {
+      const tmp = join(STORIES_DIR, `${s.id}.tmp.mp4`)
+      writeFileSync(tmp, raw)
+      execFileSync('ffmpeg', ['-nostdin', '-y', '-i', tmp,
+        '-vf', "scale='min(480,iw)':-2", '-c:v', 'libx264', '-preset', 'slow', '-crf', '28',
+        '-c:a', 'aac', '-b:a', '80k', '-movflags', '+faststart', video], { stdio: 'ignore' })
+      execFileSync('ffmpeg', ['-nostdin', '-y', '-ss', '0.5', '-i', video,
+        '-vframes', '1', '-update', '1', '-q:v', '5', poster], { stdio: 'ignore' })
+      execFileSync('rm', [tmp])
+    } else {
+      writeFileSync(video, raw)
+    }
+    stories.push({
+      id: s.id,
+      date: s.timestamp.slice(0, 10),
+      video: `/stories/${s.id}.mp4`,
+      poster: `/stories/${s.id}.jpg`,
+      title: null,
+    })
+    added++
+    console.log(`+ story ${s.timestamp.slice(0, 10)} ${s.id}`)
+  }
+
+  if (added > 0 && !DRY_RUN) {
+    stories.sort((a, b) => b.date.localeCompare(a.date))
+    writeFileSync(STORIES_JSON, JSON.stringify(stories, null, 2) + '\n')
+    console.log(`Archived ${added} story/stories.`)
+  }
+}
+
+await syncStories()
