@@ -91,4 +91,31 @@ describe('searchAndFilterVideos', () => {
   it('returns an empty array when nothing matches', () => {
     expect(searchAndFilterVideos(videos, 'zzzznomatch', null)).toEqual([])
   })
+
+  it('finds workout content for the natural query "exercise" via synonyms', () => {
+    const results = searchAndFilterVideos(videos, 'exercise', null)
+    expect(results.length).toBeGreaterThan(5)
+    expect(results.some((v) => v.category === 'Calisthenics & Fitness')).toBe(true)
+  })
+
+  it('finds fitness content for "gym" even when captions say workout', () => {
+    const results = searchAndFilterVideos(videos, 'gym', null)
+    expect(results.length).toBeGreaterThan(5)
+  })
+
+  it('matches multi-word queries where every word must hit', () => {
+    const results = searchAndFilterVideos(videos, 'push ups', null)
+    expect(results.map((v) => v.id)).toContain('top-5-push-ups-that-i-do')
+  })
+
+  it('tolerates word prefixes like "exercis" or "disciplin"', () => {
+    expect(searchAndFilterVideos(videos, 'disciplin', null).length).toBeGreaterThan(5)
+  })
+
+  it('ranks title matches above description-only matches', () => {
+    const results = searchAndFilterVideos(videos, 'system', null)
+    expect(results.length).toBeGreaterThan(1)
+    const firstHasTitleHit = results[0].title.toLowerCase().includes('system')
+    expect(firstHasTitleHit).toBe(true)
+  })
 })
