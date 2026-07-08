@@ -6,6 +6,8 @@ export interface Video {
   instagramUrl: string
   youtubeUrl?: string
   thumbnail: string | null
+  /** 'reel' (video) or 'post' (photo/carousel). Absent = reel (pre-posts entries). */
+  mediaType?: 'reel' | 'post'
   category: string
   tags: string[]
   problemSolved?: string

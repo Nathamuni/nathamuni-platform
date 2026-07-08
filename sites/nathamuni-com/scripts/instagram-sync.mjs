@@ -84,8 +84,11 @@ function draftEntry(media, existingIds) {
     entry: {
       id: slug,
       title,
-      instagramUrl: `https://www.instagram.com/reel/${shortcode}/`,
+      instagramUrl: media.permalink.includes('/reel/')
+        ? `https://www.instagram.com/reel/${shortcode}/`
+        : `https://www.instagram.com/p/${shortcode}/`,
       thumbnail: `/images/thumbnails/${shortcode}.jpg`,
+      mediaType: media.media_type === 'VIDEO' ? 'reel' : 'post',
       category,
       tags,
       shortDescription: short,
@@ -99,7 +102,7 @@ function draftEntry(media, existingIds) {
 
 async function fetchAllMedia() {
   const items = []
-  let url = `${API}/me/media?fields=id,media_type,permalink,caption,thumbnail_url,timestamp&limit=50&access_token=${TOKEN}`
+  let url = `${API}/me/media?fields=id,media_type,permalink,caption,thumbnail_url,media_url,timestamp&limit=50&access_token=${TOKEN}`
   while (url) {
     const res = await fetch(url)
     const data = await res.json()
@@ -132,18 +135,22 @@ const knownShortcodes = new Set(
 const existingIds = new Set(videos.map((v) => v.id))
 
 const media = await fetchAllMedia()
-const reels = media.filter(
-  (m) => m.media_type === 'VIDEO' && m.permalink?.includes('/reel/')
+const syncable = media.filter(
+  (m) =>
+    (m.media_type === 'VIDEO' && m.permalink?.includes('/reel/')) ||
+    m.media_type === 'IMAGE' ||
+    m.media_type === 'CAROUSEL_ALBUM'
 )
-console.log(`API media: ${media.length} total, ${reels.length} reels; site library: ${videos.length}`)
+console.log(`API media: ${media.length} total, ${syncable.length} syncable; site library: ${videos.length}`)
 
 const additions = []
-for (const m of reels) {
+for (const m of syncable) {
   const shortcode = m.permalink.replace(/\/$/, '').split('/').pop()
   if (knownShortcodes.has(shortcode)) continue
   const { entry } = draftEntry(m, existingIds)
   existingIds.add(entry.id)
-  const gotThumb = await downloadThumbnail(m.thumbnail_url, shortcode)
+  const thumbSource = m.media_type === 'VIDEO' ? m.thumbnail_url : m.media_url
+  const gotThumb = await downloadThumbnail(thumbSource, shortcode)
   if (!gotThumb) entry.thumbnail = null
   additions.push(entry)
   console.log(`+ ${entry.publishedDate}  [${entry.category}]  ${entry.title}`)

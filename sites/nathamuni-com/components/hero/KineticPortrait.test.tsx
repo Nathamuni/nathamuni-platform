@@ -16,6 +16,14 @@ describe('KineticPortrait', () => {
     expect(screen.queryByTestId('kinetic-portrait')).not.toBeInTheDocument()
   })
 
+  it('renders the lightweight static portrait on touch devices instead of video', () => {
+    vi.spyOn(mediaSupport, 'supportsAlphaWebm').mockReturnValue(true)
+    vi.spyOn(mediaSupport, 'prefersHoverInteraction').mockReturnValue(false)
+    render(<KineticPortrait />)
+    expect(screen.getByTestId('portrait-static')).toBeInTheDocument()
+    expect(screen.queryByTestId('portrait-forward')).not.toBeInTheDocument()
+  })
+
   it('renders both videos when alpha WebM is supported', () => {
     vi.spyOn(mediaSupport, 'supportsAlphaWebm').mockReturnValue(true)
     vi.spyOn(mediaSupport, 'prefersHoverInteraction').mockReturnValue(true)
