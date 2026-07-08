@@ -72,7 +72,9 @@ function draftEntry(media, existingIds) {
   const firstLine = body.split('\n').map((l) => l.trim()).find((l) => l.length > 0) ?? ''
   const date = media.timestamp.slice(0, 10)
 
-  const title = firstLine.length >= 4 ? (firstLine.length > 70 ? firstLine.slice(0, 67) + '…' : firstLine) : `New reel — ${date}`
+  const kind = media.media_type === 'VIDEO' ? 'Reel' : 'Post'
+  const niceDate = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  const title = firstLine.length >= 4 ? (firstLine.length > 70 ? firstLine.slice(0, 67) + '…' : firstLine) : `${kind} · ${niceDate}`
   let slug = slugify(title) || shortcode.toLowerCase()
   let n = 2
   const base = slug

@@ -1,6 +1,13 @@
 import Link from 'next/link'
 import { getAllStories } from '@/lib/stories'
 
+function monthLabel(iso: string): string {
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', {
+    month: 'short',
+    year: '2-digit',
+  })
+}
+
 /** Instagram-highlights-style ring strip on the homepage, linking to /moments. */
 export function MomentsRing() {
   const recent = getAllStories().slice(0, 8)
@@ -10,16 +17,22 @@ export function MomentsRing() {
       <h2 id="moments-heading" className="section-title">
         Moments
       </h2>
-      <p className="section-sub">Stories that Instagram forgot — this site doesn&apos;t.</p>
+      <p className="section-sub">Stories that Instagram deleted after 24h — archived here forever.</p>
       <div className="moments-ring-row" data-testid="moments-ring">
         {recent.map((story) => (
           <Link key={story.id} href="/moments" className="moments-ring-item">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={story.poster} alt="" loading="lazy" />
+            <span className="moments-ring-circle">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={story.poster} alt="" loading="lazy" />
+            </span>
+            <span className="moments-ring-label">{monthLabel(story.date)}</span>
           </Link>
         ))}
         <Link href="/moments" className="moments-ring-item moments-ring-more">
-          <span>All →</span>
+          <span className="moments-ring-circle">
+            <span>All →</span>
+          </span>
+          <span className="moments-ring-label">Archive</span>
         </Link>
       </div>
     </section>
