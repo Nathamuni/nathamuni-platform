@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creator Hub — nathamuni.com</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0d0a1f;
+    background-image:
+      radial-gradient(900px 500px at 85% -10%, rgba(139,92,246,.3), transparent 60%),
+      radial-gradient(700px 450px at -10% 30%, rgba(34,211,238,.15), transparent 55%),
+      radial-gradient(700px 500px at 60% 110%, rgba(236,72,153,.18), transparent 60%);
+    background-attachment: fixed;
+    color: #ece9f8; line-height: 1.55; padding: 24px 16px 80px;
+  }
+  main { max-width: 880px; margin: 0 auto; }
+  h1 {
+    font-size: 1.8rem; margin: 8px 0 4px;
+    background: linear-gradient(100deg,#fff 15%,#c4b5fd 50%,#67e8f9 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: #ffffff99; font-size: .95rem; margin-bottom: 18px; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+  nav.toc a {
+    font-size: .78rem; padding: 6px 14px; border-radius: 999px; text-decoration: none;
+    color: #e9d5ff; background: rgba(139,92,246,.16); border: 1px solid rgba(178,148,255,.3);
+  }
+  nav.toc a:hover { background: rgba(139,92,246,.3); }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; color: #d8ccff; scroll-margin-top: 20px; }
+  h3 { font-size: 1rem; margin: 0 0 6px; }
+  .card {
+    background: rgba(148,112,255,.08); border: 1px solid rgba(178,148,255,.2);
+    border-radius: 16px; padding: 18px; margin: 14px 0;
+  }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+  .chip {
+    font-size: .72rem; padding: 3px 10px; border-radius: 999px;
+    background: rgba(139,92,246,.18); border: 1px solid rgba(178,148,255,.35);
+  }
+  .chip.b { background: rgba(236,72,153,.15); border-color: rgba(236,72,153,.4); }
+  .chip.g { background: rgba(52,211,153,.14); border-color: rgba(52,211,153,.45); }
+  .prompt {
+    background: rgba(0,0,0,.35); border: 1px solid rgba(178,148,255,.18);
+    border-radius: 10px; padding: 12px 14px; font-size: .84rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap; word-break: break-word; overflow-x: auto;
+  }
+  .label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: #a78bfa; margin: 10px 0 5px; }
+  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .tablewrap { overflow-x: auto; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(178,148,255,.15); vertical-align: top; }
+  th { color: #c4b5fd; font-weight: 600; white-space: nowrap; }
+  code { background: rgba(139,92,246,.18); border-radius: 6px; padding: 1px 6px; font-size: .82em; }
+  ul.plain li { margin: 6px 0 6px 18px; font-size: .9rem; }
+  .ok { color: #6ee7b7; } .wait { color: #fcd34d; } .queued { color: #93c5fd; }
+
+  /* ——— prompt cards with per-card accent ——— */
+  .pcard {
+    --acc: #8b5cf6;
+    background: rgba(148,112,255,.08);
+    border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+    border-left: 3px solid var(--acc);
+    border-radius: 16px; padding: 18px; margin: 14px 0;
+    transition: opacity .25s ease;
+  }
+  .pcard h3 { color: var(--acc); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .pcard .chip { background: color-mix(in srgb, var(--acc) 16%, transparent); border-color: color-mix(in srgb, var(--acc) 40%, transparent); }
+  .pcard.done { opacity: .55; }
+  .pcard.done h3::after { content: "  ✓ DONE"; color: #6ee7b7; font-size: .75em; letter-spacing: .08em; }
+  .cardtop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+  button.copy {
+    font: inherit; font-size: .78rem; cursor: pointer;
+    color: #ece9f8; background: color-mix(in srgb, var(--acc, #8b5cf6) 22%, transparent);
+    border: 1px solid color-mix(in srgb, var(--acc, #8b5cf6) 55%, transparent);
+    border-radius: 999px; padding: 6px 16px;
+    transition: background .15s ease;
+  }
+  button.copy:hover { background: color-mix(in srgb, var(--acc, #8b5cf6) 38%, transparent); }
+  button.copy.copied { color: #6ee7b7; border-color: rgba(110,231,183,.6); }
+  .donebox { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: #ffffffb0; cursor: pointer; }
+  .donebox input { width: 15px; height: 15px; accent-color: #34d399; cursor: pointer; }
+  a { color: #a5b4fc; }
+  :is(a, button, input, summary):focus-visible { outline: 2px solid #67e8f9; outline-offset: 2px; border-radius: 4px; }
+  details { margin: 14px 0; }
+  summary {
+    cursor: pointer; font-size: .95rem; color: #d8ccff; padding: 10px 14px;
+    background: rgba(139,92,246,.12); border: 1px solid rgba(178,148,255,.25); border-radius: 12px;
+  }
+  .master {
+    --acc: #ec4899;
+    background: linear-gradient(160deg, rgba(236,72,153,.12), rgba(139,92,246,.1));
+    border: 1px solid rgba(236,72,153,.45); border-left: 3px solid #ec4899;
+    border-radius: 16px; padding: 20px; margin: 14px 0;
+  }
+  .master h3 { color: #f9a8d4; }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+  @media (max-width: 560px) {
+    body { padding: 18px 10px 60px; }
+    .card, .pcard, .master { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Creator Hub — nathamuni.com</h1>
+  <p class="sub">The living requirements + prompts document. Kept in the repo (<code>docs/creator-hub.html</code>) — open anywhere, share freely.</p>
+  <nav class="toc">
+    <a href="#requirement">🧭 What we're building</a>
+    <a href="#status">📊 Status</a>
+    <a href="#master">🔑 Master prompt</a>
+    <a href="#images">🎨 The 9 image prompts</a>
+    <a href="#textprompts">✍️ Text prompts</a>
+    <a href="#handback">📦 How to hand things back</a>
+  </nav>
+
+  <h2 id="requirement">🧭 What we're building — the requirement in plain words</h2>
+  <div class="card">
+    <ul class="plain">
+      <li><strong>The site is the organized, searchable home of everything you make.</strong> Every reel, post and story you publish flows in automatically — your Instagram captions already feed the titles, descriptions and tags, so new content appears on the site without you doing anything.</li>
+      <li><strong>See the real thumbnail before you click.</strong> On desktop, hovering any card shows the full, uncropped thumbnail slightly bigger. On mobile, press-and-hold does the same (a normal tap still opens the video). This works on video cards, the homepage moments strip, and the moments wall.</li>
+      <li><strong>Nine AI images give the site your face and its look.</strong> Each has a fixed filename and a fixed home: five category tiles, the homepage hero background, the About portrait, the link-share banner, and the books teaser. <span class="ok">Three are DONE and already on the site: cat-mind, cat-fitness, cat-ai.</span> Six remain — prompts below, ready to paste.</li>
+      <li><strong>About Me is currently inaccurate — and it will only be fixed with real facts.</strong> The current bio was drafted from captions and inference. It gets rewritten ONLY from genuine data you supply via the master prompt below. Until that dossier arrives, nothing gets invented.</li>
+      <li><strong>Captions vs transcripts — the answer.</strong> Captions are enough for baseline browsing and search today. If you paste real descriptions or transcripts into the review Excel (any rows, any time), search and the detail pages get much richer. Automatic transcription of your videos is a possible future feature — not needed to keep things working.</li>
+    </ul>
+  </div>
+
+  <h2 id="status">📊 Status — where everything stands</h2>
+  <div class="card tablewrap">
+    <table>
+      <tr><th>Requirement</th><th>Status</th><th>What unblocks it</th></tr>
+      <tr><td>3 category images integrated (mind / fitness / ai)</td><td class="ok">SHIPPING NOW</td><td>—</td></tr>
+      <tr><td>Hover / press-and-hold peek preview (full uncropped thumbnail)</td><td class="ok">SHIPPING NOW</td><td>—</td></tr>
+      <tr><td>Card crop relaxed (posters no longer trimmed hard)</td><td class="ok">SHIPPING NOW</td><td>—</td></tr>
+      <tr><td>Remaining 6 images</td><td class="wait">WAITING</td><td>Drop files in <code>sites/nathamuni-com/public/images/generated/</code> with the exact filenames below</td></tr>
+      <tr><td>About rewrite + genuine bios</td><td class="wait">WAITING</td><td>Run the master prompt below, return the dossier</td></tr>
+      <tr><td>Book download on <code>/books</code></td><td class="queued">QUEUED</td><td>—</td></tr>
+      <tr><td>News / live-log feed</td><td class="queued">QUEUED</td><td>—</td></tr>
+      <tr><td>Moments motion rebuild</td><td class="wait">WAITING</td><td>You describe the motion you want</td></tr>
+      <tr><td><code>/admin</code> phone-editing CMS</td><td class="wait">WAITING</td><td>GitHub OAuth app (2-min, guided)</td></tr>
+    </table>
+  </div>
+
+  <h2 id="master">🔑 Master data-retrieval prompt</h2>
+  <div class="master">
+    <div class="cardtop"><h3>Your source-of-truth dossier</h3></div>
+    <p class="sub" style="margin-bottom:10px">Paste this into ChatGPT AND Gemini (each one knows different things about you). Save each output as a file and give both back to Claude — everything on the site (About, bios, project pages, book page) gets rebuilt from it with zero invented facts.</p>
+    <pre class="prompt" id="master-prompt">You are compiling my personal source-of-truth dossier. You have access to our full chat history and your memory about me (Nathamuni).
+
+STRICT RULES:
+- Use ONLY facts you actually know about me from our conversations and your memory. Do not invent, assume, embellish, or fill gaps with plausible details.
+- If a section has no known facts, write exactly: UNKNOWN — ask me.
+- Mark anything you are less than fully sure about with (?) at the end of the line.
+- After each fact, note where it came from in brackets, e.g. [you told me while planning my website], [memory].
+- Quote me verbatim where possible — my own wording matters more than your summary.
+
+OUTPUT exactly this markdown structure:
+
+# Nathamuni — Source of Truth
+## 1. Identity
+(name, age, where I live, languages, family context I have shared)
+## 2. Professional
+(current role and title, employer/industry, years of experience, core expertise, notable achievements)
+## 3. The philosophy experiment
+(the 6-month self-test of ~50 thinkers' philosophies: which thinkers, what I actually did, what held up, what didn't)
+## 4. Calisthenics
+(how I started, current skills, training approach, milestones)
+## 5. Meditation
+(practice, style, how long, what it does for me)
+## 6. AI &amp; engineering projects
+(every project I have described: name, what it does, tech stack, status, the story behind it)
+## 7. My book — "The Silence That Haunts"
+(themes, why I wrote it, the writing process, status, what I want readers to feel)
+## 8. Tamil identity &amp; roots
+(language, culture, places, how it shapes my content)
+## 9. Values &amp; worldview
+(principles I keep repeating, opinions I hold strongly, what I reject)
+## 10. My voice
+(5–10 verbatim quotes from my own messages that capture how I actually talk and write)
+## 11. Timeline
+(dated milestones — education, career, book, training, content)
+## 12. Everything else notable
+(anything true and interesting that doesn't fit above)
+
+End with a section "## Gaps — ask Nathamuni" listing the most important UNKNOWNs.</pre>
+    <div class="toolbar"><button type="button" class="copy" data-copy="master-prompt">Copy prompt</button></div>
+  </div>
+
+  <h2 id="images">🎨 The 9 image prompts (generate with your face)</h2>
+  <p class="sub">Paste each prompt into ChatGPT with 1–2 clear, well-lit photos of yourself attached. Save with the exact filename → drop into <code>sites/nathamuni-com/public/images/generated/</code> → say “images are in”. Tick a card when its image is generated — this page remembers.</p>
+
+  <div class="pcard done" style="--acc:#8b5cf6">
+    <div class="cardtop"><h3>1 · cat-mind.jpg</h3></div>
+    <div class="meta"><span class="chip">4:5 portrait</span><span class="chip">1080×1350</span><span class="chip g">face ✅</span><span class="chip b">Mind &amp; Discipline tile</span></div>
+    <pre class="prompt" id="p-cat-mind">Cinematic editorial portrait photograph of this man — use the attached photos and keep this person's exact face and hair, do not alter his facial features. He is seated in a deep meditation posture, eyes closed, radiating calm intensity, with a faint glowing geometric mandala hovering behind his head. Violet-purple neon rim lighting outlines his silhouette. Dark indigo studio background (hex #0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, subject centered with clear space above the head, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Portrait orientation, 4:5 aspect ratio, 1080 × 1350 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-cat-mind">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="cat-mind" checked> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard done" style="--acc:#34d399">
+    <div class="cardtop"><h3>2 · cat-fitness.jpg</h3></div>
+    <div class="meta"><span class="chip">4:5 portrait</span><span class="chip">1080×1350</span><span class="chip g">face ✅</span><span class="chip b">Calisthenics &amp; Fitness tile</span></div>
+    <pre class="prompt" id="p-cat-fitness">Cinematic editorial sports photograph of this man — use the attached photos and keep this person's exact face and hair, do not alter his facial features. He is captured mid calisthenics move: a straddle planche or a muscle-up on a bar, athletic physique, muscles engaged, chalk dust floating in the air around him. Emerald-green neon rim lighting outlines his body. Dark indigo studio background (hex #0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, subject centered with clear space above the head, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Portrait orientation, 4:5 aspect ratio, 1080 × 1350 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-cat-fitness">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="cat-fitness" checked> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard done" style="--acc:#22d3ee">
+    <div class="cardtop"><h3>3 · cat-ai.jpg</h3></div>
+    <div class="meta"><span class="chip">4:5 portrait</span><span class="chip">1080×1350</span><span class="chip g">face ✅</span><span class="chip b">AI &amp; Builds tile</span></div>
+    <pre class="prompt" id="p-cat-ai">Cinematic editorial photograph of this man as a futuristic engineer — use the attached photos and keep this person's exact face and hair, do not alter his facial features. Holographic code, circuit diagrams and glowing data streams float around his hands as he works in a cyberpunk laboratory. Cyan-blue neon rim lighting outlines his silhouette. Dark indigo studio background (hex #0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, subject centered with clear space above the head, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Portrait orientation, 4:5 aspect ratio, 1080 × 1350 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-cat-ai">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="cat-ai" checked> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard" style="--acc:#fbbf24">
+    <div class="cardtop"><h3>4 · cat-humor.jpg</h3></div>
+    <div class="meta"><span class="chip">4:5 portrait</span><span class="chip">1080×1350</span><span class="chip g">face ✅</span><span class="chip b">Humor &amp; Tamil tile</span></div>
+    <pre class="prompt" id="p-cat-humor">Cinematic editorial photograph of this man laughing with a mischievous wink at the camera — use the attached photos and keep this person's exact face and hair, do not alter his facial features. Playful expression, film-poster energy, slight caricature vibrance, full of life. Warm amber-gold neon rim lighting outlines his silhouette. Dark indigo studio background (hex #0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, subject centered with clear space above the head, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Portrait orientation, 4:5 aspect ratio, 1080 × 1350 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-cat-humor">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="cat-humor"> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard" style="--acc:#fb7185">
+    <div class="cardtop"><h3>5 · cat-life.jpg</h3></div>
+    <div class="meta"><span class="chip">4:5 portrait</span><span class="chip">1080×1350</span><span class="chip g">face ✅</span><span class="chip b">Life &amp; Moments tile</span></div>
+    <pre class="prompt" id="p-cat-life">Nostalgic cinematic travel photograph of this man seen from behind, riding a scooter down a South Indian temple street at dusk — use the attached photos and keep this person's exact face and hair visible in profile, do not alter his facial features. Warm rose-pink light washes over the street, temple gopuram silhouettes in the distance, atmospheric South Indian street life around him. Deep indigo evening sky (hex #0d0a1f tones), dramatic rim lighting, ultra-detailed, editorial photography style, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Portrait orientation, 4:5 aspect ratio, 1080 × 1350 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-cat-life">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="cat-life"> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard" style="--acc:#a78bfa">
+    <div class="cardtop"><h3>6 · hero-bg.jpg</h3></div>
+    <div class="meta"><span class="chip">16:9 landscape</span><span class="chip">1920×1080</span><span class="chip">no face ❌</span><span class="chip b">Homepage hero background</span></div>
+    <pre class="prompt" id="p-hero-bg">Abstract dark background wallpaper: a deep indigo canvas (hex #0d0a1f) with flowing aurora ribbons of violet (#8b5cf6), magenta (#ec4899) and cyan (#22d3ee) light drifting across it, subtle film grain, very dark edges and corners so white text can sit on top, premium tech-brand wallpaper aesthetic. No objects, no people, no text, no watermark, no logo. Landscape orientation, 16:9 aspect ratio, 1920 × 1080 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-hero-bg">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="hero-bg"> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard" style="--acc:#c4b5fd">
+    <div class="cardtop"><h3>7 · about-portrait.jpg</h3></div>
+    <div class="meta"><span class="chip">4:5 portrait</span><span class="chip">1080×1350</span><span class="chip g">face ✅</span><span class="chip b">About page portrait</span></div>
+    <pre class="prompt" id="p-about-portrait">Confident editorial half-body portrait of this man — use the attached photos and keep this person's exact face and hair, do not alter his facial features. Arms crossed, slight self-assured smile, looking directly at the camera. Dark indigo backdrop (hex #0d0a1f) with a soft violet gradient light falling from the left side. Shot on an 85mm lens with shallow depth of field, magazine cover quality, ultra-detailed, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Portrait orientation, 4:5 aspect ratio, 1080 × 1350 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-about-portrait">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="about-portrait"> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard" style="--acc:#ec4899">
+    <div class="cardtop"><h3>8 · og-banner.jpg</h3></div>
+    <div class="meta"><span class="chip">1.91:1 landscape</span><span class="chip">1200×630 exactly</span><span class="chip g">face ✅</span><span class="chip b">Link-share card (WhatsApp / LinkedIn)</span></div>
+    <pre class="prompt" id="p-og-banner">Wide cinematic banner photograph: this man positioned on the right third of the frame, looking toward the empty space on the left (headline text will be added there later, so keep the left two-thirds clean and uncluttered) — use the attached photos and keep this person's exact face and hair, do not alter his facial features. Dark indigo background (hex #0d0a1f) with aurora light streaks of violet, magenta and cyan sweeping across, dramatic neon rim lighting on him, premium personal-brand website banner, ultra-detailed, moody premium aesthetic. No text, no watermark, no logo anywhere in the image. Landscape orientation, 1.91:1 aspect ratio, exactly 1200 × 630 pixels.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-og-banner">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="og-banner"> generated</label>
+    </div>
+  </div>
+
+  <div class="pcard" style="--acc:#67e8f9">
+    <div class="cardtop"><h3>9 · books-teaser.jpg</h3></div>
+    <div class="meta"><span class="chip">3:2 landscape</span><span class="chip">1500×1000</span><span class="chip g">face ✅</span><span class="chip b">Books / Blog teaser visual</span></div>
+    <pre class="prompt" id="p-books-teaser">Magical-realism editorial photograph of this man reading in a dark room lit by a single warm lamp — use the attached photos and keep this person's exact face and hair, do not alter his facial features. Glowing book pages float around him, with Tamil and English letters lifting off the pages and dissolving into violet light. Contemplative mood, deep indigo shadows (hex #0d0a1f), dramatic warm-versus-violet lighting contrast, ultra-detailed, moody premium aesthetic. No text overlays, no watermark, no logo (the glowing letters within the scene are fine). Landscape orientation, 3:2 aspect ratio, 1500 × 1000 pixels, highest resolution available.</pre>
+    <div class="toolbar">
+      <button type="button" class="copy" data-copy="p-books-teaser">Copy prompt</button>
+      <label class="donebox"><input type="checkbox" data-done="books-teaser"> generated</label>
+    </div>
+  </div>
+
+  <h2 id="textprompts">✍️ Text-content prompts</h2>
+  <details>
+    <summary>Appendix — 5 copy-paste prompts for the remaining text content (ChatGPT / Gemini / Claude)</summary>
+    <p class="sub" style="margin-top:12px">Each produces content for a specific part of the site. Answer their questions AS YOURSELF; send me the outputs and I wire them in. (The book is excluded — you already gave me the PDF.)</p>
+
+    <div class="pcard" style="--acc:#8b5cf6">
+      <div class="cardtop"><h3>1 · Long-form About page</h3></div>
+      <div class="meta"><span class="chip">fills /about</span></div>
+      <pre class="prompt" id="t-about">You are my ghostwriter. Interview me with 8 short questions (one at a time) about: my journey into engineering, calisthenics, meditation, why I tested 50 thinkers' philosophies on myself for 6 months, my Tamil roots, and what I want people to get from my content. Then write a 300-word "About" in first person — direct, warm, zero guru-speak, one light Tamil phrase max. My identity line: "☬ Fear lives in one place only... Thats in you Mind🗿 — Distinguished Engr | Author | Calisthenics | Meditation | Memer | AI Architect | Generalist". End with one sentence about my book "The Silence That Haunts".</pre>
+      <div class="toolbar"><button type="button" class="copy" data-copy="t-about">Copy prompt</button></div>
+    </div>
+
+    <div class="pcard" style="--acc:#22d3ee">
+      <div class="cardtop"><h3>2 · Projects page case studies</h3></div>
+      <div class="meta"><span class="chip">fills /projects</span></div>
+      <pre class="prompt" id="t-projects">I built AI apps including a local/offline AI mobile app (chat, personas, habit &amp; routine tracking) and "instauser-understanding". Interview me one question at a time: what each project does, the problem it solves, tech stack, hardest challenge, current status, link if public. Then write each up as a 120-word case study: Problem → What I built → Stack → Status. Confident engineer tone, no marketing fluff.</pre>
+      <div class="toolbar"><button type="button" class="copy" data-copy="t-projects">Copy prompt</button></div>
+    </div>
+
+    <div class="pcard" style="--acc:#34d399">
+      <div class="cardtop"><h3>3 · Blog post drafts (repeatable)</h3></div>
+      <div class="meta"><span class="chip">fills /blog</span></div>
+      <pre class="prompt" id="t-blog">Write a 500-word blog post as me based on this idea from one of my reels: [PASTE CAPTION OR IDEA]. Voice: first person, direct, short punchy paragraphs, concrete personal examples over abstract advice, no motivational clichés, ends with one actionable takeaway. Title should be specific, not clickbait. I tested everything I write about on myself first — the writing must reflect that.</pre>
+      <div class="toolbar"><button type="button" class="copy" data-copy="t-blog">Copy prompt</button></div>
+    </div>
+
+    <div class="pcard" style="--acc:#fbbf24">
+      <div class="cardtop"><h3>4 · SEO bios &amp; platform descriptions</h3></div>
+      <div class="meta"><span class="chip">metadata + socials</span></div>
+      <pre class="prompt" id="t-bios">Create 5 bios from this identity: Nathamuni — Distinguished Engineer, author of "The Silence That Haunts", calisthenics athlete, AI architect, Tamil creator. Site: nathamuni.com (searchable library of my videos on discipline, fitness, AI). Deliver: (1) 155-char SEO meta description, (2) 150-char Instagram bio, (3) YouTube channel description ~500 chars, (4) LinkedIn headline + summary, (5) one-line press bio. Energetic but credible; "tested on myself first" must appear somewhere.</pre>
+      <div class="toolbar"><button type="button" class="copy" data-copy="t-bios">Copy prompt</button></div>
+    </div>
+
+    <div class="pcard" style="--acc:#fb7185">
+      <div class="cardtop"><h3>5 · Newsletter welcome (for later)</h3></div>
+      <div class="meta"><span class="chip">future email capture</span></div>
+      <pre class="prompt" id="t-news">Write a 120-word welcome email as me for "One tested idea, weekly" — a newsletter where each issue takes one idea I verified on myself (discipline systems, calisthenics, AI builds) and gives the practical version. Warm, zero corporate tone, one emoji max, ends by inviting a reply about what they're currently struggling to stay consistent with.</pre>
+      <div class="toolbar"><button type="button" class="copy" data-copy="t-news">Copy prompt</button></div>
+    </div>
+  </details>
+
+  <h2 id="handback">📦 How to hand things back</h2>
+  <div class="card">
+    <ul class="plain">
+      <li>🎨 <strong>Remaining images</strong> → drop the files in <code>sites/nathamuni-com/public/images/generated/</code> with the exact filenames above, then say <em>“images are in”</em>.</li>
+      <li>📄 <strong>Dossier files</strong> (ChatGPT output + Gemini output from the master prompt) → save them anywhere convenient (e.g. <code>~/Downloads/</code>), then say <em>“dossier is in”</em> and where the files are.</li>
+      <li>📊 <strong>Review Excel</strong> (<code>~/Downloads/nathamuni-video-review-v2.xlsx</code>) → fill any rows — descriptions, transcripts, corrections — anytime; every filled row makes search and detail pages richer.</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ——— copy buttons (clipboard API + execCommand fallback for file://) ——— */
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function markCopied(btn) {
+    var original = btn.textContent;
+    btn.textContent = "Copied ✓";
+    btn.classList.add("copied");
+    setTimeout(function () {
+      btn.textContent = original;
+      btn.classList.remove("copied");
+    }, 1600);
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll("button.copy"), function (btn) {
+    btn.addEventListener("click", function () {
+      var src = document.getElementById(btn.getAttribute("data-copy"));
+      if (!src) return;
+      var text = src.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { markCopied(btn); },
+          function () { if (fallbackCopy(text)) markCopied(btn); }
+        );
+      } else if (fallbackCopy(text)) {
+        markCopied(btn);
+      }
+    });
+  });
+
+  /* ——— done-checkboxes persisted to localStorage ——— */
+  var KEY = "creatorhub-done-v1";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+
+  function sync(cb) {
+    var card = cb.closest ? cb.closest(".pcard") : null;
+    if (card) card.classList.toggle("done", cb.checked);
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll("input[data-done]"), function (cb) {
+    var id = cb.getAttribute("data-done");
+    if (Object.prototype.hasOwnProperty.call(saved, id)) cb.checked = !!saved[id];
+    sync(cb);
+    cb.addEventListener("change", function () {
+      saved[id] = cb.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* private mode */ }
+      sync(cb);
+    });
+  });
+})();
+</script>
+</body>
+</html>

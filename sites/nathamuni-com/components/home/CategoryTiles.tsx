@@ -13,13 +13,18 @@ export function CategoryTiles() {
           <TiltCard key={category}>
             <Link
               href={`/videos?category=${encodeURIComponent(category)}`}
-              className={`category-tile anim-fade-up anim-delay-${Math.min(i, 4)}`}
+              className={`category-tile ${meta.image ? 'has-art' : ''} anim-fade-up anim-delay-${Math.min(i, 4)}`}
               style={{ '--cat': meta.hue } as React.CSSProperties}
               data-testid="category-tile"
             >
-              <span className="category-tile-icon" aria-hidden>
-                {meta.icon}
-              </span>
+              {meta.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={meta.image} alt="" loading="lazy" className="category-tile-art" />
+              ) : (
+                <span className="category-tile-icon" aria-hidden>
+                  {meta.icon}
+                </span>
+              )}
               <span className="category-tile-name">{category}</span>
               <span className="category-tile-count">{count} videos</span>
             </Link>

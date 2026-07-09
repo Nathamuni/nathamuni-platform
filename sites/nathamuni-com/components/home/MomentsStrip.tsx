@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getAllStories, type Story } from '@/lib/stories'
+import { ThumbPeek } from '@/components/fx/ThumbPeek'
 
 function shortDate(iso: string): string {
   return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -19,8 +20,10 @@ function CardList({ stories, hidden }: { stories: Story[]; hidden?: boolean }) {
           aria-hidden={hidden || undefined}
           tabIndex={hidden ? -1 : undefined}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={story.poster} alt="" loading="lazy" />
+          <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={story.poster} alt="" loading="lazy" />
+          </ThumbPeek>
           <span className="moment-strip-date">{shortDate(story.date)}</span>
         </Link>
       ))}

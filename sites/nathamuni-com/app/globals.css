@@ -296,8 +296,35 @@
     @apply col-span-2 lg:col-span-1;
   }
   .category-tile {
-    @apply glass-card relative overflow-hidden p-4 sm:p-5 flex flex-col gap-1 transition-all duration-300 active:scale-[0.97];
+    @apply glass-card relative overflow-hidden p-4 sm:p-5 flex flex-col gap-1 justify-end transition-all duration-300 active:scale-[0.97];
     border-color: hsla(var(--cat), 70%, 60%, 0.25);
+    aspect-ratio: 4 / 5;
+  }
+  /* The full-row 5th tile on mobile would be huge at 4:5 — go wide instead. */
+  .category-tiles > :nth-child(5):last-child .category-tile {
+    aspect-ratio: 16 / 10;
+  }
+  @media (min-width: 1024px) {
+    .category-tiles > :nth-child(5):last-child .category-tile {
+      aspect-ratio: 4 / 5;
+    }
+  }
+  .category-tile-art {
+    @apply absolute inset-0 w-full h-full object-cover pointer-events-none transition-transform duration-500;
+  }
+  .tilt-card:hover .category-tile-art,
+  .category-tile:hover .category-tile-art {
+    transform: scale(1.05);
+  }
+  /* Text legibility over owner art: dark scrim from the bottom. */
+  .category-tile.has-art::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: linear-gradient(to top, rgba(13, 10, 31, 0.9) 0%, rgba(13, 10, 31, 0.3) 45%, transparent 70%);
+  }
+  .category-tile-name,
+  .category-tile-count {
+    @apply relative z-10;
   }
   .tilt-card:hover .category-tile,
   .category-tile:hover {
@@ -361,7 +388,7 @@
     @apply glass-card overflow-hidden flex flex-col transition-all duration-300 active:scale-[0.98];
     /* Skip rendering work for cards far off-screen — matters with 79 in the grid. */
     content-visibility: auto;
-    contain-intrinsic-size: auto 420px;
+    contain-intrinsic-size: auto 460px;
   }
   .tilt-card:hover .video-card,
   .video-card:hover {
@@ -370,7 +397,8 @@
   }
   .video-card-media {
     @apply block relative overflow-hidden;
-    aspect-ratio: 9 / 12;
+    /* Closer to the native 9:16 posters — trims far less off the edges. */
+    aspect-ratio: 9 / 14;
   }
   .video-card-thumbnail {
     @apply w-full h-full object-cover transition-transform duration-500;
@@ -614,6 +642,42 @@
   }
   .moment-close {
     @apply glass-card px-4 py-1.5 text-sm text-white cursor-pointer;
+  }
+
+  /* ---------- thumbnail peek (hover / long-press enlarged preview) ---------- */
+  .thumb-peek-region {
+    @apply block w-full h-full;
+  }
+  .thumb-peek-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-6 pointer-events-none;
+    background: rgba(7, 5, 18, 0.72);
+    backdrop-filter: blur(8px);
+    animation: peek-in 0.16s ease;
+  }
+  .thumb-peek-overlay img {
+    max-width: min(82vw, 30rem);
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 1rem;
+    border: 1px solid hsla(var(--cat, 262), 85%, 70%, 0.6);
+    box-shadow: 0 24px 80px -20px hsla(var(--cat, 262), 85%, 60%, 0.55);
+  }
+  @keyframes peek-in {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .thumb-peek-overlay {
+      animation: none;
+    }
+    .category-tile-art,
+    .tilt-card:hover .category-tile-art,
+    .category-tile:hover .category-tile-art {
+      transition: none;
+      transform: none;
+    }
   }
 }
 

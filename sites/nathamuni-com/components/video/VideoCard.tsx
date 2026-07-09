@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Video } from '@/lib/videos'
 import { getCategoryMeta } from '@/lib/categoryMeta'
 import { TiltCard } from '@/components/fx/TiltCard'
+import { ThumbPeek } from '@/components/fx/ThumbPeek'
 import { PlaceholderArt } from './PlaceholderArt'
 
 function formatDate(iso: string): string {
@@ -23,13 +24,15 @@ export function VideoCard({ video }: { video: Video }) {
           <span className="media-type-badge" aria-label="Photo post">📷</span>
         )}
         {video.thumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={video.thumbnail}
-            alt={video.title}
-            loading="lazy"
-            className="video-card-thumbnail"
-          />
+          <ThumbPeek src={video.thumbnail} hue={meta.hue} longPress className="thumb-peek-region">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={video.thumbnail}
+              alt={video.title}
+              loading="lazy"
+              className="video-card-thumbnail"
+            />
+          </ThumbPeek>
         ) : (
           <PlaceholderArt category={video.category} />
         )}

@@ -95,7 +95,26 @@ Status marks: ✅ shipped & verified live · 🔨 in progress · ⏳ waiting on 
   the Excel loop. Stories: date + poster + playable clip (Instagram provides no captions
   for stories; owner can add titles later if desired).
 
-## 8. Standing working agreements
+## 8. v8 — accuracy & visibility round (2026-07-09)
+
+- 🔨 **Thumbnail peek**: hover (desktop) / press-and-hold (mobile) any video card or
+  moment shows the poster slightly bigger and FULLY visible (uncropped) — video grid,
+  homepage moments strip, /moments wall.
+- 🔨 **Owner imagery live**: 3 of 9 generated images integrated as category tile art
+  (cat-mind, cat-fitness, cat-ai); tiles are uniform 4:5 art cards with gradient/icon
+  fallback so the remaining 6 drop in with a one-line change.
+- 🔨 **Card crop relaxed**: media aspect 9/12 → 9/14 so 9:16 posters lose far less.
+- ⏳ **Genuine-data pipeline**: About/bios are rewritten ONLY from the owner's real
+  data. Owner runs the master data-retrieval prompt (docs/creator-hub.html) in
+  ChatGPT + Gemini, returns the dossier files → agent rebuilds `lib/profile.ts`,
+  /about, metadata bios with zero invented facts.
+- ✅ **Captions vs transcripts (answered)**: captions suffice for baseline browse +
+  search; richer per-video descriptions/transcripts (via the review Excel) upgrade
+  search and detail pages; auto-transcription is a possible future feature.
+- 📄 **Referable requirements doc**: `sites/nathamuni-com/docs/creator-hub.html` —
+  self-contained HTML (requirements, status, all copyable prompts), lives in the repo.
+
+## 9. Standing working agreements
 
 - Ship via feature branch → tests → PR → CI green → merge → verify LIVE on nathamuni.com.
 - Never expand Meta permissions; never scrape; visitor traffic never touches the
