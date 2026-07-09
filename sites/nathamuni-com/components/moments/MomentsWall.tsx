@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { Story } from '@/lib/stories'
+import { ThumbPeek } from '@/components/fx/ThumbPeek'
 
 function formatDate(iso: string): string {
   return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -30,8 +31,10 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
             onClick={() => setActive(story)}
             aria-label={`Play story from ${formatDate(story.date)}`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={story.poster} alt="" loading="lazy" className="moment-poster" />
+            <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={story.poster} alt="" loading="lazy" className="moment-poster" />
+            </ThumbPeek>
             <span className="moment-play" aria-hidden>
               ▶
             </span>
