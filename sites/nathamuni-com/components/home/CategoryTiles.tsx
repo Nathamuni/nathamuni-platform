@@ -25,8 +25,10 @@ export function CategoryTiles() {
                   {meta.icon}
                 </span>
               )}
-              <span className="category-tile-name">{category}</span>
-              <span className="category-tile-count">{count} videos</span>
+              <span className="category-tile-plate">
+                <span className="category-tile-name">{category}</span>
+                <span className="category-tile-count">{count} videos</span>
+              </span>
             </Link>
           </TiltCard>
         )

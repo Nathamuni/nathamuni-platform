@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: defaultTitle,
     description: PROFILE.metaDescription,
-    images: [{ url: '/images/portrait-fallback.png', width: 1080, height: 1080 }],
+    images: [{ url: '/images/portrait-static.webp', width: 640, height: 852 }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -53,7 +53,7 @@ const personJsonLd = {
   '@type': 'Person',
   name: PROFILE.name,
   url: SITE_URL,
-  image: `${SITE_URL}/images/portrait-fallback.png`,
+  image: `${SITE_URL}/images/portrait-static.webp`,
   jobTitle: PROFILE.jobTitle,
   description: PROFILE.metaDescription,
   sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube],

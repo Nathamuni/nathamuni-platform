@@ -21,15 +21,24 @@ interface ThumbPeekProps {
  * before, except the click right after a long-press, which is swallowed so
  * the peek doesn't accidentally navigate.
  */
+/** Hover intent delay before the preview opens — the owner asked for 0.6s. */
+const HOVER_DELAY_MS = 600
+const LONG_PRESS_MS = 350
+
 export function ThumbPeek({ src, hue = 262, longPress = false, className, children }: ThumbPeekProps) {
   const [open, setOpen] = useState(false)
   const pressTimer = useRef<number | null>(null)
+  const hoverTimer = useRef<number | null>(null)
   const suppressClick = useRef(false)
 
   const clearTimer = () => {
     if (pressTimer.current !== null) {
       window.clearTimeout(pressTimer.current)
       pressTimer.current = null
+    }
+    if (hoverTimer.current !== null) {
+      window.clearTimeout(hoverTimer.current)
+      hoverTimer.current = null
     }
   }
 
@@ -54,7 +63,8 @@ export function ThumbPeek({ src, hue = 262, longPress = false, className, childr
       className={className}
       data-testid="thumb-peek"
       onPointerEnter={(e) => {
-        if (e.pointerType === 'mouse') setOpen(true)
+        if (e.pointerType !== 'mouse') return
+        hoverTimer.current = window.setTimeout(() => setOpen(true), HOVER_DELAY_MS)
       }}
       onPointerLeave={hide}
       onPointerDown={(e) => {
@@ -62,7 +72,7 @@ export function ThumbPeek({ src, hue = 262, longPress = false, className, childr
         pressTimer.current = window.setTimeout(() => {
           suppressClick.current = true
           setOpen(true)
-        }, 350)
+        }, LONG_PRESS_MS)
       }}
       onPointerUp={hide}
       onPointerCancel={hide}
