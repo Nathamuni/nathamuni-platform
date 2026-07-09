@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getAllVideos } from '@/lib/videos'
+import { getAllPosts } from '@/lib/blog'
 import { SITE_URL } from '@/lib/site'
 
 export const dynamic = 'force-static'
@@ -14,10 +15,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/books`, priority: 0.3 },
     { url: `${SITE_URL}/projects`, priority: 0.3 },
   ]
+  const postRoutes: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+    url: `${SITE_URL}/blog/${post.slug}`,
+    lastModified: post.publishedDate,
+    priority: 0.6,
+  }))
   const videoRoutes: MetadataRoute.Sitemap = getAllVideos().map((video) => ({
     url: `${SITE_URL}/videos/${video.id}`,
     lastModified: video.publishedDate,
     priority: 0.7,
   }))
-  return [...staticRoutes, ...videoRoutes]
+  return [...staticRoutes, ...postRoutes, ...videoRoutes]
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Image Brief — nathamuni.com</title>
+<title>Creator Hub — nathamuni.com</title>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; margin: 0; }
@@ -17,113 +17,139 @@
     background-attachment: fixed;
     color: #ece9f8; line-height: 1.55; padding: 24px 16px 80px;
   }
-  main { max-width: 860px; margin: 0 auto; }
+  main { max-width: 880px; margin: 0 auto; }
   h1 {
-    font-size: 1.7rem; margin: 8px 0 4px;
+    font-size: 1.8rem; margin: 8px 0 4px;
     background: linear-gradient(100deg,#fff 15%,#c4b5fd 50%,#67e8f9 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .sub { color: #ffffff99; font-size: .95rem; margin-bottom: 26px; }
-  h2 { font-size: 1.15rem; margin: 34px 0 10px; color: #d8ccff; }
+  .sub { color: #ffffff99; font-size: .95rem; margin-bottom: 18px; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+  nav.toc a {
+    font-size: .78rem; padding: 6px 14px; border-radius: 999px; text-decoration: none;
+    color: #e9d5ff; background: rgba(139,92,246,.16); border: 1px solid rgba(178,148,255,.3);
+  }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; color: #d8ccff; scroll-margin-top: 20px; }
+  h3 { font-size: 1rem; margin: 18px 0 6px; }
   .card {
     background: rgba(148,112,255,.08); border: 1px solid rgba(178,148,255,.2);
     border-radius: 16px; padding: 18px; margin: 14px 0;
   }
-  .card h3 { font-size: 1rem; margin-bottom: 6px; }
   .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
   .chip {
     font-size: .72rem; padding: 3px 10px; border-radius: 999px;
     background: rgba(139,92,246,.18); border: 1px solid rgba(178,148,255,.35);
   }
   .chip.b { background: rgba(236,72,153,.15); border-color: rgba(236,72,153,.4); }
+  .chip.g { background: rgba(52,211,153,.14); border-color: rgba(52,211,153,.45); }
   .prompt {
     background: rgba(0,0,0,.35); border: 1px solid rgba(178,148,255,.18);
-    border-radius: 10px; padding: 12px 14px; font-size: .85rem;
+    border-radius: 10px; padding: 12px 14px; font-size: .84rem;
     white-space: pre-wrap; overflow-x: auto;
   }
-  .label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: #a78bfa; margin-bottom: 5px; }
+  .label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: #a78bfa; margin: 10px 0 5px; }
   table { width: 100%; border-collapse: collapse; font-size: .82rem; }
   .tablewrap { overflow-x: auto; }
-  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(178,148,255,.15); white-space: nowrap; }
-  th { color: #c4b5fd; font-weight: 600; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(178,148,255,.15); }
+  th { color: #c4b5fd; font-weight: 600; white-space: nowrap; }
   code { background: rgba(139,92,246,.18); border-radius: 6px; padding: 1px 6px; font-size: .82em; }
-  .rules li { margin: 6px 0 6px 18px; font-size: .9rem; }
-  .hue { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  ul.plain li { margin: 6px 0 6px 18px; font-size: .9rem; }
+  .ok { color: #6ee7b7; } .wait { color: #fcd34d; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Image Brief — nathamuni.com</h1>
-  <p class="sub">9 AI images to generate with your face in ChatGPT. Paste each prompt, attach 1–2 clear photos of yourself, save with the exact filename, drop everything in <code>sites/nathamuni-com/public/images/generated/</code>, then say “images are in”.</p>
+  <h1>Creator Hub — nathamuni.com</h1>
+  <p class="sub">Your single reference: what the site contains, every file that matters, the 9 images to generate, and copy-paste prompts (ChatGPT / Gemini / Claude) for all remaining text content.</p>
+  <nav class="toc">
+    <a href="#inventory">📋 Site inventory</a>
+    <a href="#files">🗂 Files &amp; data map</a>
+    <a href="#images">🎨 The 9 images</a>
+    <a href="#prompts">✍️ Text-content prompts</a>
+    <a href="#queue">⏭ Your queue</a>
+  </nav>
 
-  <h2>Rules for every prompt</h2>
-  <ul class="rules">
-    <li>Attach your face photos and add: <em>“Use this person's exact face and hair. Do not alter facial features.”</em></li>
-    <li>Dark, moody backgrounds — the site is deep indigo <code>#0d0a1f</code> with neon accents.</li>
-    <li>Ask for <strong>no text</strong> in the image. Export the largest size offered.</li>
-  </ul>
-
-  <h2>Specs at a glance</h2>
+  <h2 id="inventory">📋 Site inventory — every page that exists</h2>
   <div class="card tablewrap">
     <table>
-      <tr><th>File</th><th>Ratio</th><th>Size (px)</th><th>Face</th><th>Used for</th></tr>
-      <tr><td><code>cat-mind.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Mind &amp; Discipline tile</td></tr>
-      <tr><td><code>cat-fitness.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Fitness tile</td></tr>
-      <tr><td><code>cat-ai.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>AI &amp; Builds tile</td></tr>
-      <tr><td><code>cat-humor.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Humor &amp; Tamil tile</td></tr>
-      <tr><td><code>cat-life.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Life &amp; Moments tile</td></tr>
-      <tr><td><code>hero-bg.jpg</code></td><td>16:9</td><td>1920×1080</td><td>❌</td><td>Hero background</td></tr>
-      <tr><td><code>about-portrait.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>About page</td></tr>
-      <tr><td><code>og-banner.jpg</code></td><td>1.91:1</td><td>1200×630 exact</td><td>✅</td><td>Link-share card</td></tr>
-      <tr><td><code>books-teaser.jpg</code></td><td>3:2</td><td>1500×1000</td><td>✅</td><td>Books/Blog teaser</td></tr>
+      <tr><th>Page</th><th>What it is</th><th>Status</th></tr>
+      <tr><td><code>/</code></td><td>Hero (kinetic portrait), category pillars, featured, latest, auto-flowing Moments strip, About preview</td><td class="ok">Live</td></tr>
+      <tr><td><code>/videos</code></td><td>Full 161-item library — keyword + AI semantic search (English &amp; Tamil), category/tag/type filters</td><td class="ok">Live</td></tr>
+      <tr><td><code>/videos/[161 pages]</code></td><td>Detail per reel/post: full Instagram caption, tags, related items, link out</td><td class="ok">Live</td></tr>
+      <tr><td><code>/moments</code></td><td>Permanent story archive (Instagram deletes these in 24h) with lightbox playback; auto-grows daily</td><td class="ok">Live</td></tr>
+      <tr><td><code>/blog</code> + <code>/blog/[slug]</code></td><td>Long-form posts in your voice, linked to their short-form videos</td><td class="ok">Live — 3 posts</td></tr>
+      <tr><td><code>/books</code></td><td>The Silence That Haunts — showcase page</td><td class="wait">Building from your PDF now</td></tr>
+      <tr><td><code>/about</code></td><td>Bio + socials (all copy from one file: <code>lib/profile.ts</code>)</td><td class="ok">Live</td></tr>
+      <tr><td><code>/projects</code></td><td>Case studies of your AI builds</td><td class="wait">Needs your project info (prompt below)</td></tr>
+      <tr><td><code>/api/search</code></td><td>Semantic search endpoint (Workers AI bge-m3, free, keyless)</td><td class="ok">Live</td></tr>
+      <tr><td><code>sitemap.xml</code> · <code>robots.txt</code></td><td>SEO plumbing + share cards + structured data on every page</td><td class="ok">Live</td></tr>
+      <tr><td>News / live-log feed</td><td>Unified chronological feed of everything</td><td class="wait">Queued — next session</td></tr>
+      <tr><td><code>/admin</code></td><td>Edit-from-phone CMS panel</td><td class="wait">Queued — needs your GitHub OAuth app</td></tr>
     </table>
   </div>
 
-  <h2>Category tiles (1–5) — append this style suffix to each</h2>
-  <div class="card"><div class="label">Shared suffix</div><div class="prompt">...cinematic portrait, dark indigo studio background (#0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, subject centered with space above the head, moody premium aesthetic, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
+  <h2 id="files">🗂 Files &amp; data map — what controls what</h2>
+  <div class="card tablewrap">
+    <table>
+      <tr><th>File (in <code>sites/nathamuni-com/</code>)</th><th>Controls</th></tr>
+      <tr><td><code>lib/videos.json</code></td><td>All 161 reels/posts (auto-grown daily by Instagram sync; safe to hand-edit)</td></tr>
+      <tr><td><code>lib/stories.json</code> + <code>public/stories/</code></td><td>Story archive (self-hosted clips + posters)</td></tr>
+      <tr><td><code>lib/posts.json</code></td><td>Blog posts (add an object = new post appears everywhere)</td></tr>
+      <tr><td><code>lib/profile.ts</code></td><td>Your bio, roles, headline, about text — one file updates the whole site</td></tr>
+      <tr><td><code>lib/social.ts</code> · <code>lib/categoryMeta.ts</code></td><td>Social links · category colors/icons/taglines</td></tr>
+      <tr><td><code>public/images/thumbnails/</code></td><td>One JPG per video (auto-downloaded; overwrite to customize)</td></tr>
+      <tr><td><code>public/images/generated/</code></td><td>Where YOUR 9 AI images go</td></tr>
+      <tr><td><code>scripts/instagram-sync.mjs</code></td><td>Daily auto-import of new posts/reels/stories</td></tr>
+      <tr><td><code>worker/index.mjs</code></td><td>Serves the site + the AI search endpoint</td></tr>
+      <tr><td><code>docs/</code> · <code>REQUIREMENTS.md</code> (repo root)</td><td>Roadmap, playbooks, brand system, growth ideas, image brief, this hub · all-time requirements</td></tr>
+    </table>
+  </div>
 
-  <div class="card"><h3><span class="hue" style="background:#8b5cf6"></span>1 · cat-mind.jpg — Mind &amp; Discipline (violet)</h3>
-    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
-    <div class="prompt">This man seated in deep meditation posture, eyes closed, calm intensity, violet-purple neon rim light, faint glowing geometric mandala behind his head...</div></div>
+  <h2 id="images">🎨 The 9 images (generate with your face)</h2>
+  <p class="sub">Paste each prompt into ChatGPT with 1–2 clear photos of yourself. Save with the exact filename → drop ALL into <code>public/images/generated/</code> → say “images are in”.</p>
+  <div class="card tablewrap">
+    <table>
+      <tr><th>File</th><th>Ratio</th><th>Size px</th><th>Face</th><th>Prompt core (append the shared suffix below)</th></tr>
+      <tr><td><code>cat-mind.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Seated in deep meditation, eyes closed, violet-purple neon rim light, faint glowing geometric mandala behind head</td></tr>
+      <tr><td><code>cat-fitness.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Mid calisthenics move (planche / muscle-up), emerald-green neon rim light, chalk dust in the air</td></tr>
+      <tr><td><code>cat-ai.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Futuristic engineer, holographic code floating around hands, cyan-blue rim light, cyberpunk lab</td></tr>
+      <tr><td><code>cat-humor.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Laughing with a mischievous wink, warm amber-gold light, film-poster energy</td></tr>
+      <tr><td><code>cat-life.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>From behind on a scooter/temple street at dusk, rose-pink light, South Indian street, nostalgic cinematic</td></tr>
+      <tr><td><code>hero-bg.jpg</code></td><td>16:9</td><td>1920×1080</td><td>❌</td><td>Abstract deep-indigo #0d0a1f aurora ribbons (violet/magenta/cyan), dark edges, no objects</td></tr>
+      <tr><td><code>about-portrait.jpg</code></td><td>4:5</td><td>1080×1350</td><td>✅</td><td>Editorial half-body portrait, arms crossed, slight smile, 85mm, violet gradient light</td></tr>
+      <tr><td><code>og-banner.jpg</code></td><td>1.91:1</td><td>1200×630 exact</td><td>✅</td><td>You on the right third, empty space left, aurora streaks, premium brand banner</td></tr>
+      <tr><td><code>books-teaser.jpg</code></td><td>3:2</td><td>1500×1000</td><td>✅</td><td>Reading in a dark room, single warm lamp, glowing Tamil+English letters dissolving into violet light</td></tr>
+    </table>
+    <div class="label">Shared style suffix — append to every prompt</div>
+    <div class="prompt">...cinematic, dark indigo studio background (#0d0a1f), dramatic neon rim lighting, ultra-detailed, editorial photography style, moody premium aesthetic, no text. Use this person's exact face and hair. Do not alter facial features.</div>
+  </div>
 
-  <div class="card"><h3><span class="hue" style="background:#34d399"></span>2 · cat-fitness.jpg — Calisthenics &amp; Fitness (emerald)</h3>
-    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
-    <div class="prompt">This man mid calisthenics move (straddle planche or muscle-up on a bar), athletic physique, emerald-green neon rim light, chalk dust in the air...</div></div>
+  <h2 id="prompts">✍️ Text-content prompts — paste into ChatGPT / Gemini / Claude</h2>
+  <p class="sub">Each produces content for a specific part of the site. Answer their questions AS YOURSELF; send me the outputs and I wire them in. (The book is excluded — you already gave me the PDF.)</p>
 
-  <div class="card"><h3><span class="hue" style="background:#22d3ee"></span>3 · cat-ai.jpg — AI &amp; Builds (cyan)</h3>
-    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
-    <div class="prompt">This man as a futuristic engineer, holographic code and circuit diagrams floating around his hands, cyan-blue neon rim light, cyberpunk laboratory...</div></div>
+  <div class="card"><h3>1 · Long-form About page</h3><div class="meta"><span class="chip">fills /about</span></div>
+  <div class="prompt">You are my ghostwriter. Interview me with 8 short questions (one at a time) about: my journey into engineering, calisthenics, meditation, why I tested 50 thinkers' philosophies on myself for 6 months, my Tamil roots, and what I want people to get from my content. Then write a 300-word "About" in first person — direct, warm, zero guru-speak, one light Tamil phrase max. My identity line: "☬ Fear lives in one place only... Thats in you Mind🗿 — Distinguished Engr | Author | Calisthenics | Meditation | Memer | AI Architect | Generalist". End with one sentence about my book "The Silence That Haunts".</div></div>
 
-  <div class="card"><h3><span class="hue" style="background:#f59e0b"></span>4 · cat-humor.jpg — Humor &amp; Tamil (amber)</h3>
-    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
-    <div class="prompt">This man laughing with a mischievous wink at camera, playful expression, warm amber-gold neon rim light, film-poster energy, slight caricature vibrance...</div></div>
+  <div class="card"><h3>2 · Projects page case studies</h3><div class="meta"><span class="chip">fills /projects</span></div>
+  <div class="prompt">I built AI apps including a local/offline AI mobile app (chat, personas, habit &amp; routine tracking) and "instauser-understanding". Interview me one question at a time: what each project does, the problem it solves, tech stack, hardest challenge, current status, link if public. Then write each up as a 120-word case study: Problem → What I built → Stack → Status. Confident engineer tone, no marketing fluff.</div></div>
 
-  <div class="card"><h3><span class="hue" style="background:#fb7185"></span>5 · cat-life.jpg — Life &amp; Moments (rose)</h3>
-    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
-    <div class="prompt">This man from behind on a scooter/temple street at dusk, warm rose-pink light, South Indian street atmosphere, nostalgic cinematic travel photo...</div></div>
+  <div class="card"><h3>3 · Blog post drafts (repeatable)</h3><div class="meta"><span class="chip">fills /blog</span></div>
+  <div class="prompt">Write a 500-word blog post as me based on this idea from one of my reels: [PASTE CAPTION OR IDEA]. Voice: first person, direct, short punchy paragraphs, concrete personal examples over abstract advice, no motivational clichés, ends with one actionable takeaway. Title should be specific, not clickbait. I tested everything I write about on myself first — the writing must reflect that.</div></div>
 
-  <h2>Site visuals (6–9)</h2>
-  <div class="card"><h3>6 · hero-bg.jpg — Hero background</h3>
-    <div class="meta"><span class="chip">16:9 · 1920×1080</span><span class="chip">no face</span></div>
-    <div class="prompt">Abstract dark background, deep indigo #0d0a1f, flowing aurora ribbons of violet, magenta and cyan light, subtle grain, very dark edges suitable for white text overlay, premium tech-brand wallpaper, no objects, no text.</div></div>
+  <div class="card"><h3>4 · SEO bios &amp; platform descriptions</h3><div class="meta"><span class="chip">metadata + socials</span></div>
+  <div class="prompt">Create 5 bios from this identity: Nathamuni — Distinguished Engineer, author of "The Silence That Haunts", calisthenics athlete, AI architect, Tamil creator. Site: nathamuni.com (searchable library of my videos on discipline, fitness, AI). Deliver: (1) 155-char SEO meta description, (2) 150-char Instagram bio, (3) YouTube channel description ~500 chars, (4) LinkedIn headline + summary, (5) one-line press bio. Energetic but credible; "tested on myself first" must appear somewhere.</div></div>
 
-  <div class="card"><h3>7 · about-portrait.jpg — About page</h3>
-    <div class="meta"><span class="chip">4:5 · 1080×1350</span><span class="chip b">face required</span></div>
-    <div class="prompt">Confident editorial half-body portrait of this man, arms crossed, slight smile, dark indigo backdrop with soft violet gradient light from the left, shot on 85mm, shallow depth of field, magazine cover quality, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
+  <div class="card"><h3>5 · Newsletter welcome (for later)</h3><div class="meta"><span class="chip">future email capture</span></div>
+  <div class="prompt">Write a 120-word welcome email as me for "One tested idea, weekly" — a newsletter where each issue takes one idea I verified on myself (discipline systems, calisthenics, AI builds) and gives the practical version. Warm, zero corporate tone, one emoji max, ends by inviting a reply about what they're currently struggling to stay consistent with.</div></div>
 
-  <div class="card"><h3>8 · og-banner.jpg — Link-share banner</h3>
-    <div class="meta"><span class="chip">1.91:1 · 1200×630 EXACT</span><span class="chip b">face required</span></div>
-    <div class="prompt">Wide banner: this man on the right third looking toward empty space on the left (text goes there later), dark indigo background with aurora light streaks, cinematic, premium personal-brand website banner, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
-
-  <div class="card"><h3>9 · books-teaser.jpg — Books/Blog teaser</h3>
-    <div class="meta"><span class="chip">3:2 · 1500×1000</span><span class="chip b">face required</span></div>
-    <div class="prompt">This man reading in a dark room lit by a single warm lamp, floating glowing book pages and Tamil + English letters dissolving into violet light around him, contemplative, magical-realism editorial photo, no text. Use this person's exact face and hair. Do not alter facial features.</div></div>
-
-  <h2>What happens after you deliver</h2>
-  <div class="card"><ul class="rules">
-    <li>Category tiles become full image cards with your face, category-hued gradient overlay, still directly clickable.</li>
-    <li>Hero gets the aurora texture; About shows your portrait; every shared link shows the banner.</li>
-    <li>Books/Blog placeholders get the teaser. Later batches (book covers, blog headers, logo) come after.</li>
+  <h2 id="queue">⏭ Your queue (everything waiting on you)</h2>
+  <div class="card"><ul class="plain">
+    <li>🎨 Generate the 9 images above → <code>public/images/generated/</code></li>
+    <li>✍️ Run text prompts 1, 2, 4 (about / projects / bios) → send outputs to me</li>
+    <li>📊 Review Excel (<code>~/Downloads/nathamuni-video-review-v2.xlsx</code>) — fill any rows, anytime</li>
+    <li>🔑 GitHub OAuth app (2-min, guided) → unlocks the /admin phone-editing panel</li>
+    <li>📰 News/live-feed section — queued for our next session</li>
+    <li class="ok">✅ Nothing else — Meta, token renewal, daily sync all run themselves</li>
   </ul></div>
 </main>
 </body>

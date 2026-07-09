@@ -515,13 +515,34 @@
 
 @layer components {
   /* ---------- moments (story archive) ---------- */
-  .moments-strip {
-    @apply flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 sm:mx-0 sm:px-0;
-    scrollbar-width: none;
-    scroll-snap-type: x mandatory;
+  @keyframes moments-flow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
-  .moments-strip::-webkit-scrollbar {
-    display: none;
+  .moments-marquee {
+    @apply overflow-hidden -mx-4 px-4 sm:mx-0 sm:px-0;
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+  }
+  .moments-track {
+    @apply flex gap-3 w-max pb-2;
+    animation: moments-flow 45s linear infinite;
+  }
+  .moments-marquee:hover .moments-track,
+  .moments-marquee:active .moments-track {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .moments-marquee {
+      overflow-x: auto;
+      mask-image: none;
+    }
+    .moments-track {
+      animation: none;
+      width: auto;
+    }
+    .moments-track > [aria-hidden] {
+      display: none;
+    }
   }
   .moment-strip-card {
     @apply relative flex-shrink-0 w-28 sm:w-32 rounded-xl overflow-hidden transition-transform duration-200;
@@ -593,5 +614,113 @@
   }
   .moment-close {
     @apply glass-card px-4 py-1.5 text-sm text-white cursor-pointer;
+  }
+}
+
+@layer components {
+  /* ---------- blog ---------- */
+  .post-list {
+    @apply flex flex-col gap-4 max-w-3xl;
+  }
+  .post-card {
+    @apply glass-card p-5 sm:p-6 flex flex-col gap-1.5 transition-all duration-300 active:scale-[0.99];
+  }
+  .post-card:hover {
+    border-color: hsla(var(--cat, 262), 85%, 70%, 0.6);
+    box-shadow: 0 14px 40px -14px hsla(var(--cat, 262), 85%, 60%, 0.45);
+    transform: translateY(-3px);
+  }
+  .post-card-title {
+    @apply text-lg sm:text-xl;
+  }
+  .post-card-excerpt {
+    @apply text-sm text-white/60 leading-relaxed;
+  }
+  .post-article {
+    @apply max-w-2xl flex flex-col gap-3;
+  }
+  .post-title {
+    @apply text-2xl sm:text-4xl leading-tight;
+    background: linear-gradient(100deg, #ffffff 20%, #d8ccff 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .post-body {
+    @apply flex flex-col gap-4 mt-2 text-white/80 leading-relaxed text-[0.95rem] sm:text-base;
+  }
+  .post-related {
+    @apply mt-8;
+  }
+  .post-related-card {
+    @apply max-w-[240px];
+  }
+}
+
+@layer components {
+  /* ---------- book page ---------- */
+  .book-hero {
+    @apply flex flex-col sm:flex-row gap-8 items-center sm:items-start max-w-4xl mx-auto;
+  }
+  .book-cover {
+    @apply flex-shrink-0 w-48 sm:w-56 rounded-xl flex flex-col items-center justify-center text-center p-6 gap-3;
+    aspect-ratio: 2 / 3;
+    background:
+      radial-gradient(120% 80% at 80% 0%, rgba(139, 92, 246, 0.5), transparent 60%),
+      radial-gradient(100% 70% at 10% 100%, rgba(236, 72, 153, 0.35), transparent 55%),
+      #14102b;
+    border: 1px solid rgba(178, 148, 255, 0.35);
+    box-shadow: 0 24px 70px -20px rgba(139, 92, 246, 0.55);
+  }
+  .book-cover-title {
+    @apply font-display text-xl leading-snug;
+    background: linear-gradient(100deg, #fff, #c4b5fd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .book-cover-author {
+    @apply text-xs text-white/60 tracking-widest uppercase;
+  }
+  .book-hero-copy {
+    @apply flex flex-col gap-3 text-center sm:text-left items-center sm:items-start;
+  }
+  .book-tagline {
+    @apply font-display text-lg text-white/90;
+  }
+  .book-core {
+    @apply text-sm text-white/55 italic;
+  }
+  .book-parts {
+    @apply max-w-4xl mx-auto mt-12;
+  }
+  .book-parts-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+  }
+  .book-part {
+    @apply p-5;
+  }
+  .book-part h3 {
+    @apply text-base mb-1;
+    color: #c4b5fd;
+  }
+  .book-part p {
+    @apply text-sm text-white/65 leading-relaxed;
+  }
+  .book-quotes {
+    @apply max-w-3xl mx-auto mt-12 flex flex-col gap-4;
+  }
+  .book-quote {
+    @apply glass-card px-5 py-4 text-white/85 font-display text-base sm:text-lg leading-relaxed;
+    border-left: 3px solid rgba(139, 92, 246, 0.8);
+  }
+  .book-audience {
+    @apply max-w-3xl mx-auto mt-12 p-6 sm:p-8;
+  }
+  .book-audience p {
+    @apply text-white/75 leading-relaxed;
+  }
+  .book-promise {
+    @apply mt-3 text-sm text-white/50 italic;
   }
 }
