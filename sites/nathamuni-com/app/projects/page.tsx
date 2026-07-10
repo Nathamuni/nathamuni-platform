@@ -1,10 +1,59 @@
-import { ComingSoon } from '@/components/layout/ComingSoon'
+import type { Metadata } from 'next'
+import { getProjects, type ProjectStatus } from '@/lib/projects'
+
+export const metadata: Metadata = {
+  title: 'Projects',
+  description:
+    "Case studies from Nathamuni's build log: offline-first AI, automation systems, and the apps he shipped along the way.",
+  alternates: { canonical: '/projects' },
+}
+
+const STATUS_CLASSES: Record<ProjectStatus, string> = {
+  live: 'text-emerald-300 border-emerald-400/40 bg-emerald-400/10',
+  internal: 'text-violet-300 border-violet-400/40 bg-violet-400/10',
+  'in-progress': 'text-amber-300 border-amber-400/40 bg-amber-400/10',
+  'student-era': 'text-white/50 border-white/20 bg-white/5',
+}
 
 export default function ProjectsPage() {
+  const projects = getProjects()
+
   return (
-    <ComingSoon
-      title="Projects"
-      description="Project write-ups and case studies are coming soon."
-    />
+    <section className="section" data-testid="projects-page">
+      <h1 className="section-title">Projects</h1>
+      <p className="section-sub">
+        What I&apos;ve actually shipped — the problem each one solved, what I built, and where it
+        stands today.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5" data-reveal>
+        {projects.map((project) => (
+          <div key={project.slug} className="glass-card p-5 sm:p-6 flex flex-col gap-3">
+            <span
+              className={`inline-block w-fit text-xs uppercase tracking-widest font-semibold px-3 py-1 rounded-full border ${STATUS_CLASSES[project.status]}`}
+              data-testid={`project-status-${project.slug}`}
+            >
+              {project.statusLabel}
+            </span>
+            <h2 className="font-display text-lg sm:text-xl">{project.name}</h2>
+            <p className="text-white/60 text-sm italic">{project.problem}</p>
+            <p className="text-white/80 text-sm leading-relaxed">{project.built}</p>
+            <ul className="video-card-tags mt-1">
+              {project.stack.map((item) => (
+                <li key={item}>
+                  <span className="detail-tag">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-white/50 text-sm mt-8" data-reveal>
+        That&apos;s the featured seven — sixteen-plus applications shipped in total, several on
+        the Play Store, including a college game and a YouTube spam-comment finder-and-remover bot
+        nobody asked for but everybody&apos;s inbox needed.
+      </p>
+    </section>
   )
 }

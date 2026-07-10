@@ -4,7 +4,8 @@ export interface Story {
   id: string
   date: string
   video: string
-  poster: string
+  /** Null when ffmpeg poster extraction failed (self-healed on a later sync run). */
+  poster: string | null
   title: string | null
 }
 

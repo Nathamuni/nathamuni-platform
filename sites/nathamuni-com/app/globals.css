@@ -194,11 +194,57 @@
     z-index: 2;
   }
 
+  /* ---------- cursor aurora (homepage, desktop-only atmosphere) ---------- */
+  .cursor-aurora {
+    @apply fixed inset-0 pointer-events-none z-40;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-aurora-glow,
+  .cursor-aurora-echo {
+    @apply absolute rounded-full pointer-events-none;
+    top: 0;
+    left: 0;
+    will-change: transform;
+  }
+  .cursor-aurora-glow {
+    width: 420px;
+    height: 420px;
+    filter: blur(90px);
+  }
+  .cursor-aurora-echo {
+    width: 300px;
+    height: 300px;
+    filter: blur(100px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-aurora {
+      display: none;
+    }
+  }
+
   /* ---------- hero ---------- */
   .hero {
-    @apply relative flex flex-col-reverse sm:flex-row items-center gap-5 sm:gap-8 px-4 sm:px-8 pt-8 sm:pt-12 pb-8 max-w-6xl mx-auto overflow-visible;
+    @apply relative flex flex-col-reverse sm:flex-row items-center justify-center gap-6 sm:gap-10 px-4 sm:px-8 pt-10 sm:pt-14 pb-10 max-w-6xl mx-auto overflow-visible;
     --par-x: 0;
     --par-y: 0;
+    min-height: min(90svh, 840px);
+  }
+  .hero-backdrop {
+    @apply absolute inset-0 w-full h-full object-cover pointer-events-none select-none;
+    z-index: -2;
+    opacity: 0.4;
+    border-radius: 2rem;
+    filter: saturate(1.15);
+  }
+  .hero-backdrop-vignette {
+    @apply absolute inset-0 pointer-events-none;
+    z-index: -1;
+    border-radius: 2rem;
+    background:
+      radial-gradient(120% 85% at 50% 40%, transparent 20%, rgba(13, 10, 31, 0.55) 65%, rgba(13, 10, 31, 0.94) 100%),
+      linear-gradient(to bottom, rgba(13, 10, 31, 0.12), rgba(13, 10, 31, 0.7) 90%);
   }
   .hero-orb {
     @apply absolute rounded-full pointer-events-none;
@@ -253,12 +299,30 @@
   }
   .hero-title {
     @apply font-display leading-[0.95];
-    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    font-size: clamp(2.9rem, 7.6vw, 5.6rem);
     text-wrap: balance;
-    background: linear-gradient(100deg, #ffffff 15%, #c4b5fd 45%, #f0abfc 72%, #67e8f9 100%);
+    background: linear-gradient(
+      100deg,
+      #ffffff 8%,
+      #c4b5fd 28%,
+      #f0abfc 48%,
+      #67e8f9 68%,
+      #c4b5fd 86%,
+      #ffffff 100%
+    );
+    background-size: 220% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    animation: hero-title-shimmer 8s ease-in-out infinite alternate;
+  }
+  @keyframes hero-title-shimmer {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 100% 50%;
+    }
   }
   .hero-quote {
     @apply relative italic sm:border-l-2 sm:pl-4;
@@ -271,7 +335,17 @@
     @apply hidden sm:block text-sm text-white/50;
   }
   .hero-portrait-frame {
-    @apply relative flex-shrink-0 w-48 h-48 sm:w-80 sm:h-80;
+    @apply relative flex-shrink-0 w-48 sm:w-72 lg:w-80;
+    aspect-ratio: 4 / 5;
+  }
+  .hero-portrait-frame::after {
+    content: '';
+    @apply absolute inset-0 pointer-events-none rounded-2xl;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -30px 50px -24px rgba(13, 10, 31, 0.6);
   }
   @media (hover: hover) and (pointer: fine) {
     .hero-portrait-frame {
@@ -280,17 +354,19 @@
     }
   }
   .hero-portrait-ring {
-    @apply absolute rounded-full pointer-events-none;
-    inset: -6%;
+    @apply absolute rounded-[2rem] pointer-events-none;
+    inset: -10%;
     z-index: 0;
     background: conic-gradient(from 0deg, #8b5cf6, #ec4899, #22d3ee, #8b5cf6);
-    filter: blur(28px);
-    opacity: 0.45;
+    filter: blur(36px);
+    opacity: 0.5;
     animation: hero-ring-spin 18s linear infinite;
   }
   .hero-portrait-img {
-    @apply relative w-full h-full object-contain rounded-full;
+    @apply relative w-full h-full object-cover rounded-2xl;
     z-index: 1;
+    border: 1px solid rgba(178, 148, 255, 0.28);
+    box-shadow: 0 30px 90px -24px rgba(139, 92, 246, 0.55);
     animation: hero-portrait-float 7s ease-in-out infinite;
   }
   @keyframes hero-ring-spin {
@@ -335,6 +411,37 @@
       animation: none;
       transform: none;
     }
+    .hero-title {
+      animation: none;
+      background-position: 0% 50%;
+    }
+    .scroll-divider {
+      animation: none;
+    }
+  }
+
+  /* ---------- scroll divider ---------- */
+  .scroll-divider {
+    @apply relative mx-auto max-w-5xl h-px my-1 sm:my-3;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(139, 92, 246, 0.65),
+      rgba(236, 72, 153, 0.65),
+      rgba(34, 211, 238, 0.65),
+      transparent
+    );
+    background-size: 200% 100%;
+    opacity: 0.6;
+    animation: scroll-divider-flow 7s linear infinite;
+  }
+  @keyframes scroll-divider-flow {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 200% 50%;
+    }
   }
 
   /* ---------- sections ---------- */
@@ -353,7 +460,7 @@
 
   /* ---------- category tiles ---------- */
   .category-tiles {
-    @apply grid grid-cols-2 lg:grid-cols-5 gap-4;
+    @apply grid grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6;
   }
   /* On the 2-column mobile grid, let the 5th tile span the full row instead
      of leaving an orphaned half-width tile. */
@@ -361,42 +468,52 @@
     @apply col-span-2 lg:col-span-1;
   }
   .category-tile {
-    @apply glass-card relative overflow-hidden p-4 sm:p-5 flex flex-col gap-1 justify-end transition-all duration-300 active:scale-[0.97];
+    @apply glass-card relative overflow-hidden flex flex-col transition-all duration-300 active:scale-[0.97];
     border-color: hsla(var(--cat), 70%, 60%, 0.25);
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 3 / 4;
   }
-  /* The full-row 5th tile on mobile would be huge at 4:5 — go wide instead. */
+  /* The full-row 5th tile on mobile would be huge at 3:4 — go wide instead. */
   .category-tiles > :nth-child(5):last-child .category-tile {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 16 / 9;
   }
   @media (min-width: 1024px) {
     .category-tiles > :nth-child(5):last-child .category-tile {
-      aspect-ratio: 4 / 5;
+      aspect-ratio: 3 / 4;
     }
   }
+  /* Media area holds the art/icon only — the plate below is a separate,
+     fused bottom bar so the label never overlaps a face. */
+  .category-tile-media {
+    @apply relative flex-1 overflow-hidden flex items-center justify-center transition-transform duration-500;
+    background: radial-gradient(120% 120% at 30% 15%, hsla(var(--cat), 70%, 45%, 0.32), rgba(13, 10, 31, 0.65) 72%);
+  }
+  .tilt-card:hover .category-tile-media,
+  .category-tile:hover .category-tile-media {
+    transform: scale(1.035);
+  }
   .category-tile-art {
-    @apply absolute inset-0 w-full h-full object-cover pointer-events-none transition-transform duration-500;
+    @apply absolute inset-0 w-full h-full object-cover pointer-events-none;
+    animation: category-tile-kenburns 14s ease-in-out infinite alternate;
   }
-  .tilt-card:hover .category-tile-art,
-  .category-tile:hover .category-tile-art {
-    transform: scale(1.05);
+  @keyframes category-tile-kenburns {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.12);
+    }
   }
-  /* Text legibility over owner art: dark scrim from the bottom. */
-  .category-tile.has-art::before {
-    content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background: linear-gradient(to top, rgba(13, 10, 31, 0.9) 0%, rgba(13, 10, 31, 0.3) 45%, transparent 70%);
+  .category-tile-icon {
+    @apply relative z-10 text-4xl;
   }
-  .category-tile-name,
-  .category-tile-count {
-    @apply relative z-10;
-  }
-  /* Gradient-glass plate so the label stays legible over any tile art. */
+  /* Fused bottom bar: full-width, rounded only at the bottom, hued top
+     border — a plate, not an overlay, so art stays uncluttered. */
   .category-tile-plate {
-    @apply relative z-10 flex flex-col gap-0.5 rounded-xl px-3 py-2 -mx-1 -mb-1;
-    background: linear-gradient(135deg, hsla(var(--cat), 70%, 58%, 0.28), rgba(13, 10, 31, 0.55) 62%);
-    border: 1px solid hsla(var(--cat), 85%, 75%, 0.38);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    @apply relative z-10 flex flex-col gap-0.5 px-3.5 py-3 sm:px-4 sm:py-3.5;
+    border-radius: 0 0 1rem 1rem;
+    background: linear-gradient(135deg, hsla(var(--cat), 70%, 28%, 0.65), rgba(13, 10, 31, 0.88) 70%);
+    border-top: 1px solid hsla(var(--cat), 85%, 75%, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
@@ -423,15 +540,7 @@
   .tilt-card:hover .category-tile,
   .category-tile:hover {
     border-color: hsla(var(--cat), 85%, 70%, 0.8);
-    box-shadow: 0 14px 44px -12px hsla(var(--cat), 85%, 60%, 0.55);
-  }
-  .category-tile::after {
-    content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background: radial-gradient(120% 90% at 85% 0%, hsla(var(--cat), 80%, 55%, 0.18), transparent 55%);
-  }
-  .category-tile-icon {
-    @apply text-2xl;
+    box-shadow: 0 16px 48px -14px hsla(var(--cat), 85%, 60%, 0.55);
   }
   .category-tile-name {
     @apply font-display text-sm sm:text-base leading-snug;
@@ -472,22 +581,25 @@
 
   /* ---------- video grid & cards ---------- */
   .video-grid {
-    @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5;
+    @apply grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6;
   }
   .video-grid-empty {
     @apply text-white/55 text-center py-14;
   }
 
   .video-card {
-    @apply glass-card overflow-hidden flex flex-col transition-all duration-300 active:scale-[0.98];
+    @apply glass-card overflow-hidden flex flex-col transition-all duration-500 ease-out active:scale-[0.98];
     /* Skip rendering work for cards far off-screen — matters with 79 in the grid. */
     content-visibility: auto;
     contain-intrinsic-size: auto 460px;
   }
   .tilt-card:hover .video-card,
   .video-card:hover {
-    border-color: hsla(var(--cat, 262), 85%, 70%, 0.65);
-    box-shadow: 0 18px 48px -14px hsla(var(--cat, 262), 85%, 60%, 0.5);
+    transform: translateY(-4px);
+    border-color: hsla(var(--cat, 262), 85%, 70%, 0.7);
+    box-shadow:
+      0 24px 60px -18px hsla(var(--cat, 262), 85%, 55%, 0.5),
+      0 8px 22px -12px rgba(0, 0, 0, 0.45);
   }
   .video-card-media {
     @apply block relative overflow-hidden;
@@ -506,20 +618,20 @@
     background: linear-gradient(to top, rgba(7, 7, 12, 0.8), transparent);
   }
   .video-card-body {
-    @apply p-3.5 flex flex-col gap-1.5 flex-1;
+    @apply p-4 flex flex-col gap-2 flex-1;
   }
   .video-card-category {
     @apply text-[0.65rem] uppercase tracking-widest font-semibold;
     color: hsla(var(--cat, 262), 85%, 72%, 1);
   }
   .video-card-title {
-    @apply text-sm sm:text-base leading-snug;
+    @apply text-sm sm:text-base leading-snug tracking-tight;
   }
   .video-card-title a {
     @apply hover:text-white transition-colors;
   }
   .video-card-description {
-    @apply text-xs text-white/55 leading-relaxed;
+    @apply text-xs text-white/55 leading-relaxed mt-0.5;
   }
   .video-card-date {
     @apply text-[0.65rem] text-white/35 mt-auto pt-1;
@@ -646,8 +758,8 @@
     mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
   }
   .moments-track {
-    @apply flex gap-3 w-max pb-2;
-    animation: moments-flow 45s linear infinite;
+    @apply flex gap-4 w-max pb-2;
+    animation: moments-flow 58s linear infinite;
   }
   .moments-marquee:hover .moments-track,
   .moments-marquee:active .moments-track {
@@ -667,7 +779,7 @@
     }
   }
   .moment-strip-card {
-    @apply relative flex-shrink-0 w-28 sm:w-32 rounded-xl overflow-hidden transition-transform duration-200;
+    @apply relative flex-shrink-0 w-32 sm:w-44 rounded-2xl overflow-hidden transition-all duration-300;
     aspect-ratio: 4 / 5;
     scroll-snap-align: start;
     border: 1px solid rgba(178, 148, 255, 0.22);
@@ -676,8 +788,9 @@
     transform: scale(0.96);
   }
   .moment-strip-card:hover {
+    transform: translateY(-3px);
     border-color: rgba(236, 72, 153, 0.6);
-    box-shadow: 0 10px 30px -10px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 14px 36px -12px rgba(236, 72, 153, 0.45);
   }
   .moment-strip-card img {
     @apply w-full h-full object-cover;
@@ -808,9 +921,13 @@
     .video-card:active {
       animation: none;
     }
-    .category-tile-art,
-    .tilt-card:hover .category-tile-art,
-    .category-tile:hover .category-tile-art {
+    .category-tile-art {
+      animation: none;
+      transform: none;
+    }
+    .category-tile-media,
+    .tilt-card:hover .category-tile-media,
+    .category-tile:hover .category-tile-media {
       transition: none;
       transform: none;
     }
@@ -823,15 +940,26 @@
     @apply flex flex-col gap-4 max-w-3xl;
   }
   .post-card {
-    @apply glass-card p-5 sm:p-6 flex flex-col gap-1.5 transition-all duration-300 active:scale-[0.99];
+    @apply glass-card relative overflow-hidden flex flex-col gap-1.5 transition-all duration-300 active:scale-[0.99] p-5 sm:p-6 pl-6 sm:pl-7;
+  }
+  /* Hued rail down the left edge — a quiet category cue before you even read the title. */
+  .post-card::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 pointer-events-none;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      hsla(var(--cat, 262), 85%, 68%, 0.95),
+      hsla(var(--cat, 262), 85%, 50%, 0.25)
+    );
   }
   .post-card:hover {
     border-color: hsla(var(--cat, 262), 85%, 70%, 0.6);
-    box-shadow: 0 14px 40px -14px hsla(var(--cat, 262), 85%, 60%, 0.45);
+    box-shadow: 0 16px 44px -14px hsla(var(--cat, 262), 85%, 60%, 0.5);
     transform: translateY(-3px);
   }
   .post-card-title {
-    @apply text-lg sm:text-xl;
+    @apply font-display text-lg sm:text-xl tracking-tight;
   }
   .post-card-excerpt {
     @apply text-sm text-white/60 leading-relaxed;

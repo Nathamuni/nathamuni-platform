@@ -26,6 +26,19 @@ export default function BooksPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(bookJsonLd) }}
       />
+      <div
+        className="glass-card overflow-hidden mb-8 aspect-[16/7] sm:aspect-[21/6]"
+        data-reveal
+        data-testid="book-banner"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/generated/books-teaser.jpg"
+          alt="The Silence That Haunts — atmospheric banner"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
       <div className="book-hero" data-reveal>
         <div className="book-cover" aria-hidden>
           <span className="book-cover-title">{BOOK.title}</span>

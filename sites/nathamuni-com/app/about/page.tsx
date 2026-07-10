@@ -4,7 +4,7 @@ import { AboutContent } from '@/components/about/AboutContent'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'Who Nathamuni is: engineer, author, calisthenics athlete, and AI architect sharing ideas tested on himself first.',
+    'The arc, the experiments, and the principles behind Nathamuni: self-taught engineer, AI architect, and author who tests everything on himself before he teaches it.',
   alternates: { canonical: '/about' },
 }
 

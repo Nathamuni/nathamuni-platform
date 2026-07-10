@@ -4,7 +4,7 @@ export function HeroPortrait() {
       <span className="hero-portrait-ring" aria-hidden />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/portrait-static.webp"
+        src="/images/generated/about-portrait.jpg"
         alt="Nathamuni portrait"
         className="hero-portrait-img"
         fetchPriority="high"

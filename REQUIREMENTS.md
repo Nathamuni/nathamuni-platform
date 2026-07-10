@@ -131,7 +131,25 @@ Status marks: ✅ shipped & verified live · 🔨 in progress · ⏳ waiting on 
 - ✅ **Prompt log**: every owner directive is appended to `memory/prompt-log.md`
   (standing rule, also stored in agent memory).
 
-## 10. Standing working agreements
+## 10. v10 — the experience overhaul (2026-07-10)
+
+- 🔨 All 9 owner images live (6 new: humor/life tiles, hero-bg, about-portrait,
+  og-banner, books-teaser).
+- 🔨 Hero v3: scroll-stopping full-bleed aurora + real portrait, cursor-following
+  color glow (desktop), 3D everywhere tasteful, fluid; mobile pristine.
+- 🔨 Tiles/cards: label-art mismatch fixed, bigger, elegant "Start here" grid.
+- 🔨 Moments poster bug fixed (ffmpeg silent failure) + sync hardened + UI fallback.
+- 🔨 About page complete rework from verified data (docs/content-source.md).
+- 🔨 Projects page: real case studies (BrainBox, research pipeline, Android
+  automation, meeting intelligence, instauser-understanding, Synergy, SMILES…).
+- 🔨 Blog: researched long-form posts with references (honest framing, his voice).
+- 🔨 /stats: public library statistics page; sync extended to pull like/comment
+  counts (graceful if unavailable).
+- ✅ Owner data pipeline complete: dossiers + resume + about-me delivered and
+  distilled into docs/content-source.md (sanitized; hard exclusions listed).
+- Standing: mobile must never break; no invented facts; sensitive facts excluded.
+
+## 11. Standing working agreements
 
 - Ship via feature branch → tests → PR → CI green → merge → verify LIVE on nathamuni.com.
 - Never expand Meta permissions; never scrape; visitor traffic never touches the

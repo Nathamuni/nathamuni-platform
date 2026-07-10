@@ -1,0 +1,64 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { Companion } from './Companion'
+
+function stubMatchMedia(reducedMotion: boolean) {
+  window.matchMedia = ((query: string) => ({
+    matches: query.includes('reduced-motion') ? reducedMotion : false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia
+}
+
+describe('Companion', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+    stubMatchMedia(false)
+  })
+
+  afterEach(() => {
+    window.localStorage.clear()
+    stubMatchMedia(false)
+  })
+
+  it('renders the picker button', () => {
+    render(<Companion />)
+    expect(screen.getByRole('button', { name: 'Choose companion' })).toBeInTheDocument()
+  })
+
+  it('shows the default character (Kitty) after mount', () => {
+    render(<Companion />)
+    const character = screen.getByTestId('companion-character')
+    expect(character).toBeInTheDocument()
+    expect(character).toHaveAttribute('data-character', 'kitty')
+  })
+
+  it('selecting Off hides the character and persists the choice to localStorage', () => {
+    render(<Companion />)
+    fireEvent.click(screen.getByRole('button', { name: 'Choose companion' }))
+    fireEvent.click(screen.getByRole('menuitemradio', { name: /off/i }))
+
+    expect(screen.queryByTestId('companion-character')).not.toBeInTheDocument()
+    expect(window.localStorage.getItem('companion-choice')).toBe('off')
+  })
+
+  it('renders a static character when prefers-reduced-motion is set', () => {
+    stubMatchMedia(true)
+    render(<Companion />)
+    const character = screen.getByTestId('companion-character')
+    expect(character).toBeInTheDocument()
+    expect(character).toHaveAttribute('data-reduced', 'true')
+  })
+
+  it('does not throw when the document is clicked', () => {
+    render(<Companion />)
+    expect(() => {
+      fireEvent.click(document.body)
+    }).not.toThrow()
+  })
+})

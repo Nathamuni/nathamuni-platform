@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Outfit, Inter } from 'next/font/google'
 import { Nav } from '@/components/layout/Nav'
 import { ScrollReveal } from '@/components/fx/ScrollReveal'
+import { Companion } from '@/components/fx/Companion'
 import { Footer } from '@/components/layout/Footer'
 import { SOCIAL_LINKS } from '@/lib/social'
 import { SITE_URL } from '@/lib/site'
@@ -34,10 +35,11 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: defaultTitle,
     description: PROFILE.metaDescription,
-    images: [{ url: '/images/portrait-static.webp', width: 640, height: 852 }],
+    images: [{ url: '/images/generated/og-banner.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
+    images: ['/images/generated/og-banner.jpg'],
   },
   alternates: {
     canonical: '/',
@@ -53,7 +55,7 @@ const personJsonLd = {
   '@type': 'Person',
   name: PROFILE.name,
   url: SITE_URL,
-  image: `${SITE_URL}/images/portrait-static.webp`,
+  image: `${SITE_URL}/images/generated/about-portrait.jpg`,
   jobTitle: PROFILE.jobTitle,
   description: PROFILE.metaDescription,
   sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube],
@@ -71,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ScrollReveal />
         <main>{children}</main>
         <Footer />
+        <Companion />
       </body>
     </html>
   )
