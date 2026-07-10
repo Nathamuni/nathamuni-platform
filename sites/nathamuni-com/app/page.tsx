@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getAllVideos, getFeaturedVideos } from '@/lib/videos'
 import { PROFILE, rolesLine } from '@/lib/profile'
-import { KineticPortrait } from '@/components/hero/KineticPortrait'
+import { HeroPortrait } from '@/components/hero/HeroPortrait'
 import { HeroParallax } from '@/components/hero/HeroParallax'
 import { SocialButtons } from '@/components/layout/SocialButtons'
 import { CategoryTiles } from '@/components/home/CategoryTiles'
@@ -18,14 +18,13 @@ export default function HomePage() {
   return (
     <>
       <HeroParallax>
-        <div className="hero-portrait">
-          <KineticPortrait />
-        </div>
+        <HeroPortrait />
         <div className="hero-copy anim-fade-up">
-          <h1 className="hero-title">{PROFILE.headline}</h1>
-          <p className="hero-bio">
+          <p className="hero-eyebrow">
             {PROFILE.mark} {rolesLine()}
           </p>
+          <h1 className="hero-title">{PROFILE.name}</h1>
+          <p className="hero-quote">{PROFILE.headline}</p>
           <p className="hero-promise">{PROFILE.promise}</p>
           <Link href="/videos" className="hero-search" data-testid="hero-search-link">
             <span aria-hidden>🔍</span>
@@ -35,7 +34,7 @@ export default function HomePage() {
         </div>
       </HeroParallax>
 
-      <section className="section" aria-labelledby="pillars-heading" data-reveal>
+      <section className="section" aria-labelledby="pillars-heading" data-reveal data-reveal-3d>
         <h2 id="pillars-heading" className="section-title">
           Pick your pillar
         </h2>
@@ -43,7 +42,7 @@ export default function HomePage() {
         <CategoryTiles />
       </section>
 
-      <section className="section" aria-labelledby="featured-heading" data-reveal>
+      <section className="section" aria-labelledby="featured-heading" data-reveal data-reveal-3d>
         <h2 id="featured-heading" className="section-title">
           Start here
         </h2>
@@ -57,7 +56,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="latest-heading" data-reveal>
+      <section className="section" aria-labelledby="latest-heading" data-reveal data-reveal-3d>
         <div className="section-head-row">
           <div>
             <h2 id="latest-heading" className="section-title">

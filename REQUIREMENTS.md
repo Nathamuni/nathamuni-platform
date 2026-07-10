@@ -114,7 +114,24 @@ Status marks: ✅ shipped & verified live · 🔨 in progress · ⏳ waiting on 
 - 📄 **Referable requirements doc**: `sites/nathamuni-com/docs/creator-hub.html` —
   self-contained HTML (requirements, status, all copyable prompts), lives in the repo.
 
-## 9. Standing working agreements
+## 9. v9 — hero & motion round (2026-07-09, same day)
+
+- 🔨 **Moments lightbox navigation**: ‹ › arrows + keyboard arrows to move between
+  stories; when a clip ends it auto-advances to the next (closes after the last).
+- 🔨 **Hero v2 — no video**: kinetic video portrait removed entirely (~8.4 MB);
+  static portrait presented with aurora ring + float + 3D pointer tilt. Text
+  reordered — roles eyebrow first, "Nathamuni" as the headline, the fear quote as
+  a styled accent line (owner: quote must NOT be the first thing).
+- 🔨 **More 3D + auto motion on home**: self-drifting orbs, 3D scroll entrances for
+  home sections; tasteful, reduced-motion-safe, cheap on mobile ("don't make this
+  site slopey").
+- 🔨 **Gradient-glass polish**: glass plates behind category-tile labels (text was
+  unreadable over tile art); shiver press animation on tiles/cards; hover peek
+  opens after 0.6s with a smooth pop.
+- ✅ **Prompt log**: every owner directive is appended to `memory/prompt-log.md`
+  (standing rule, also stored in agent memory).
+
+## 10. Standing working agreements
 
 - Ship via feature branch → tests → PR → CI green → merge → verify LIVE on nathamuni.com.
 - Never expand Meta permissions; never scrape; visitor traffic never touches the
