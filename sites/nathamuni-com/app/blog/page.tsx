@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getAllPosts } from '@/lib/blog'
+import { getAllPosts, getReadingMinutes } from '@/lib/blog'
 import { getCategoryMeta } from '@/lib/categoryMeta'
 
 export const metadata: Metadata = {
@@ -33,14 +33,26 @@ export default function BlogPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="post-card"
+              className="post-card group"
               style={{ '--cat': meta.hue } as React.CSSProperties}
               data-testid="post-card"
             >
-              <span className="video-card-category">{post.category}</span>
+              <div className="flex items-center justify-between gap-3">
+                <span className="video-card-category">
+                  {meta.icon} {post.category}
+                </span>
+                <span className="text-[0.65rem] uppercase tracking-widest text-white/35 flex-shrink-0">
+                  {getReadingMinutes(post)} min read
+                </span>
+              </div>
               <h2 className="post-card-title">{post.title}</h2>
               <p className="post-card-excerpt">{post.excerpt}</p>
-              <span className="video-card-date">{formatDate(post.publishedDate)}</span>
+              <div className="flex items-center justify-between gap-3 mt-1">
+                <span className="video-card-date">{formatDate(post.publishedDate)}</span>
+                <span className="text-xs text-white/30 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
+                  Read →
+                </span>
+              </div>
             </Link>
           )
         })}

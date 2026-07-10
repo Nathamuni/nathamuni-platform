@@ -111,6 +111,27 @@ describe('MomentsWall', () => {
     expect(screen.queryByTestId('moment-lightbox')).not.toBeInTheDocument()
   })
 
+  it('renders a gradient placeholder instead of a broken image when poster is null', () => {
+    const noPoster: Story[] = [
+      { id: 'np1', date: '2026-07-05', video: '/stories/np1.mp4', poster: null, title: null },
+    ]
+    render(<MomentsWall stories={noPoster} />)
+    const card = screen.getByRole('button', { name: /^Play story from/ })
+    expect(card.querySelector('img')).not.toBeInTheDocument()
+    expect(card.querySelector('.thumb-peek-region')).not.toBeInTheDocument()
+    expect(card.textContent).toContain('▶')
+  })
+
+  it('opens the lightbox for a poster-less story without a poster attribute on the video', () => {
+    const noPoster: Story[] = [
+      { id: 'np1', date: '2026-07-05', video: '/stories/np1.mp4', poster: null, title: null },
+    ]
+    render(<MomentsWall stories={noPoster} />)
+    openLightbox(0)
+    const video = screen.getByTestId('moment-lightbox').querySelector('video')!
+    expect(video.getAttribute('poster')).toBeNull()
+  })
+
   it('advances to the next story when the video ends', () => {
     render(<MomentsWall stories={stories} />)
     openLightbox(0)

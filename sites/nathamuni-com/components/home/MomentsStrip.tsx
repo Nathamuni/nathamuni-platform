@@ -20,10 +20,18 @@ function CardList({ stories, hidden }: { stories: Story[]; hidden?: boolean }) {
           aria-hidden={hidden || undefined}
           tabIndex={hidden ? -1 : undefined}
         >
-          <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={story.poster} alt="" loading="lazy" />
-          </ThumbPeek>
+          {story.poster ? (
+            <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={story.poster} alt="" loading="lazy" />
+            </ThumbPeek>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">
+              <span aria-hidden className="text-lg text-white/70">
+                ▶
+              </span>
+            </div>
+          )}
           <span className="moment-strip-date">{shortDate(story.date)}</span>
         </Link>
       ))}

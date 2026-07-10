@@ -63,10 +63,18 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
             onClick={() => setActiveIndex(index)}
             aria-label={`Play story from ${formatDate(story.date)}`}
           >
-            <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={story.poster} alt="" loading="lazy" className="moment-poster" />
-            </ThumbPeek>
+            {story.poster ? (
+              <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={story.poster} alt="" loading="lazy" className="moment-poster" />
+              </ThumbPeek>
+            ) : (
+              <div className="moment-poster bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">
+                <span aria-hidden className="text-2xl text-white/70">
+                  ▶
+                </span>
+              </div>
+            )}
             <span className="moment-play" aria-hidden>
               ▶
             </span>
@@ -87,7 +95,7 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
             <video
               key={active.id}
               src={active.video}
-              poster={active.poster}
+              poster={active.poster ?? undefined}
               controls
               autoPlay
               playsInline

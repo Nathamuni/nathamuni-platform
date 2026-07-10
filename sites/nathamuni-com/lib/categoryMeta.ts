@@ -30,11 +30,13 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     hue: 38,
     icon: '😉',
     tagline: 'Roasts, memes, and Tamil takes in between the lessons.',
+    image: '/images/generated/cat-humor.jpg',
   },
   'Life & Moments': {
     hue: 340,
     icon: '🌊',
     tagline: 'Travel, gratitude, and the days behind the content.',
+    image: '/images/generated/cat-life.jpg',
   },
 }
 

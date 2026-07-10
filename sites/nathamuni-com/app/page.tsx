@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { getAllVideos, getFeaturedVideos } from '@/lib/videos'
+import { getAllStories } from '@/lib/stories'
 import { PROFILE, rolesLine } from '@/lib/profile'
 import { HeroPortrait } from '@/components/hero/HeroPortrait'
 import { HeroParallax } from '@/components/hero/HeroParallax'
+import { CursorAurora } from '@/components/fx/CursorAurora'
 import { SocialButtons } from '@/components/layout/SocialButtons'
 import { CategoryTiles } from '@/components/home/CategoryTiles'
 import { VideoCard } from '@/components/video/VideoCard'
@@ -14,25 +16,46 @@ export default function HomePage() {
   const videos = getAllVideos()
   const featured = getFeaturedVideos()
   const latest = videos.filter((v) => (v.mediaType ?? 'reel') === 'reel').slice(0, 4)
+  const momentsCount = getAllStories().length
 
   return (
     <>
+      <CursorAurora />
       <HeroParallax>
         <HeroPortrait />
-        <div className="hero-copy anim-fade-up">
-          <p className="hero-eyebrow">
+        <div className="hero-copy">
+          <p className="hero-eyebrow anim-fade-up">
             {PROFILE.mark} {rolesLine()}
           </p>
-          <h1 className="hero-title">{PROFILE.name}</h1>
-          <p className="hero-quote">{PROFILE.headline}</p>
-          <p className="hero-promise">{PROFILE.promise}</p>
-          <Link href="/videos" className="hero-search" data-testid="hero-search-link">
+          <h1 className="hero-title anim-fade-up anim-delay-1">{PROFILE.name}</h1>
+          <p className="hero-quote anim-fade-up anim-delay-2">{PROFILE.headline}</p>
+          <p className="hero-promise anim-fade-up anim-delay-2">{PROFILE.promise}</p>
+          <Link
+            href="/videos"
+            className="hero-search anim-fade-up anim-delay-3"
+            data-testid="hero-search-link"
+          >
             <span aria-hidden>🔍</span>
             <span>Search all {videos.length} — try &ldquo;discipline&rdquo; or &ldquo;push-ups&rdquo;</span>
           </Link>
-          <SocialButtons />
+          <div className="hero-stats anim-fade-up anim-delay-3" data-testid="hero-stats">
+            <span className="hero-stat">
+              <strong>{videos.length}</strong> videos
+            </span>
+            <span className="hero-stat">
+              <strong>{momentsCount}</strong> moments
+            </span>
+            <span className="hero-stat">
+              <strong>1</strong> book
+            </span>
+          </div>
+          <div className="anim-fade-up anim-delay-4">
+            <SocialButtons />
+          </div>
         </div>
       </HeroParallax>
+
+      <div className="scroll-divider" aria-hidden />
 
       <section className="section" aria-labelledby="pillars-heading" data-reveal data-reveal-3d>
         <h2 id="pillars-heading" className="section-title">

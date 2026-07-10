@@ -17,14 +17,18 @@ export function CategoryTiles() {
               style={{ '--cat': meta.hue } as React.CSSProperties}
               data-testid="category-tile"
             >
-              {meta.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={meta.image} alt="" loading="lazy" className="category-tile-art" />
-              ) : (
-                <span className="category-tile-icon" aria-hidden>
-                  {meta.icon}
-                </span>
-              )}
+              {/* Media area only — the label plate below is fused to the
+                  bottom edge so text never sits over the subject's face. */}
+              <span className="category-tile-media">
+                {meta.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={meta.image} alt="" loading="lazy" className="category-tile-art" />
+                ) : (
+                  <span className="category-tile-icon" aria-hidden>
+                    {meta.icon}
+                  </span>
+                )}
+              </span>
               <span className="category-tile-plate">
                 <span className="category-tile-name">{category}</span>
                 <span className="category-tile-count">{count} videos</span>

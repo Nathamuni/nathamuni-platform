@@ -10,8 +10,8 @@
  * Usage:
  *   IG_ACCESS_TOKEN=... node scripts/instagram-sync.mjs [--dry-run]
  */
-import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -85,41 +85,72 @@ function draftEntry(media, existingIds) {
   const tags = [...new Set([...CAT_TAGS[category], ...hashtags])].slice(0, 8)
   const short = firstLine.length > 0 ? (firstLine.length > 140 ? firstLine.slice(0, 137) + '…' : firstLine) : title
 
-  return {
-    entry: {
-      id: slug,
-      title,
-      instagramUrl: media.permalink.includes('/reel/')
-        ? `https://www.instagram.com/reel/${shortcode}/`
-        : `https://www.instagram.com/p/${shortcode}/`,
-      thumbnail: `/images/thumbnails/${shortcode}.jpg`,
-      mediaType: media.media_type === 'VIDEO' ? 'reel' : 'post',
-      category,
-      tags,
-      shortDescription: short,
-      detailedDescription: body || title,
-      featured: false,
-      publishedDate: date,
-    },
-    shortcode,
+  const entry = {
+    id: slug,
+    title,
+    instagramUrl: media.permalink.includes('/reel/')
+      ? `https://www.instagram.com/reel/${shortcode}/`
+      : `https://www.instagram.com/p/${shortcode}/`,
+    thumbnail: `/images/thumbnails/${shortcode}.jpg`,
+    mediaType: media.media_type === 'VIDEO' ? 'reel' : 'post',
+    category,
+    tags,
+    shortDescription: short,
+    detailedDescription: body || title,
+    featured: false,
+    publishedDate: date,
   }
+  // Engagement counts are best-effort — only set when the API actually returned them.
+  if (typeof media.like_count === 'number') entry.likeCount = media.like_count
+  if (typeof media.comments_count === 'number') entry.commentsCount = media.comments_count
+
+  return { entry, shortcode }
 }
 
+const BASE_FIELDS = 'id,media_type,permalink,caption,thumbnail_url,media_url,timestamp'
+const ENGAGEMENT_FIELDS = 'like_count,comments_count'
+
+function mediaUrl(fields) {
+  return `${API}/me/media?fields=${fields}&limit=50&access_token=${TOKEN}`
+}
+
+function fatal(error) {
+  console.error(`Instagram API error: ${error.message} (code ${error.code})`)
+  console.error('If the token expired (60-day lifetime), regenerate it in the Meta dashboard and update the IG_ACCESS_TOKEN secret.')
+  process.exit(1)
+}
+
+/**
+ * Pulls every media item. Tries to include like_count/comments_count; if the
+ * API rejects those fields (older API version, permission gap, etc.) it
+ * retries once without them so engagement data degrades gracefully instead
+ * of blocking the whole sync.
+ */
 async function fetchAllMedia() {
-  const items = []
-  let url = `${API}/me/media?fields=id,media_type,permalink,caption,thumbnail_url,media_url,timestamp&limit=50&access_token=${TOKEN}`
-  while (url) {
-    const res = await fetch(url)
-    const data = await res.json()
-    if (data.error) {
-      console.error(`Instagram API error: ${data.error.message} (code ${data.error.code})`)
-      console.error('If the token expired (60-day lifetime), regenerate it in the Meta dashboard and update the IG_ACCESS_TOKEN secret.')
-      process.exit(1)
-    }
-    items.push(...data.data)
-    url = data.paging?.next ?? null
+  let fields = `${BASE_FIELDS},${ENGAGEMENT_FIELDS}`
+  let engagementSupported = true
+
+  let res = await fetch(mediaUrl(fields))
+  let data = await res.json()
+  if (data.error) {
+    console.warn(`Engagement fields rejected (${data.error.message}) — retrying without like/comment counts.`)
+    engagementSupported = false
+    fields = BASE_FIELDS
+    res = await fetch(mediaUrl(fields))
+    data = await res.json()
   }
-  return items
+  if (data.error) fatal(data.error)
+
+  const items = [...data.data]
+  let next = data.paging?.next ?? null
+  while (next) {
+    const pageRes = await fetch(next)
+    const page = await pageRes.json()
+    if (page.error) fatal(page.error)
+    items.push(...page.data)
+    next = page.paging?.next ?? null
+  }
+  return { items, engagementSupported }
 }
 
 async function downloadThumbnail(thumbUrl, shortcode) {
@@ -139,7 +170,7 @@ const knownShortcodes = new Set(
 )
 const existingIds = new Set(videos.map((v) => v.id))
 
-const media = await fetchAllMedia()
+const { items: media, engagementSupported } = await fetchAllMedia()
 const syncable = media.filter(
   (m) =>
     (m.media_type === 'VIDEO' && m.permalink?.includes('/reel/')) ||
@@ -147,6 +178,7 @@ const syncable = media.filter(
     m.media_type === 'CAROUSEL_ALBUM'
 )
 console.log(`API media: ${media.length} total, ${syncable.length} syncable; site library: ${videos.length}`)
+if (!engagementSupported) console.log('Engagement counts (likes/comments) unavailable this run.')
 
 const additions = []
 for (const m of syncable) {
@@ -161,14 +193,42 @@ for (const m of syncable) {
   console.log(`+ ${entry.publishedDate}  [${entry.category}]  ${entry.title}`)
 }
 
-if (additions.length === 0) {
+// Engagement counts drift over time, so existing entries get their
+// likeCount/commentsCount refreshed in place — every other hand-edited field
+// (title, category, tags, descriptions, ...) is left exactly as-is, matching
+// the "never touch existing entries" rule the rest of this script follows.
+let engagementUpdated = false
+if (engagementSupported) {
+  const byShortcode = new Map(
+    media.map((m) => [m.permalink.replace(/\/$/, '').split('/').pop(), m])
+  )
+  for (const v of videos) {
+    const shortcode = v.instagramUrl.replace(/\/$/, '').split('/').pop().split('?')[0]
+    const m = byShortcode.get(shortcode)
+    if (!m) continue
+    if (typeof m.like_count === 'number' && v.likeCount !== m.like_count) {
+      v.likeCount = m.like_count
+      engagementUpdated = true
+    }
+    if (typeof m.comments_count === 'number' && v.commentsCount !== m.comments_count) {
+      v.commentsCount = m.comments_count
+      engagementUpdated = true
+    }
+  }
+}
+
+if (additions.length === 0 && !engagementUpdated) {
   console.log('Nothing new — library is in sync.')
 } else if (DRY_RUN) {
-  console.log(`DRY RUN: would add ${additions.length} new item(s).`)
+  console.log(
+    `DRY RUN: would add ${additions.length} new item(s)${engagementUpdated ? ' and refresh engagement counts' : ''}.`
+  )
 } else {
   mkdirSync(THUMBS_DIR, { recursive: true })
   writeFileSync(VIDEOS_JSON, JSON.stringify([...videos, ...additions], null, 2) + '\n')
-  console.log(`Added ${additions.length} new item(s) to videos.json.`)
+  console.log(
+    `Added ${additions.length} new item(s) to videos.json${engagementUpdated ? '; refreshed engagement counts' : ''}.`
+  )
 }
 
 // ---- Stories: archive today's active stories before Instagram deletes them ----
@@ -177,12 +237,76 @@ if (additions.length === 0) {
 // back to storing the original file if unavailable.
 
 function hasFfmpeg() {
-  try {
-    execFileSync('ffmpeg', ['-version'], { stdio: 'ignore' })
-    return true
-  } catch {
-    return false
+  const res = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' })
+  return !res.error && res.status === 0
+}
+
+/**
+ * Runs ffmpeg and only reports success when the process actually exited 0
+ * AND the expected output file exists — ffmpeg occasionally exits cleanly
+ * without writing a frame (e.g. a bad -ss offset on a very short clip), and
+ * that used to slip through silently, leaving stories.json pointing at a
+ * poster/video file that was never created. Cleans up any partial output on
+ * failure so a later run doesn't mistake it for a real file.
+ */
+function runFfmpeg(args, outputPath) {
+  const res = spawnSync('ffmpeg', args, { stdio: 'ignore' })
+  const ok = !res.error && res.status === 0 && existsSync(outputPath)
+  if (!ok && existsSync(outputPath)) {
+    try {
+      unlinkSync(outputPath)
+    } catch {
+      /* best effort cleanup */
+    }
   }
+  return ok
+}
+
+function encodeStoryVideo(rawPath, outPath) {
+  return runFfmpeg(
+    ['-nostdin', '-y', '-i', rawPath,
+      '-vf', "scale='min(480,iw)':-2", '-c:v', 'libx264', '-preset', 'slow', '-crf', '28',
+      '-c:a', 'aac', '-b:a', '80k', '-movflags', '+faststart', outPath],
+    outPath
+  )
+}
+
+function extractPoster(videoPath, posterPath) {
+  return runFfmpeg(
+    ['-nostdin', '-y', '-ss', '0.5', '-i', videoPath,
+      '-vframes', '1', '-update', '1', '-q:v', '5', posterPath],
+    posterPath
+  )
+}
+
+/**
+ * Self-healing pass: any archived story whose poster is missing (null, or a
+ * path that doesn't actually exist on disk) gets a fresh extraction attempt
+ * from its already-archived video, so a one-off ffmpeg hiccup doesn't leave
+ * a dead poster forever.
+ */
+function healMissingPosters(stories, ffmpegAvailable) {
+  if (!ffmpegAvailable || DRY_RUN) return { healed: 0, changed: 0 }
+  let healed = 0
+  let changed = 0
+  for (const s of stories) {
+    const posterPath = s.poster ? join(SITE_ROOT, 'public', s.poster.replace(/^\//, '')) : null
+    if (posterPath && existsSync(posterPath)) continue
+    const videoPath = join(SITE_ROOT, 'public', s.video.replace(/^\//, ''))
+    if (!existsSync(videoPath)) continue
+    const target = join(STORIES_DIR, `${s.id}.jpg`)
+    if (extractPoster(videoPath, target)) {
+      s.poster = `/stories/${s.id}.jpg`
+      healed++
+      changed++
+      console.log(`healed poster for story ${s.id}`)
+    } else if (s.poster !== null) {
+      // Was pointing at a dead path — mark it honestly rather than leave a lie.
+      s.poster = null
+      changed++
+    }
+  }
+  return { healed, changed }
 }
 
 async function syncStories() {
@@ -195,15 +319,24 @@ async function syncStories() {
     return
   }
   const active = (data.data ?? []).filter((s) => s.media_type === 'VIDEO' && s.media_url)
-  if (active.length === 0) {
-    console.log('No active stories right now.')
-    return
-  }
 
   const stories = existsSync(STORIES_JSON) ? JSON.parse(readFileSync(STORIES_JSON, 'utf8')) : []
   const knownStories = new Set(stories.map((s) => s.id))
   const ffmpeg = hasFfmpeg()
   mkdirSync(STORIES_DIR, { recursive: true })
+
+  const { healed, changed: healChanged } = healMissingPosters(stories, ffmpeg)
+
+  if (active.length === 0) {
+    console.log('No active stories right now.')
+    if (healChanged > 0 && !DRY_RUN) {
+      stories.sort((a, b) => b.date.localeCompare(a.date))
+      writeFileSync(STORIES_JSON, JSON.stringify(stories, null, 2) + '\n')
+      console.log(`Healed ${healed} poster(s).`)
+    }
+    return
+  }
+
   let added = 0
 
   for (const s of active) {
@@ -217,33 +350,41 @@ async function syncStories() {
       console.log(`DRY RUN: would archive story ${s.id}`)
       continue
     }
+
+    let posterOk = false
     if (ffmpeg) {
       const tmp = join(STORIES_DIR, `${s.id}.tmp.mp4`)
       writeFileSync(tmp, raw)
-      execFileSync('ffmpeg', ['-nostdin', '-y', '-i', tmp,
-        '-vf', "scale='min(480,iw)':-2", '-c:v', 'libx264', '-preset', 'slow', '-crf', '28',
-        '-c:a', 'aac', '-b:a', '80k', '-movflags', '+faststart', video], { stdio: 'ignore' })
-      execFileSync('ffmpeg', ['-nostdin', '-y', '-ss', '0.5', '-i', video,
-        '-vframes', '1', '-update', '1', '-q:v', '5', poster], { stdio: 'ignore' })
-      execFileSync('rm', [tmp])
+      const videoOk = encodeStoryVideo(tmp, video)
+      if (existsSync(tmp)) unlinkSync(tmp)
+      if (videoOk) {
+        posterOk = extractPoster(video, poster)
+        if (!posterOk) {
+          console.warn(`ffmpeg poster extraction failed for story ${s.id} — storing without a poster.`)
+        }
+      } else {
+        console.warn(`ffmpeg video encode failed for story ${s.id} — storing the original file.`)
+        writeFileSync(video, raw)
+      }
     } else {
       writeFileSync(video, raw)
     }
+
     stories.push({
       id: s.id,
       date: s.timestamp.slice(0, 10),
       video: `/stories/${s.id}.mp4`,
-      poster: `/stories/${s.id}.jpg`,
+      poster: posterOk ? `/stories/${s.id}.jpg` : null,
       title: null,
     })
     added++
-    console.log(`+ story ${s.timestamp.slice(0, 10)} ${s.id}`)
+    console.log(`+ story ${s.timestamp.slice(0, 10)} ${s.id}${posterOk ? '' : ' (no poster)'}`)
   }
 
-  if (added > 0 && !DRY_RUN) {
+  if ((added > 0 || healChanged > 0) && !DRY_RUN) {
     stories.sort((a, b) => b.date.localeCompare(a.date))
     writeFileSync(STORIES_JSON, JSON.stringify(stories, null, 2) + '\n')
-    console.log(`Archived ${added} story/stories.`)
+    console.log(`Archived ${added} story/stories${healed > 0 ? `, healed ${healed} poster(s)` : ''}.`)
   }
 }
 

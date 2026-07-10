@@ -7,7 +7,7 @@ describe('HeroPortrait', () => {
     render(<HeroPortrait />)
     const img = screen.getByTestId('hero-portrait-img')
     expect(img).toBeInTheDocument()
-    expect(img).toHaveAttribute('src', '/images/portrait-static.webp')
+    expect(img).toHaveAttribute('src', '/images/generated/about-portrait.jpg')
   })
 
   it('renders the frame wrapper', () => {

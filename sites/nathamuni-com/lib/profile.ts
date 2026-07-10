@@ -26,17 +26,16 @@ export const PROFILE = {
     'Videos on discipline, calisthenics, and AI — tested on myself first. No endless scrolling: search them.',
   /** Short intro for the homepage About preview. */
   aboutShort:
-    "I turn six months of testing 50 thinkers' life philosophies, calisthenics training, and AI architecture work into short, useful videos — so you don't have to scroll to find the one that matters to you right now.",
-  /** Full about-page paragraphs, rendered in order. */
+    "Self-taught since a childhood where school didn't come easy, now a distinguished engineer building offline-first AI. I test everything on myself first — six months on 50 thinkers, a solo marathon with no race bib, a back injury I trained back from — before it becomes a video or a line of code.",
+  /** Intro paragraphs shown at the top of the about page, beside the portrait. */
   aboutLong: [
-    '☬ Fear lives in one place only... Thats in you Mind🗿',
-    'Distinguished Engr | Author | Calisthenics | Meditation | Memer | AI Architect | Generalist',
-    "I spent six months putting the core ideas of 50 different thinkers to the test in my own life, and now I share what actually holds up — personal growth, calisthenics training, and the occasional roast of my own DMs — in short videos instead of long threads. This site exists so you can search and find the one that's useful to you right now, instead of scrolling for it.",
+    "I'm Nathamuni — twenty-three, based in Trichy, Tamil Nadu. On paper: a distinguished engineer working on AI-driven, offline-first systems. Off paper: the same kid who found school hard and decided to teach himself everything else instead.",
+    "Nothing goes on this site until it survives contact with my own life first — training, habits, the AI I build, the philosophies I test. If it didn't hold up under me, it doesn't get taught to you.",
   ],
   /** Used in metadata + JSON-LD. */
   jobTitle: 'Distinguished Engineer & AI Architect',
   metaDescription:
-    'The organized library of Nathamuni: videos on discipline, calisthenics, and AI — tested on myself first. Search by topic instead of scrolling a feed.',
+    'Nathamuni: distinguished engineer and AI architect, self-taught since childhood, tested on himself first — offline-first AI, calisthenics, and a book built from three years of failure.',
 } as const
 
 export function rolesLine(): string {
