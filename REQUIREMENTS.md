@@ -149,7 +149,23 @@ Status marks: ✅ shipped & verified live · 🔨 in progress · ⏳ waiting on 
   distilled into docs/content-source.md (sanitized; hard exclusions listed).
 - Standing: mobile must never break; no invented facts; sensitive facts excluded.
 
-## 11. Standing working agreements
+## 11. v11–v12 — polish + journey + AI twin (2026-07-11)
+
+- 🔨 v11 polish: cursor effect behind content (was hiding details), vibrant
+  bottom-lane kitty, premium /stats redesign, tile label contrast, moments strip
+  uniformity, books banner crop, blog text hardening, moments thought-cards +
+  end-cap, mobile humor-tile crop. About: current = software developer in
+  Chennai; book date confirmed November 2025.
+- 🔨 v12 /journey: animated decision-map page (ideology, policies, dated
+  decisions) + dreams/goals/milestones tracker (lib/journey.ts, owner-editable).
+- 🔨 v12 /ask: "Ask Nathamuni" AI twin on Cloudflare Workers AI (free tier, no
+  paid key) — persona in his voice, grounded ONLY in sanitized verified facts +
+  site content, per-IP rate limiting, refusal on private topics.
+- ⏳ GitHub public-stats feed (weekly action) — pending owner's GitHub username
+  confirmation. Rejected for now: Meta insights (API-block risk), Play scraping
+  (fragile), fitness OAuth (infrastructure).
+
+## 12. Standing working agreements
 
 - Ship via feature branch → tests → PR → CI green → merge → verify LIVE on nathamuni.com.
 - Never expand Meta permissions; never scrape; visitor traffic never touches the

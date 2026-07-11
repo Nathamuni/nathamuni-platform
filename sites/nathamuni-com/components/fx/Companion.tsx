@@ -9,6 +9,14 @@ const DEFAULT_CHARACTER: Character = 'kitty'
 const MOBILE_BREAKPOINT = 640
 const MOBILE_BASELINE = 72
 const DESKTOP_BASELINE = 24
+// Bottom lane: how far the character's lowest edge is ever allowed to sit
+// from the viewport's true bottom, on any axis of movement (idle / seek /
+// sit / scamper). Desktop stays tight; mobile leaves room for the tab bar.
+const DESKTOP_LANE_BAND = 90
+const MOBILE_LANE_BAND = 150
+// Horizontal clearance kept free of the bottom-right character picker so the
+// wandering/seeking/scampering character never settles under its own button.
+const PICKER_CLEARANCE = 76
 const NOTICE_RADIUS = 260
 const POINTER_STOP_MS = 220
 const IGNORE_TIMEOUT_MS = 8000
@@ -23,6 +31,18 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
+/** Clamp a Y coordinate into the bottom lane for the given viewport/size. */
+function laneY(y: number, size: number, mobile: boolean) {
+  const vh = window.innerHeight
+  const band = mobile ? MOBILE_LANE_BAND : DESKTOP_LANE_BAND
+  return clamp(y, vh - band - size, vh - size)
+}
+
+/** Rightmost X the character may occupy, leaving the picker button clear. */
+function maxX(vw: number, size: number) {
+  return Math.max(4, vw - size - PICKER_CLEARANCE)
+}
+
 function isCharacter(value: string | null): value is Character {
   return value === 'kitty' || value === 'spark' || value === 'off'
 }
@@ -31,6 +51,7 @@ interface EyeRefs {
   uid: string
   pupilRefs: React.MutableRefObject<Array<SVGCircleElement | null>>
   eyeRefs: React.MutableRefObject<Array<SVGGElement | null>>
+  reducedMotion: boolean
 }
 
 interface KittySvgProps extends EyeRefs {
@@ -39,18 +60,37 @@ interface KittySvgProps extends EyeRefs {
 
 /**
  * Small vector cat: rounded body, triangle ears with an inner-ear accent,
- * a swishable tail, and two tracked pupils.
+ * a swishable tail, and two tracked pupils. The body is a living
+ * violet→magenta→cyan gradient with a slow rotating sweep and a soft
+ * blurred glow duplicate behind it for extra vibrancy.
  */
-function KittySvg({ uid, pupilRefs, eyeRefs, tailRef }: KittySvgProps) {
+function KittySvg({ uid, pupilRefs, eyeRefs, tailRef, reducedMotion }: KittySvgProps) {
   const gradId = `cmp-kitty-grad-${uid}`
+  const glowId = `cmp-kitty-glow-${uid}`
   return (
     <svg width={56} height={56} viewBox="0 0 64 64" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#8b5cf6" />
-          <stop offset="100%" stopColor="#ec4899" />
+          <stop offset="50%" stopColor="#ec4899" />
+          <stop offset="100%" stopColor="#22d3ee" />
+          {!reducedMotion && (
+            <animateTransform
+              attributeName="gradientTransform"
+              type="rotate"
+              from="0 32 32"
+              to="360 32 32"
+              dur="8s"
+              repeatCount="indefinite"
+            />
+          )}
         </linearGradient>
+        <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation={5} />
+        </filter>
       </defs>
+      <ellipse cx="30" cy="46" rx="24" ry="18" fill={`url(#${gradId})`} opacity={0.5} filter={`url(#${glowId})`} />
+      <circle cx="32" cy="28" r="19" fill={`url(#${gradId})`} opacity={0.45} filter={`url(#${glowId})`} />
       <path
         ref={tailRef}
         className="cmp-tail"
@@ -64,8 +104,8 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef }: KittySvgProps) {
       <ellipse cx="30" cy="46" rx="20" ry="14" fill={`url(#${gradId})`} />
       <path d="M18 18 L14 4 L28 16 Z" fill="#8b5cf6" />
       <path d="M46 18 L50 4 L36 16 Z" fill="#8b5cf6" />
-      <path d="M20 14 L18 7 L24 14 Z" fill="#ec4899" />
-      <path d="M44 14 L46 7 L40 14 Z" fill="#ec4899" />
+      <path d="M20 14 L18 7 L24 14 Z" fill="#22d3ee" />
+      <path d="M44 14 L46 7 L40 14 Z" fill="#22d3ee" />
       <circle cx="32" cy="28" r="16" fill={`url(#${gradId})`} />
       {[26, 38].map((cx, i) => (
         <g
@@ -75,7 +115,8 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef }: KittySvgProps) {
           }}
           style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
         >
-          <circle cx={cx} cy="27" r="4.4" fill="#ffffff" />
+          <circle cx={cx} cy="27" r="4.8" fill="#ffffff" />
+          <circle cx={cx} cy="27" r="4.8" fill="none" stroke="#22d3ee" strokeOpacity={0.55} strokeWidth={0.6} />
           <circle
             ref={(el) => {
               pupilRefs.current[i] = el
@@ -98,25 +139,31 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef }: KittySvgProps) {
 }
 
 /**
- * Glowing aurora orb: soft blurred halo behind a violet-to-cyan gradient
- * sphere, with two tracked eye-glints.
+ * Glowing aurora orb: soft blurred halo behind a richer four-stop
+ * cyan→violet→magenta sphere that gently pulses, with two tracked
+ * eye-glints.
  */
-function SparkSvg({ uid, pupilRefs, eyeRefs }: EyeRefs) {
+function SparkSvg({ uid, pupilRefs, eyeRefs, reducedMotion }: EyeRefs) {
   const gradId = `cmp-spark-grad-${uid}`
   const blurId = `cmp-spark-blur-${uid}`
   return (
     <svg width={52} height={52} viewBox="0 0 60 60" fill="none" aria-hidden="true">
       <defs>
-        <radialGradient id={gradId} cx="35%" cy="30%" r="72%">
-          <stop offset="0%" stopColor="#22d3ee" />
-          <stop offset="55%" stopColor="#8b5cf6" />
+        <radialGradient id={gradId} cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="#67e8f9" />
+          <stop offset="35%" stopColor="#22d3ee" />
+          <stop offset="65%" stopColor="#8b5cf6" />
           <stop offset="100%" stopColor="#ec4899" />
         </radialGradient>
         <filter id={blurId} x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation={4.5} />
         </filter>
       </defs>
-      <circle cx="30" cy="30" r="22" fill={`url(#${gradId})`} opacity={0.5} filter={`url(#${blurId})`} />
+      <circle cx="30" cy="30" r="22" fill={`url(#${gradId})`} opacity={0.55} filter={`url(#${blurId})`}>
+        {!reducedMotion && (
+          <animate attributeName="r" values="22;25;22" dur="3.2s" repeatCount="indefinite" />
+        )}
+      </circle>
       <circle cx="30" cy="30" r="17" fill={`url(#${gradId})`} />
       {[24, 36].map((cx, i) => (
         <g
@@ -336,11 +383,16 @@ export function Companion() {
       sitSince: 0,
       peekX: 0,
       lastScrollY: window.scrollY,
+      // Raw (unclamped) point the character should visually gaze toward,
+      // e.g. a click far up the page — the body stays in its lane but the
+      // eyes/head tilt up toward it.
+      gazeAt: null as XY | null,
     }
 
     const pickWanderTarget = () => {
       const vw = window.innerWidth
-      state.target = { x: clamp(Math.random() * vw, 4, Math.max(4, vw - size - 4)), y: baselineY() }
+      const mobile = vw < MOBILE_BREAKPOINT
+      state.target = { x: clamp(Math.random() * vw, 4, maxX(vw, size)), y: laneY(baselineY(), size, mobile) }
     }
     state.target = { x: state.pos.x, y: state.pos.y }
     pickWanderTarget()
@@ -360,13 +412,22 @@ export function Companion() {
     const onDocClick = (e: MouseEvent) => {
       if (pickerWrapRef.current?.contains(e.target as Node)) return
       const vw = window.innerWidth
-      const vh = window.innerHeight
+      const mobile = vw < MOBILE_BREAKPOINT
       state.mode = 'scamper'
       state.hopping = false
+      state.gazeAt = { x: e.clientX, y: e.clientY }
       state.target = {
-        x: clamp(e.clientX - size / 2, 0, Math.max(0, vw - size)),
-        y: clamp(e.clientY - size / 2, 0, Math.max(0, vh - size)),
+        x: clamp(e.clientX - size / 2, 0, maxX(vw, size)),
+        y: laneY(e.clientY - size / 2, size, mobile),
       }
+      // Near-instant start: kick velocity toward the target immediately
+      // instead of waiting for the spring to build up from rest.
+      const dirX = state.target.x - state.pos.x
+      const dirY = state.target.y - state.pos.y
+      const dist = Math.hypot(dirX, dirY) || 1
+      const kick = 7
+      state.vel.x = (dirX / dist) * kick
+      state.vel.y = (dirY / dist) * kick
     }
 
     const onScroll = () => {
@@ -391,7 +452,7 @@ export function Companion() {
       last = now
 
       const vw = window.innerWidth
-      const vh = window.innerHeight
+      const mobile = vw < MOBILE_BREAKPOINT
 
       if (state.mode === 'idle') {
         if (state.hasMouse && now - state.lastPointerMoveAt > POINTER_STOP_MS) {
@@ -400,8 +461,8 @@ export function Companion() {
           if (Math.hypot(dx, dy) < NOTICE_RADIUS) {
             state.mode = 'seeking'
             state.target = {
-              x: clamp(state.pointer.x - size * 0.7, 0, Math.max(0, vw - size)),
-              y: clamp(state.pointer.y - size * 0.4, 0, Math.max(0, vh - size)),
+              x: clamp(state.pointer.x - size * 0.7, 0, maxX(vw, size)),
+              y: laneY(state.pointer.y - size * 0.4, size, mobile),
             }
           }
         }
@@ -422,8 +483,8 @@ export function Companion() {
           state.wanderAt = now
         } else if (state.hasMouse && now - state.lastPointerMoveAt < 60) {
           const nextTarget = {
-            x: clamp(state.pointer.x - size * 0.7, 0, Math.max(0, vw - size)),
-            y: clamp(state.pointer.y - size * 0.4, 0, Math.max(0, vh - size)),
+            x: clamp(state.pointer.x - size * 0.7, 0, maxX(vw, size)),
+            y: laneY(state.pointer.y - size * 0.4, size, mobile),
           }
           const moved = Math.hypot(nextTarget.x - state.pos.x, nextTarget.y - state.pos.y)
           state.target = nextTarget
@@ -439,18 +500,19 @@ export function Companion() {
           state.hopping = false
           state.mode = 'idle'
           state.wanderAt = now + 1200
+          state.gazeAt = null
         }
       }
 
-      const springK = state.mode === 'scamper' ? 0.02 : state.mode === 'seeking' ? 0.012 : 0.006
-      const damping = state.mode === 'scamper' ? 0.82 : 0.88
-      const targetY = state.mode === 'idle' ? baselineY() : state.target.y
+      const springK = state.mode === 'scamper' ? 0.05 : state.mode === 'seeking' ? 0.022 : 0.008
+      const damping = state.mode === 'scamper' ? 0.7 : state.mode === 'seeking' ? 0.78 : 0.86
+      const targetY = state.mode === 'idle' ? laneY(baselineY(), size, mobile) : state.target.y
       const ax = (state.target.x - state.pos.x) * springK
       const ay = (targetY - state.pos.y) * springK
       state.vel.x = (state.vel.x + ax * dt) * damping
       state.vel.y = (state.vel.y + ay * dt) * damping
-      state.pos.x = clamp(state.pos.x + state.vel.x * dt, 0, Math.max(0, vw - size))
-      state.pos.y = clamp(state.pos.y + state.vel.y * dt, 0, Math.max(0, vh - size))
+      state.pos.x = clamp(state.pos.x + state.vel.x * dt, 0, maxX(vw, size))
+      state.pos.y = laneY(state.pos.y + state.vel.y * dt, size, mobile)
 
       if (Math.abs(state.vel.x) > 0.15) state.facing = state.vel.x > 0 ? 1 : -1
 
@@ -471,7 +533,6 @@ export function Companion() {
       const finalX = state.pos.x + state.peekX
       const finalY = state.pos.y + bob + hop
       charEl.style.transform = `translate3d(${finalX}px, ${finalY}px, 0)`
-      artEl.style.transform = `scaleX(${state.facing})`
 
       state.tailPhase += (state.mode === 'scamper' ? 0.18 : 0.045) * dt
       if (tailRef.current) {
@@ -494,9 +555,15 @@ export function Companion() {
         }
       }
 
-      const lookAt = state.hasMouse
-        ? state.pointer
-        : { x: finalX + size / 2 + state.facing * 40, y: finalY }
+      // While scampering toward a click that landed above the lane, the
+      // body stays clamped to the bottom but the gaze (and a slight head
+      // tilt) still points up at the actual click position.
+      const lookAt =
+        state.mode === 'scamper' && state.gazeAt
+          ? state.gazeAt
+          : state.hasMouse
+            ? state.pointer
+            : { x: finalX + size / 2 + state.facing * 40, y: finalY }
       const eyeCenterX = finalX + size / 2
       const eyeCenterY = finalY + size * 0.35
       const dx = clamp(lookAt.x - eyeCenterX, -60, 60)
@@ -509,6 +576,9 @@ export function Companion() {
       pupilRefs.current.forEach((p) => {
         if (p) p.setAttribute('transform', `translate(${px.toFixed(2)}, ${py.toFixed(2)})`)
       })
+
+      const tilt = clamp((eyeCenterY - lookAt.y) / 25, -1, 1) * 8
+      artEl.style.transform = `scaleX(${state.facing}) rotate(${tilt}deg)`
     }
 
     raf = requestAnimationFrame(loop)
@@ -549,9 +619,15 @@ export function Companion() {
         >
           <div ref={artRef} className="cmp-art">
             {character === 'kitty' ? (
-              <KittySvg uid={uid} pupilRefs={pupilRefs} eyeRefs={eyeRefs} tailRef={tailRef} />
+              <KittySvg
+                uid={uid}
+                pupilRefs={pupilRefs}
+                eyeRefs={eyeRefs}
+                tailRef={tailRef}
+                reducedMotion={reducedMotion}
+              />
             ) : (
-              <SparkSvg uid={uid} pupilRefs={pupilRefs} eyeRefs={eyeRefs} />
+              <SparkSvg uid={uid} pupilRefs={pupilRefs} eyeRefs={eyeRefs} reducedMotion={reducedMotion} />
             )}
           </div>
         </div>

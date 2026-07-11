@@ -13,9 +13,12 @@ is not publishable without asking him. **Never invent facts.**
 - Identity line (exact): `☬ Fear lives in one place only... Thats in you Mind🗿 —
   Distinguished Engr | Author | Calisthenics | Meditation | Memer | AI Architect | Generalist`
 - BE Computer Science & Engineering, Saranathan College of Engineering, 2020–2024.
-- Software Engineer (Contract) → Engineer at Reveal IT Solutions (Jun 2024 – Mar 2026);
-  describes his current role as a distinguished engineer at a startup. Specializes in
-  AI-driven ecosystems and offline-first mobile solutions.
+- **Current (confirmed 2026-07-11): software developer, working in Chennai.**
+- Previous: Software Engineer (Contract) → Engineer at Reveal IT Solutions
+  (Jun 2024 – Mar 2026). Specializes in AI-driven ecosystems and offline-first
+  mobile solutions. The "distinguished engineer at a startup" phrasing is his
+  identity-line branding — fine in the roles line, but employment copy must say
+  software developer in Chennai (current) with the rest as past experience.
 - Childhood: ADHD, struggled academically; deliberately self-taught across game dev,
   app dev, frontend, mathematics, hacking (ethical/curiosity framing only), 3D
   modelling, crafts; used to study 10–11 hours a day; won hackathons; deliberately
@@ -73,10 +76,9 @@ Linux daily driver.
 ## The book
 
 - **The Silence That Haunts** — self-authored, self-published via Draft2Digital;
-  physical print edition by deliberate choice. ⚠️ Publication date CONFLICTS across
-  sources (book's own edition page: November 2025 — see `lib/book.ts`; dossiers say
-  late 2025 / January 2026). Do NOT state a publication month in site copy until the
-  owner confirms; `lib/book.ts` (from the actual book) is the most authoritative.
+  physical print edition by deliberate choice. Publication date CONFIRMED by the
+  owner (2026-07-11): **November 2025** (matches the book's own edition page in
+  `lib/book.ts`). Safe to state.
   Explores the psychological truths that surface when the outside noise is silenced.
   (Detailed chapter brief: `.superpowers/sdd/book-brief.md`.)
 - **The Gray Man** (in progress) — technical behavioral manual on the neurobiology of

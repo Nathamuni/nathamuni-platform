@@ -196,10 +196,9 @@
 
   /* ---------- cursor aurora (homepage, desktop-only atmosphere) ---------- */
   .cursor-aurora {
-    @apply fixed inset-0 pointer-events-none z-40;
+    @apply fixed inset-0 pointer-events-none z-0;
     opacity: 0;
     transition: opacity 0.6s ease;
-    mix-blend-mode: screen;
   }
   .cursor-aurora-glow,
   .cursor-aurora-echo {
@@ -209,14 +208,14 @@
     will-change: transform;
   }
   .cursor-aurora-glow {
-    width: 420px;
-    height: 420px;
-    filter: blur(90px);
+    width: 360px;
+    height: 360px;
+    filter: blur(70px);
   }
   .cursor-aurora-echo {
-    width: 300px;
-    height: 300px;
-    filter: blur(100px);
+    width: 220px;
+    height: 220px;
+    filter: blur(85px);
   }
   @media (prefers-reduced-motion: reduce) {
     .cursor-aurora {
@@ -476,9 +475,17 @@
   .category-tiles > :nth-child(5):last-child .category-tile {
     aspect-ratio: 16 / 9;
   }
+  /* At the wide mobile crop the subject's face sits high in frame — bias the
+     Ken Burns art upward instead of a dead-center crop. */
+  .category-tiles > :nth-child(5):last-child .category-tile-art {
+    object-position: 50% 22%;
+  }
   @media (min-width: 1024px) {
     .category-tiles > :nth-child(5):last-child .category-tile {
       aspect-ratio: 3 / 4;
+    }
+    .category-tiles > :nth-child(5):last-child .category-tile-art {
+      object-position: 50% 50%;
     }
   }
   /* Media area holds the art/icon only — the plate below is a separate,
@@ -511,7 +518,7 @@
   .category-tile-plate {
     @apply relative z-10 flex flex-col gap-0.5 px-3.5 py-3 sm:px-4 sm:py-3.5;
     border-radius: 0 0 1rem 1rem;
-    background: linear-gradient(135deg, hsla(var(--cat), 70%, 28%, 0.65), rgba(13, 10, 31, 0.88) 70%);
+    background: linear-gradient(135deg, hsla(var(--cat), 70%, 20%, 0.78), rgba(13, 10, 31, 0.94) 70%);
     border-top: 1px solid hsla(var(--cat), 85%, 75%, 0.45);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
@@ -543,11 +550,12 @@
     box-shadow: 0 16px 48px -14px hsla(var(--cat), 85%, 60%, 0.55);
   }
   .category-tile-name {
-    @apply font-display text-sm sm:text-base leading-snug;
+    @apply font-display font-medium text-sm sm:text-base leading-snug;
+    color: #fff;
   }
   .category-tile-count {
     @apply text-xs;
-    color: hsla(var(--cat), 90%, 76%, 1);
+    color: hsla(var(--cat), 90%, 78%, 1);
   }
 
   /* ---------- explorer controls ---------- */
@@ -778,11 +786,20 @@
       display: none;
     }
   }
+  /* Fixed footprint for every card in the strip — width, aspect-ratio, and
+     border-radius are identical regardless of poster image or fallback
+     content, so intrinsic image size can never influence the box. */
   .moment-strip-card {
     @apply relative flex-shrink-0 w-32 sm:w-44 rounded-2xl overflow-hidden transition-all duration-300;
     aspect-ratio: 4 / 5;
+    min-width: 8rem;
     scroll-snap-align: start;
     border: 1px solid rgba(178, 148, 255, 0.22);
+  }
+  @media (min-width: 640px) {
+    .moment-strip-card {
+      min-width: 11rem;
+    }
   }
   .moment-strip-card:active {
     transform: scale(0.96);
@@ -791,6 +808,12 @@
     transform: translateY(-3px);
     border-color: rgba(236, 72, 153, 0.6);
     box-shadow: 0 14px 36px -12px rgba(236, 72, 153, 0.45);
+  }
+  /* The media element (poster wrapper or gradient fallback) always fills the
+     card via absolute positioning — never sized by its own content. */
+  .moment-strip-card > .thumb-peek-region,
+  .moment-strip-card > div {
+    @apply absolute inset-0 w-full h-full object-cover;
   }
   .moment-strip-card img {
     @apply w-full h-full object-cover;
@@ -829,6 +852,51 @@
   }
   .moment-date {
     @apply absolute bottom-1.5 inset-x-0 text-center text-[0.6rem] text-white/80;
+  }
+
+  /* ---------- thought cards (moments wall interstitials) ---------- */
+  /* Same footprint as .moment-card so it drops into the grid seamlessly,
+     but a rich hued gradient instead of a poster — the archive isn't just
+     clips, it's a vibe. */
+  .thought-card {
+    @apply relative overflow-hidden flex flex-col justify-between p-4 sm:p-5;
+    aspect-ratio: 9 / 16;
+    border-radius: 1rem;
+    border: 1px solid hsla(var(--cat), 75%, 65%, 0.5);
+    background: linear-gradient(
+      160deg,
+      hsla(var(--cat), 85%, 60%, 0.35),
+      rgba(13, 10, 31, 0.9)
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 16px 40px -18px hsla(var(--cat), 85%, 55%, 0.5);
+  }
+  .thought-card::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: radial-gradient(120% 90% at 15% 0%, hsla(var(--cat), 90%, 70%, 0.3), transparent 60%);
+  }
+  .thought-card-quote {
+    @apply relative z-10 font-display italic text-sm sm:text-base leading-snug text-white/95;
+  }
+  .thought-card-mark {
+    @apply relative z-10 self-end text-lg;
+    color: hsla(var(--cat), 90%, 78%, 1);
+  }
+  .thought-card-endcap {
+    border-color: hsla(var(--cat), 90%, 70%, 0.75);
+    background: linear-gradient(
+      160deg,
+      hsla(var(--cat), 90%, 62%, 0.55),
+      rgba(13, 10, 31, 0.88)
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 20px 52px -16px hsla(var(--cat), 90%, 60%, 0.65);
+  }
+  .thought-card-endcap .thought-card-quote {
+    @apply not-italic font-medium;
   }
 
   .moment-lightbox {
@@ -975,7 +1043,7 @@
     color: transparent;
   }
   .post-body {
-    @apply flex flex-col gap-4 mt-2 text-white/80 leading-relaxed text-[0.95rem] sm:text-base;
+    @apply flex flex-col gap-4 mt-2 text-white/85 leading-relaxed text-[0.95rem] sm:text-base;
   }
   .post-related {
     @apply mt-8;
@@ -987,6 +1055,16 @@
 
 @layer components {
   /* ---------- book page ---------- */
+  /* Caps the teaser banner so it stays composed at wide desktop widths
+     instead of stretching into a thin, over-cropped strip. */
+  .book-banner {
+    @apply relative max-h-[300px] sm:max-h-[360px];
+  }
+  .book-banner-fade {
+    @apply absolute inset-x-0 bottom-0 pointer-events-none;
+    height: 45%;
+    background: linear-gradient(to top, rgba(13, 10, 31, 0.92), transparent);
+  }
   .book-hero {
     @apply flex flex-col sm:flex-row gap-8 items-center sm:items-start max-w-4xl mx-auto;
   }
