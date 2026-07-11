@@ -23,7 +23,9 @@ const EMBED_BATCH = 90
 // multilingual — useful for the occasional Tamil phrase in the twin's voice.
 const ASK_MODEL = '@cf/zai-org/glm-4.7-flash'
 const ASK_MAX_QUESTION_LEN = 300
-const ASK_MAX_TOKENS = 500
+// Reasoning model: thinking tokens count against the budget, so leave enough
+// headroom that the visible answer never comes back empty.
+const ASK_MAX_TOKENS = 1400
 const ASK_TOP_K = 5
 const ASK_MIN_SCORE = 0.35
 // Free Workers AI tier is 10,000 neurons/day account-wide (shared with
@@ -234,15 +236,15 @@ async function handleAsk(request, env) {
       .filter((r) => r.score > ASK_MIN_SCORE)
       .map((r) => r.item)
 
+    // Single system message — some chat models reject multiple system turns.
     const messages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'system', content: buildAskContext(persona, related) },
+      { role: 'system', content: `${SYSTEM_PROMPT}\n\n${buildAskContext(persona, related)}` },
       { role: 'user', content: question },
     ]
 
     const result = await env.AI.run(ASK_MODEL, { messages, max_tokens: ASK_MAX_TOKENS })
-    const answer = result?.response?.trim()
-    if (!answer) throw new Error('empty model response')
+    const answer = extractAnswer(result)
+    if (!answer) throw new Error(`empty model response: ${JSON.stringify(result).slice(0, 200)}`)
 
     return Response.json({ answer })
   } catch (err) {
@@ -252,6 +254,29 @@ async function handleAsk(request, env) {
       { status: 200 }
     )
   }
+}
+
+/**
+ * Workers AI text models differ in response shape, and reasoning models may
+ * wrap visible output around <think> blocks — normalize all of it to a string.
+ */
+function extractAnswer(result) {
+  if (!result) return ''
+  let text = ''
+  if (typeof result === 'string') text = result
+  else {
+    const cand =
+      result.response ??
+      result.result?.response ??
+      result.output_text ??
+      result.choices?.[0]?.message?.content ??
+      ''
+    text = typeof cand === 'string' ? cand : ''
+  }
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    .replace(/^[\s\S]*?<\/think>/, (m) => (m.length < text.length ? '' : m))
+    .trim()
 }
 
 async function handleSearch(request, env) {
