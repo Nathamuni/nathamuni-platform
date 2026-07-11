@@ -8,6 +8,7 @@ export const dynamic = 'force-static'
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE_URL, priority: 1 },
+    { url: `${SITE_URL}/feed`, priority: 0.8 },
     { url: `${SITE_URL}/videos`, priority: 0.9 },
     { url: `${SITE_URL}/moments`, priority: 0.6 },
     { url: `${SITE_URL}/stats`, priority: 0.5 },

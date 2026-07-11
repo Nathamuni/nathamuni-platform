@@ -54,7 +54,7 @@ a tracked requirement.
 2. Text-content prompts: don't require one-by-one runs — one combined
    all-in-one canvas prompt ("best possible one") producing the whole content
    pack in a single paste. Delivered in chat (owner used it — dossiers came
-   back same day). Adding it to creator-hub.html = small open backlog item.
+   back same day). Also added to creator-hub.html (2026-07-11, ships with v13).
 
 ## 2026-07-10 — v10 round (the big brief)
 
