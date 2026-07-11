@@ -784,7 +784,8 @@
      content, so intrinsic image size can never influence the box. */
   .moment-strip-card {
     @apply relative flex-shrink-0 w-32 sm:w-44 rounded-2xl overflow-hidden transition-all duration-300;
-    aspect-ratio: 4 / 5;
+    /* Native story ratio — the full poster, no cropping, matching /moments. */
+    aspect-ratio: 9 / 16;
     min-width: 8rem;
     scroll-snap-align: start;
     border: 1px solid rgba(178, 148, 255, 0.22);
