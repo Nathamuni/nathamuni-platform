@@ -498,17 +498,10 @@
   .category-tile:hover .category-tile-media {
     transform: scale(1.035);
   }
+  /* No idle zoom: the posters carry text near the edges (owner requirement:
+     full image visible, no cropping) — motion lives on hover only. */
   .category-tile-art {
     @apply absolute inset-0 w-full h-full object-cover pointer-events-none;
-    animation: category-tile-kenburns 14s ease-in-out infinite alternate;
-  }
-  @keyframes category-tile-kenburns {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.12);
-    }
   }
   .category-tile-icon {
     @apply relative z-10 text-4xl;
@@ -1058,7 +1051,7 @@
   /* Caps the teaser banner so it stays composed at wide desktop widths
      instead of stretching into a thin, over-cropped strip. */
   .book-banner {
-    @apply relative max-h-[300px] sm:max-h-[360px];
+    @apply relative max-h-[340px] sm:max-h-[440px];
   }
   .book-banner-fade {
     @apply absolute inset-x-0 bottom-0 pointer-events-none;
