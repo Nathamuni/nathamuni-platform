@@ -18,6 +18,8 @@ describe('Nav', () => {
       '/books',
       '/projects',
       '/stats',
+      '/journey',
+      '/ask',
     ]
     const links = screen.getAllByRole('link')
     expectedHrefs.forEach((href) => {

@@ -93,3 +93,47 @@ a tracked requirement.
     looking at / chasing the cursor, reacting to clicks (taps on mobile); user
     can pick the toy; must be visually appealing and Cloudflare-static
     compatible (it is — pure client-side).
+
+## 2026-07-11 — v11 polish round (screenshots feedback)
+
+1. Kitty: more responsive + vibrant/different colors; must NOT cover content
+   (seen sitting on tiles/text) → constrained to a bottom lane.
+2. Cursor effect: current one "not good… hiding some details and causing me
+   distraction" → redesign, must never obscure text (move behind content).
+3. Tile labels: dark/hue-colored text unreadable over plates ("black color text
+   not looking nice", "card here is hidden… text not visible") → white names.
+4. Moments strip: card sizes/crops mismatched → uniform.
+5. About outdated: he NOW works in Chennai as a software developer; Reveal IT
+   etc. are PREVIOUS experience. Fix copy accordingly.
+6. Books page banner looks bad at wide resolution → fix crop/height.
+7. Blog post body text nearly invisible (ghosted) → suspected cursor overlay
+   compositing; fix with cursor v2 + text opacity hardening.
+8. /stats "looking childish… I want visually appealing, no distractions" →
+   premium redesign.
+9. Moments page ends blankly → add end-cap + interspersed vibrant quote/thought
+   cards ("logged for the future", text quotes, random interesting cards);
+   he wants the site to NOT feel normal — contrast, vibrant, different.
+10. Humor tile on mobile (full-width 5th tile) crops badly → fix focal point.
+11. Book date CONFIRMED by owner: **November 2025**.
+12. reels-needing-description.txt: keep ONLY the reels that truly need his
+    input (search must work, e.g. "diet" should find the diet reel).
+
+## 2026-07-11 — v12 round (1am/10am messages)
+
+1. "Do all those changes, not limited to that" + overall mobile UI must be
+   much better.
+2. **Decision-map / ideology page**: flow map of his decisions, policies,
+   ideology — "in this time, if this happened, I took this decision" — animated,
+   diagrammatic, mobile-responsive, its own page; creative freedom granted
+   ("make it up… I don't want it to be rigid; you have my ideology").
+3. **Dream tracking, goals and milestones** included.
+4. **Data sources audit**: state which external data is genuinely useful, then
+   implement the good ones (audit delivered in chat 2026-07-11; goals-file now,
+   GitHub-stats worth it pending username confirm, Meta insights rejected as
+   risky, Play scraping rejected as fragile).
+5. **AI version of the assistant/him on the site**: "ask me anything" chat
+   answering in his style, solving problems the way he would; asked whether a
+   paid API key is needed → NO: Cloudflare Workers AI free tier (same binding
+   as semantic search) serves the chat model; strict grounding + rate limits.
+6. He asked for his voice-typed request to be restated as a clear realistic
+   spec (done in chat, mirrored here).

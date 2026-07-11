@@ -12,6 +12,8 @@ const NAV_LINKS = [
   { href: '/books', label: 'Books' },
   { href: '/projects', label: 'Projects' },
   { href: '/stats', label: 'Stats' },
+  { href: '/journey', label: 'Journey' },
+  { href: '/ask', label: 'Ask' },
 ]
 
 /** The app-style bottom tab bar on mobile shows the four primary sections. */

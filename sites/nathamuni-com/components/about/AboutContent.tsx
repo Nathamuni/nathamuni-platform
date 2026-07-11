@@ -133,8 +133,8 @@ export function AboutContent() {
         <h2 className="section-title">The book</h2>
         <p className="text-white/80 leading-relaxed">
           <em>The Silence That Haunts</em> is my first book — self-authored, and printed as a
-          physical book by deliberate choice. It&apos;s what surfaced when I turned the outside
-          noise off and let the psychological truths underneath actually speak.
+          physical book by deliberate choice, out November 2025. It&apos;s what surfaced when I
+          turned the outside noise off and let the psychological truths underneath actually speak.
         </p>
         <p className="text-white/60 text-sm mt-3">
           Next book — <em>The Gray Man</em> — is already in the lab: a technical, behavioral manual

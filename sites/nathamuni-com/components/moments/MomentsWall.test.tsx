@@ -149,4 +149,43 @@ describe('MomentsWall', () => {
     fireEvent.ended(video)
     expect(screen.queryByTestId('moment-lightbox')).not.toBeInTheDocument()
   })
+
+  it('always appends the vibrant end-cap card, even with few stories', () => {
+    render(<MomentsWall stories={stories} />)
+    expect(screen.getByTestId('thought-card-endcap')).toBeInTheDocument()
+    expect(screen.getByTestId('thought-card-endcap').textContent).toContain('logged for the future')
+  })
+
+  it('does not change the story card count when the end-cap is present', () => {
+    render(<MomentsWall stories={stories} />)
+    expect(screen.getAllByRole('button', { name: /^Play story from/ })).toHaveLength(stories.length)
+  })
+
+  it('intersperses a thought card after every 6th story and keeps lightbox order intact', () => {
+    const many: Story[] = Array.from({ length: 13 }, (_, i) => ({
+      id: `m${i}`,
+      date: `2026-07-${String((i % 27) + 1).padStart(2, '0')}`,
+      video: `/stories/m${i}.mp4`,
+      poster: `/stories/m${i}.jpg`,
+      title: null,
+    }))
+    render(<MomentsWall stories={many} />)
+
+    // 13 stories -> interspersed after the 6th and 12th, plus the end-cap.
+    expect(screen.getAllByRole('button', { name: /^Play story from/ })).toHaveLength(13)
+    expect(screen.getAllByTestId('thought-card')).toHaveLength(2)
+    expect(screen.getByTestId('thought-card-endcap')).toBeInTheDocument()
+
+    // Lightbox index math is unaffected by grid position: opening the 7th
+    // rendered story button (index 6 in the source array) must show m6, and
+    // "next" must show m7, not a thought card's position.
+    openLightbox(6)
+    expect(screen.getByTestId('moment-lightbox').querySelector('video')?.getAttribute('src')).toBe(
+      '/stories/m6.mp4'
+    )
+    fireEvent.click(screen.getByTestId('moment-nav-next'))
+    expect(screen.getByTestId('moment-lightbox').querySelector('video')?.getAttribute('src')).toBe(
+      '/stories/m7.mp4'
+    )
+  })
 })
