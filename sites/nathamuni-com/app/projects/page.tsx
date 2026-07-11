@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getProjects, type ProjectStatus } from '@/lib/projects'
+import github from '@/lib/github.json'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -54,6 +55,28 @@ export default function ProjectsPage() {
         the Play Store, including a college game and a YouTube spam-comment finder-and-remover bot
         nobody asked for but everybody&apos;s inbox needed.
       </p>
+
+      {github?.login && (
+        <a
+          href={github.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="glass-card mt-6 px-5 py-4 flex flex-wrap items-center gap-x-8 gap-y-2 hover:border-white/30 transition-all"
+          data-reveal
+          data-testid="github-strip"
+        >
+          <span className="text-xs uppercase tracking-widest text-white/40 font-semibold">
+            On GitHub
+          </span>
+          <span className="text-sm text-white/75" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {github.publicRepos} public repos
+          </span>
+          <span className="text-sm text-white/75" style={{ fontVariantNumeric: 'tabular-nums' }}>
+            {github.followers} followers
+          </span>
+          <span className="text-sm text-violet-300 ml-auto">github.com/{github.login} →</span>
+        </a>
+      )}
     </section>
   )
 }

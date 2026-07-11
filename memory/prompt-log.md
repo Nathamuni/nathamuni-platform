@@ -137,3 +137,20 @@ a tracked requirement.
    as semantic search) serves the chat model; strict grounding + rate limits.
 6. He asked for his voice-typed request to be restated as a clear realistic
    spec (done in chat, mirrored here).
+
+## 2026-07-11 — v14 round (evening screenshots)
+
+1. Shared https://github.com/stars/Nathamuni/ → GitHub username confirmed:
+   `Nathamuni`. GitHub stats implemented (weekly action + /projects strip).
+2. Moments and other cards are cropped — "I want it to see full sized, no
+   cropping" → strip + video cards now native 9:16.
+3. Blog text STILL dark → TRUE root cause found: Tailwind v4 token collision —
+   custom color `--color-base` hijacked the `text-base` font-size utility into
+   `color:#0d0a1f` (desktop/sm+ only). Fixed by renaming token to
+   `--color-ground`. NEVER name a theme color `base`/`sm`/`lg` etc.
+4. "Do again and check all my previous complaints and functional requirements,
+   fix all, check the website against those" → full audit pass run with v14.
+5. Feed section could be better + everything must keep working as data grows →
+   feed kind-filters (CSS-only, with counts), rows already content-visibility;
+   growth-proofing verified (feed/stats/search all data-driven).
+6. Owner completed the reels description file → 43 reels imported (v13).

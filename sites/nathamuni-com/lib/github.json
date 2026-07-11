@@ -1,0 +1,38 @@
+{
+  "login": "Nathamuni",
+  "url": "https://github.com/Nathamuni",
+  "followers": 9,
+  "publicRepos": 31,
+  "totalStars": 0,
+  "topRepos": [
+    {
+      "name": "2D-Game",
+      "stars": 0,
+      "description": "Sara-Run ",
+      "url": "https://github.com/Nathamuni/2D-Game",
+      "language": "Java"
+    },
+    {
+      "name": "certificate",
+      "stars": 0,
+      "description": null,
+      "url": "https://github.com/Nathamuni/certificate",
+      "language": "Dart"
+    },
+    {
+      "name": "CLG-project",
+      "stars": 0,
+      "description": null,
+      "url": "https://github.com/Nathamuni/CLG-project",
+      "language": "JavaScript"
+    },
+    {
+      "name": "javascript",
+      "stars": 0,
+      "description": null,
+      "url": "https://github.com/Nathamuni/javascript",
+      "language": null
+    }
+  ],
+  "fetchedAt": "2026-07-11"
+}
