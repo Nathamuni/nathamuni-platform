@@ -61,10 +61,42 @@ function groupByMonth(entries: FeedEntry[]): MonthGroup[] {
  * spine on the left, month dividers, and compact glass rows. Rows use
  * content-visibility:auto since a full feed easily runs past 200 entries.
  */
+const FILTERS: { id: string; kind: FeedKind | null; label: string }[] = [
+  { id: 'fk-all', kind: null, label: 'All' },
+  { id: 'fk-reel', kind: 'reel', label: 'Reels' },
+  { id: 'fk-post', kind: 'post', label: 'Posts' },
+  { id: 'fk-story', kind: 'story', label: 'Moments' },
+  { id: 'fk-blog', kind: 'blog', label: 'Essays' },
+]
+
 export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
   const groups = groupByMonth(entries)
+  const counts = entries.reduce<Record<string, number>>((acc, e) => {
+    acc[e.kind] = (acc[e.kind] ?? 0) + 1
+    return acc
+  }, {})
 
   return (
+    <div className="feed-shell">
+      <fieldset className="feed-filters" aria-label="Filter the feed by type">
+        {FILTERS.map((f) => (
+          <span key={f.id}>
+            <input
+              type="radio"
+              name="feed-kind"
+              id={f.id}
+              className="feed-filter-input"
+              defaultChecked={f.kind === null}
+            />
+            <label htmlFor={f.id} className="feed-filter-chip">
+              {f.label}
+              <span className="feed-filter-count">
+                {f.kind === null ? entries.length : (counts[f.kind] ?? 0)}
+              </span>
+            </label>
+          </span>
+        ))}
+      </fieldset>
     <div className="feed-timeline">
       <div className="feed-spine" aria-hidden />
       {groups.map((group) => (
@@ -80,6 +112,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
                   className={`feed-row anim-fade-up anim-delay-${delay}`}
                   style={{ '--cat': entry.hue } as React.CSSProperties}
                   data-testid="feed-row"
+                  data-kind={entry.kind}
                 >
                   <span className="feed-row-thumb">
                     {entry.image ? (
@@ -228,7 +261,64 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
         @media (prefers-reduced-motion: reduce) {
           .feed-row { transition: none; }
         }
+        .feed-filters {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          border: 0;
+          padding: 0;
+          margin: 0 0 1.75rem;
+        }
+        .feed-filter-input {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+        .feed-filter-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-size: 0.78rem;
+          padding: 0.45rem 0.9rem;
+          border-radius: 999px;
+          cursor: pointer;
+          color: rgba(255, 255, 255, 0.65);
+          background: rgba(148, 112, 255, 0.08);
+          border: 1px solid rgba(178, 148, 255, 0.18);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          transition: all 0.2s ease;
+          min-height: 40px;
+        }
+        .feed-filter-count {
+          font-size: 0.65rem;
+          color: rgba(255, 255, 255, 0.4);
+          font-variant-numeric: tabular-nums;
+        }
+        .feed-filter-chip:hover { border-color: rgba(178, 148, 255, 0.45); color: #fff; }
+        .feed-filter-input:checked + .feed-filter-chip {
+          color: #fff;
+          background: linear-gradient(120deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.25));
+          border-color: rgba(178, 148, 255, 0.6);
+        }
+        .feed-filter-input:focus-visible + .feed-filter-chip {
+          outline: 2px solid rgba(139, 92, 246, 0.9);
+          outline-offset: 2px;
+        }
+        .feed-shell:has(#fk-reel:checked) .feed-row:not([data-kind='reel']),
+        .feed-shell:has(#fk-post:checked) .feed-row:not([data-kind='post']),
+        .feed-shell:has(#fk-story:checked) .feed-row:not([data-kind='story']),
+        .feed-shell:has(#fk-blog:checked) .feed-row:not([data-kind='blog']) {
+          display: none;
+        }
+        .feed-shell:has(#fk-reel:checked) .feed-month:not(:has([data-kind='reel'])),
+        .feed-shell:has(#fk-post:checked) .feed-month:not(:has([data-kind='post'])),
+        .feed-shell:has(#fk-story:checked) .feed-month:not(:has([data-kind='story'])),
+        .feed-shell:has(#fk-blog:checked) .feed-month:not(:has([data-kind='blog'])) {
+          display: none;
+        }
       `}</style>
+    </div>
     </div>
   )
 }
