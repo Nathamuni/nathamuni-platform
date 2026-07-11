@@ -11,6 +11,7 @@ describe('Nav', () => {
     render(<Nav />)
     const expectedHrefs = [
       '/',
+      '/feed',
       '/videos',
       '/moments',
       '/about',
