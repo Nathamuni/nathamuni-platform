@@ -9,5 +9,12 @@
   },
   "ai": {
     "binding": "AI"
-  }
+  },
+  // Anonymous question log + newsletter list ("nathamuni-inbox" KV).
+  "kv_namespaces": [
+    {
+      "binding": "INBOX",
+      "id": "968ff3b2478d472683029c0d8e3d7aad"
+    }
+  ]
 }
