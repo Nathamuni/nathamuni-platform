@@ -54,15 +54,29 @@ export default function BooksPage() {
           <p className="book-tagline">{BOOK.tagline}</p>
           <p className="book-core">&ldquo;{BOOK.corePrinciple}&rdquo;</p>
           <p className="video-detail-description">{BOOK.pitch}</p>
-          <a
-            href={SOCIAL_LINKS.instagram}
-            target="_blank"
-            rel="noreferrer"
-            className="social-button social-button-primary detail-cta"
-            data-testid="book-cta"
-          >
-            DM me for a copy
-          </a>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="/downloads/the-silence-that-haunts-sample.pdf"
+              download
+              className="social-button social-button-primary detail-cta"
+              data-testid="book-sample-cta"
+            >
+              Read the free sample (PDF)
+            </a>
+            <a
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noreferrer"
+              className="social-button detail-cta"
+              data-testid="book-cta"
+            >
+              DM me for a copy
+            </a>
+          </div>
+          <p className="text-white/40 text-xs mt-1">
+            The sample: table of contents, the core principle, and the full introduction — my
+            story, from the book itself.
+          </p>
         </div>
       </div>
 
