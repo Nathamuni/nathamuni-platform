@@ -536,29 +536,14 @@
   .category-tile {
     @apply glass-card relative overflow-hidden flex flex-col transition-all duration-300 active:scale-[0.97];
     border-color: hsla(var(--cat), 70%, 60%, 0.25);
-    aspect-ratio: 3 / 4;
-  }
-  /* The full-row 5th tile on mobile would be huge at 3:4 — go wide instead. */
-  .category-tiles > :nth-child(5):last-child .category-tile {
-    aspect-ratio: 16 / 9;
-  }
-  /* At the wide mobile crop the subject's face sits high in frame — bias the
-     Ken Burns art upward instead of a dead-center crop. */
-  .category-tiles > :nth-child(5):last-child .category-tile-art {
-    object-position: 50% 22%;
-  }
-  @media (min-width: 1024px) {
-    .category-tiles > :nth-child(5):last-child .category-tile {
-      aspect-ratio: 3 / 4;
-    }
-    .category-tiles > :nth-child(5):last-child .category-tile-art {
-      object-position: 50% 50%;
-    }
   }
   /* Media area holds the art/icon only — the plate below is a separate,
      fused bottom bar so the label never overlaps a face. */
+  /* Native 4:5 — the tile art's exact ratio, so the full poster shows with
+     zero cropping on every viewport (owner requirement). Plate sits below. */
   .category-tile-media {
-    @apply relative flex-1 overflow-hidden flex items-center justify-center transition-transform duration-500;
+    @apply relative overflow-hidden flex items-center justify-center transition-transform duration-500;
+    aspect-ratio: 4 / 5;
     background: radial-gradient(120% 120% at 30% 15%, hsla(var(--cat), 70%, 45%, 0.32), rgba(13, 10, 31, 0.65) 72%);
   }
   .tilt-card:hover .category-tile-media,
