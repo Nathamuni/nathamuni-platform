@@ -46,21 +46,51 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
 }
 
 export const viewport: Viewport = {
   themeColor: '#07070c',
 }
 
-const personJsonLd = {
+const siteJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: PROFILE.name,
-  url: SITE_URL,
-  image: `${SITE_URL}/images/generated/about-portrait.jpg`,
-  jobTitle: PROFILE.jobTitle,
-  description: PROFILE.metaDescription,
-  sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube],
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: PROFILE.name,
+      alternateName: ['Nathamuni.com', 'nathamuni'],
+      description: PROFILE.metaDescription,
+      publisher: { '@id': `${SITE_URL}/#person` },
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#person`,
+      name: PROFILE.name,
+      url: SITE_URL,
+      image: `${SITE_URL}/images/generated/about-portrait.jpg`,
+      jobTitle: PROFILE.jobTitle,
+      description: PROFILE.metaDescription,
+      knowsAbout: [
+        'Artificial Intelligence',
+        'Software Engineering',
+        'Calisthenics',
+        'Meditation',
+        'Writing',
+      ],
+      homeLocation: { '@type': 'Place', name: 'Chennai, Tamil Nadu, India' },
+      mainEntityOfPage: { '@id': `${SITE_URL}/#website` },
+      sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube],
+    },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -69,7 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
         <Nav />
         <ScrollReveal />
