@@ -170,5 +170,21 @@ a tracked requirement.
 4. "Final improvements — your call": shipped the finishing seven — scroll
    progress bar, route transition fade, count-up numerals, back-to-top,
    section-title underline reveal, hero scroll cue, real footer.
-5. STILL WAITING ON OWNER: book sample-vs-full decision, Gemini API key,
-   GitHub OAuth app (/admin), book purchase link, 9 undescribed reels.
+5. STILL WAITING ON OWNER: Gemini API key, GitHub OAuth app (/admin), book
+   purchase link, 9 undescribed reels. (Book sample: DECIDED + shipped —
+   12-page PDF on /books, v19.)
+
+## v18–v20 data layer — facts + planned upgrade (documented 2026-07-12)
+
+- KV namespace `nathamuni-inbox` (id 968ff3b2478d472683029c0d8e3d7aad,
+  account fb4e4e82bfb55d63d6febf120a4683f3) bound as INBOX. Keys:
+  `join:<email>` = newsletter list (email, ambition, at); `q:<ts>:<rand>` =
+  anonymous twin questions (question, outcome, at). Read via dashboard only —
+  MCP/bindings auth is namespace-level, cannot read keys (by design).
+- **PLANNED: email double opt-in (owner request, do when newsletter launches):**
+  (1) owner creates a free Resend account + API key → Cloudflare Worker secret
+  `RESEND_KEY` (dashboard → Worker → Settings → Variables); (2) /api/join then
+  stores `pending:<token>` → email, sends a confirm email via Resend
+  (free 100/day), `/api/verify?token=` promotes to `join:<email>` with
+  verified:true; ~40 lines in worker/index.mjs following existing patterns.
+  Trigger phrase: "set up email verification".
