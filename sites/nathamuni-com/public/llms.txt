@@ -1,0 +1,18 @@
+# Nathamuni
+
+> Personal site of Nathamuni — software developer and AI architect from Chennai, India. Self-taught since childhood; everything published here (calisthenics, meditation, discipline, offline-first AI) is tested on himself first.
+
+## Pages
+
+- [Home](https://nathamuni.com/): who Nathamuni is, latest videos and writing
+- [About](https://nathamuni.com/about): full story, experiments, principles
+- [Videos](https://nathamuni.com/videos): searchable video library (discipline, calisthenics, AI)
+- [Blog](https://nathamuni.com/blog): essays on training, ADHD, local-first AI, meditation
+- [Books](https://nathamuni.com/books): "The Silence That Haunts" — free sample available
+- [Journey](https://nathamuni.com/journey): timeline of the arc so far
+- [Projects](https://nathamuni.com/projects): software and AI projects
+
+## Social
+
+- Instagram: https://www.instagram.com/nathamuni_/
+- YouTube: https://www.youtube.com/@LogicAndLaunch

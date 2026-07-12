@@ -23,7 +23,12 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt,
     alternates: { canonical: `/blog/${post.slug}` },
-    openGraph: { type: 'article', title: post.title, description: post.excerpt },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.excerpt,
+      images: [{ url: '/images/generated/og-banner.jpg', width: 1200, height: 630 }],
+    },
   }
 }
 
