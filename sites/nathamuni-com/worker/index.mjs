@@ -318,9 +318,29 @@ async function handleAsk(request, env) {
       { role: 'user', content: question },
     ]
 
-    const result = await env.AI.run(ASK_MODEL, { messages, max_tokens: ASK_MAX_TOKENS })
-    const answer = extractAnswer(result)
-    if (!answer) throw new Error(`empty model response: ${JSON.stringify(result).slice(0, 200)}`)
+    // Reasoning models can spend the whole budget "thinking" on unusual
+    // questions and return no visible text — retry once, bigger budget,
+    // with an explicit nudge to answer directly.
+    let answer = ''
+    let lastResult
+    for (const attempt of [
+      { messages, max_tokens: ASK_MAX_TOKENS },
+      {
+        messages: [
+          messages[0],
+          {
+            role: 'user',
+            content: `${question}\n\n(Answer directly in 2-5 sentences. Do not overthink.)`,
+          },
+        ],
+        max_tokens: ASK_MAX_TOKENS + 800,
+      },
+    ]) {
+      lastResult = await env.AI.run(ASK_MODEL, attempt)
+      answer = extractAnswer(lastResult)
+      if (answer) break
+    }
+    if (!answer) throw new Error(`empty model response: ${JSON.stringify(lastResult).slice(0, 200)}`)
 
     await logQuestion(env, question, 'answered')
     return Response.json({ answer })
