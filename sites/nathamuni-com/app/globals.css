@@ -163,13 +163,49 @@
   }
 
   .site-footer {
-    @apply mt-20 px-4 py-8 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/50;
+    @apply mt-20 px-4 py-8 sm:px-8 sm:py-10 max-w-6xl mx-auto flex flex-col gap-8 text-sm text-white/55;
+    border-top: 1px solid rgba(178, 148, 255, 0.14);
   }
-  .site-footer-social {
-    @apply flex gap-4;
+  .site-footer-top {
+    @apply flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between;
   }
-  .site-footer-social a {
-    @apply hover:text-white transition-colors;
+  .site-footer-brand {
+    @apply flex flex-col gap-2 max-w-xs;
+  }
+  .site-footer-brand-name {
+    @apply font-display text-lg;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, #22d3ee);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .site-footer-tagline {
+    @apply text-xs text-white/45 leading-relaxed;
+  }
+  .site-footer-nav {
+    @apply grid grid-cols-3 gap-6 sm:gap-10;
+  }
+  .site-footer-col {
+    @apply flex flex-col gap-2;
+  }
+  .site-footer-col-title {
+    @apply text-[0.65rem] uppercase tracking-widest text-white/35 mb-1;
+  }
+  .site-footer-col-links {
+    @apply flex flex-col gap-1.5;
+  }
+  .site-footer-col-links a {
+    @apply text-white/55 hover:text-white transition-colors;
+  }
+  .site-footer-bottom {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-6;
+    border-top: 1px solid rgba(178, 148, 255, 0.1);
+  }
+  .site-footer-note {
+    @apply text-xs text-white/35 text-center sm:text-left;
+  }
+  .site-footer-copy {
+    @apply text-xs text-white/35 text-center sm:text-right;
   }
 
   /* ---------- 3D tilt system ---------- */
@@ -449,6 +485,37 @@
   }
   .section-title {
     @apply text-2xl mb-2;
+    position: relative;
+  }
+  /* Underline reveal bar. Default state is "drawn" (scaleX(1)) so titles
+     outside any [data-reveal] ancestor (page h1s like /blog, /videos) show
+     it immediately; only a title still waiting inside an unrevealed
+     [data-reveal] section starts collapsed and animates open once that
+     ancestor gains .is-visible. */
+  .section-title::after {
+    content: '';
+    display: block;
+    position: relative;
+    margin-top: 0.5rem;
+    width: 44px;
+    height: 3px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #8b5cf6, #22d3ee);
+    transform-origin: left center;
+    transform: scaleX(1);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+  }
+  [data-reveal]:not(.is-visible) .section-title::after {
+    transform: scaleX(0);
+  }
+  [data-reveal].is-visible .section-title::after {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .section-title::after {
+      transition: none;
+      transform: scaleX(1);
+    }
   }
   .section-sub {
     @apply text-sm text-white/50 mb-7;

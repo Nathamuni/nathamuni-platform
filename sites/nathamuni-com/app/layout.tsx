@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from 'next'
 import { Outfit, Inter } from 'next/font/google'
 import { Nav } from '@/components/layout/Nav'
 import { ScrollReveal } from '@/components/fx/ScrollReveal'
+import { ScrollProgress } from '@/components/fx/ScrollProgress'
 import { Companion } from '@/components/fx/Companion'
+import { BackToTop } from '@/components/fx/BackToTop'
 import { Footer } from '@/components/layout/Footer'
 import { SOCIAL_LINKS } from '@/lib/social'
 import { SITE_URL } from '@/lib/site'
@@ -71,9 +73,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <Nav />
         <ScrollReveal />
+        <ScrollProgress />
         <main>{children}</main>
         <Footer />
         <Companion />
+        <BackToTop />
       </body>
     </html>
   )

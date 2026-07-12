@@ -5,11 +5,14 @@ import { PROFILE, rolesLine } from '@/lib/profile'
 import { HeroPortrait } from '@/components/hero/HeroPortrait'
 import { HeroParallax } from '@/components/hero/HeroParallax'
 import { CursorAurora } from '@/components/fx/CursorAurora'
+import { ScrollCue } from '@/components/fx/ScrollCue'
+import { CountUp } from '@/components/fx/CountUp'
 import { SocialButtons } from '@/components/layout/SocialButtons'
 import { CategoryTiles } from '@/components/home/CategoryTiles'
 import { VideoCard } from '@/components/video/VideoCard'
 import { MomentsStrip } from '@/components/home/MomentsStrip'
 import { AboutPreview } from '@/components/about/AboutPreview'
+import { JoinBlock } from '@/components/join/JoinBlock'
 import { PlaceholdersRow } from '@/components/layout/PlaceholdersRow'
 
 export default function HomePage() {
@@ -40,13 +43,22 @@ export default function HomePage() {
           </Link>
           <div className="hero-stats anim-fade-up anim-delay-3" data-testid="hero-stats">
             <span className="hero-stat">
-              <strong>{videos.length}</strong> videos
+              <strong>
+                <CountUp value={videos.length} />
+              </strong>{' '}
+              videos
             </span>
             <span className="hero-stat">
-              <strong>{momentsCount}</strong> moments
+              <strong>
+                <CountUp value={momentsCount} />
+              </strong>{' '}
+              moments
             </span>
             <span className="hero-stat">
-              <strong>1</strong> book
+              <strong>
+                <CountUp value={1} />
+              </strong>{' '}
+              book
             </span>
           </div>
           <div className="anim-fade-up anim-delay-4">
@@ -54,6 +66,8 @@ export default function HomePage() {
           </div>
         </div>
       </HeroParallax>
+
+      <ScrollCue />
 
       <div className="scroll-divider" aria-hidden />
 
@@ -100,6 +114,7 @@ export default function HomePage() {
 
       <MomentsStrip />
       <AboutPreview />
+      <JoinBlock />
       <PlaceholdersRow />
     </>
   )

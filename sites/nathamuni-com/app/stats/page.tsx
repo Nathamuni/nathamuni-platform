@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getStats } from '@/lib/stats'
 import { getCategoryMeta } from '@/lib/categoryMeta'
+import { CountUp } from '@/components/fx/CountUp'
 
 export const metadata: Metadata = {
   title: 'The library in numbers',
@@ -29,12 +30,19 @@ function StatTile({
         delay ? ` anim-delay-${delay}` : ''
       }`}
     >
-      <span
-        className="font-display text-white leading-none text-3xl sm:text-4xl"
-        style={tabularNums}
-      >
-        {typeof value === 'number' ? value.toLocaleString() : value}
-      </span>
+      {typeof value === 'number' ? (
+        <CountUp
+          value={value}
+          className="font-display text-white leading-none text-3xl sm:text-4xl"
+        />
+      ) : (
+        <span
+          className="font-display text-white leading-none text-3xl sm:text-4xl"
+          style={tabularNums}
+        >
+          {value}
+        </span>
+      )}
       <span className={labelClass}>{label}</span>
     </div>
   )
@@ -56,12 +64,10 @@ export default function StatsPage() {
           Everything I&apos;ve put out, counted honestly — no rounding up, no cherry-picking.
         </p>
         <div className="mt-5 sm:mt-6 flex items-baseline gap-3 anim-fade-up anim-delay-2">
-          <span
+          <CountUp
+            value={totalItems}
             className="font-display text-white leading-none text-[3.5rem] sm:text-[5.5rem] lg:text-[6.5rem]"
-            style={tabularNums}
-          >
-            {totalItems.toLocaleString()}
-          </span>
+          />
           <span className={`${labelClass} pb-1 sm:pb-2`}>items in the archive</span>
         </div>
       </div>

@@ -193,6 +193,82 @@ async function checkAndBumpRateLimit(env, request) {
   return { allowed: true }
 }
 
+/**
+ * Anonymous question log — the owner's future content pipeline. Stores only
+ * the question text, outcome, and timestamp in KV (no IP, no identity).
+ * Inert until an INBOX KV namespace is bound; failures never affect answers.
+ */
+async function logQuestion(env, question, outcome) {
+  if (!env.INBOX) return
+  try {
+    const key = `q:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`
+    await env.INBOX.put(key, JSON.stringify({ question, outcome, at: new Date().toISOString() }))
+  } catch (err) {
+    console.warn('question log skipped:', err.message)
+  }
+}
+
+const JOIN_MAX_AMBITION_LEN = 200
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+/**
+ * "Join the lab" capture: email + optional ambition ("what are you chasing").
+ * Privacy-honest: stored solely for the weekly newsletter; honeypot-guarded;
+ * per-IP rate limited; inert (friendly 503) until the INBOX KV is bound.
+ */
+async function handleJoin(request, env) {
+  if (request.method !== 'POST') {
+    return Response.json({ error: 'method not allowed' }, { status: 405 })
+  }
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return Response.json({ error: 'Invalid request.' }, { status: 400 })
+  }
+
+  // Honeypot: bots fill every field — pretend success, store nothing.
+  if ((body?.website ?? '').toString().trim() !== '') {
+    return Response.json({ ok: true })
+  }
+
+  const email = (body?.email ?? '').toString().trim().toLowerCase()
+  const ambition = (body?.ambition ?? '').toString().trim().slice(0, JOIN_MAX_AMBITION_LEN)
+  if (!EMAIL_RE.test(email) || email.length > 254) {
+    return Response.json({ error: 'That email does not look right.' }, { status: 400 })
+  }
+
+  if (!env.INBOX) {
+    return Response.json(
+      { error: 'The lab list opens very soon — until then, DM me on Instagram.' },
+      { status: 503 }
+    )
+  }
+
+  // Reuse the cache-counter mechanism: max 5 join attempts per IP per hour.
+  const ip = request.headers.get('cf-connecting-ip') ?? 'unknown'
+  const cache = caches.default
+  const hourBucket = Math.floor(Date.now() / 3600_000)
+  const joinKey = `https://rate.nathamuni.internal/join/${ip}/${hourBucket}`
+  const prev = await readCounter(cache, joinKey)
+  if (prev >= 5) {
+    return Response.json({ error: 'Too many attempts — try again later.' }, { status: 429 })
+  }
+  await writeCounter(cache, joinKey, prev + 1, 3600)
+
+  try {
+    // Idempotent per email: re-joining just refreshes the record.
+    await env.INBOX.put(
+      `join:${email}`,
+      JSON.stringify({ email, ambition, at: new Date().toISOString() })
+    )
+    return Response.json({ ok: true })
+  } catch (err) {
+    console.error('join error:', err.message)
+    return Response.json({ error: 'Could not save that just now — try again.' }, { status: 500 })
+  }
+}
+
 async function handleAsk(request, env) {
   if (request.method !== 'POST') {
     return Response.json({ error: 'method not allowed' }, { status: 405 })
@@ -246,9 +322,11 @@ async function handleAsk(request, env) {
     const answer = extractAnswer(result)
     if (!answer) throw new Error(`empty model response: ${JSON.stringify(result).slice(0, 200)}`)
 
+    await logQuestion(env, question, 'answered')
     return Response.json({ answer })
   } catch (err) {
     console.error('ask error:', err.message)
+    await logQuestion(env, question, 'failed')
     return Response.json(
       { error: "The twin's brain hiccuped mid-thought — try asking again in a moment." },
       { status: 200 }
@@ -312,6 +390,14 @@ const worker = {
     }
     if (pathname === '/api/ask') {
       return handleAsk(request, env)
+    }
+    if (pathname === '/api/join') {
+      try {
+        return await handleJoin(request, env)
+      } catch (err) {
+        console.error('join fatal:', err.message)
+        return Response.json({ error: 'Could not save that just now — try again.' }, { status: 500 })
+      }
     }
     return env.ASSETS.fetch(request)
   },

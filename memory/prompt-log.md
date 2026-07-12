@@ -154,3 +154,21 @@ a tracked requirement.
    feed kind-filters (CSS-only, with counts), rows already content-visibility;
    growth-proofing verified (feed/stats/search all data-driven).
 6. Owner completed the reels description file → 43 reels imported (v13).
+
+## 2026-07-12 — v15–v17 (final rounds)
+
+1. Six more video enrichments by voice note: his two BEST diet reels
+   (DW0UrFBkcoz, DW249vGEe5i) must top "diet" searches ✓ (verified live);
+   protein/amino breakdown reel; spirituality/growth-mindset reel; flexibility
+   workout linked as parts 1 & 2 ✓.
+2. Still-cropped reports → tile Ken-Burns idle zoom removed (was cropping 12%,
+   beheading the Humor meme text); books banner recomposed; home moments strip
+   4:5→9:16 (v14 pattern-match miss found and fixed; verified in live CSS).
+3. Asked how /ask works + why free + what Cloudflare gives for "just a domain"
+   → explained (GLM-4.7-Flash + bge-m3 RAG, 10k neurons/day free allocation
+   verified from docs, free-plan cannot bill, static-first speed).
+4. "Final improvements — your call": shipped the finishing seven — scroll
+   progress bar, route transition fade, count-up numerals, back-to-top,
+   section-title underline reveal, hero scroll cue, real footer.
+5. STILL WAITING ON OWNER: book sample-vs-full decision, Gemini API key,
+   GitHub OAuth app (/admin), book purchase link, 9 undescribed reels.
