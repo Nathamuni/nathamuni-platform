@@ -13,6 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/moments`, priority: 0.6 },
     { url: `${SITE_URL}/stats`, priority: 0.5 },
     { url: `${SITE_URL}/about`, priority: 0.6 },
+    { url: `${SITE_URL}/journey`, priority: 0.5 },
+    { url: `${SITE_URL}/ask`, priority: 0.4 },
     { url: `${SITE_URL}/blog`, priority: 0.3 },
     { url: `${SITE_URL}/books`, priority: 0.3 },
     { url: `${SITE_URL}/projects`, priority: 0.3 },
