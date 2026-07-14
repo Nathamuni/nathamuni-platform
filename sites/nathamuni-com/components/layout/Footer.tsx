@@ -12,6 +12,8 @@ const EXPLORE_LINKS: FooterLink[] = [
   { href: '/feed', label: 'Feed' },
   { href: '/videos', label: 'Videos' },
   { href: '/moments', label: 'Moments' },
+  { href: '/courses', label: 'Courses' },
+  { href: '/sessions', label: 'Sessions' },
 ]
 
 const READ_LINKS: FooterLink[] = [

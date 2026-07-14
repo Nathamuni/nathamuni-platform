@@ -165,7 +165,24 @@ Status marks: ✅ shipped & verified live · 🔨 in progress · ⏳ waiting on 
   confirmation. Rejected for now: Meta insights (API-block risk), Play scraping
   (fragile), fitness OAuth (infrastructure).
 
-## 12. Standing working agreements
+## 12. v21 — courses, sessions, nav regroup (2026-07-14)
+
+- 🔨 **/courses**: 5 structured paths assembled from existing verified content
+  (Consistency System, Full-Body Flexibility, Calisthenics Foundations,
+  Diet Tested, Local-First AI Starter) — theory blocks labeled by credibility
+  ("☬ Tested on myself" / "Research-backed" w/ live-verified refs / "Standard
+  practice"), his real videos embedded, action checklists (localStorage),
+  health disclaimers.
+- 🔨 **/sessions**: 4 runnable protocols (Diet Reset w/ blood-panel baseline,
+  Unlock Your Body, The 7-Day Reset from the book, Ship Local AI in a
+  Weekend) — steps + checkpoints + metrics tables + step tracker.
+- 🔨 **Nav regrouped** (owner agreed 11 flat links = janky): 8 primary visible
+  + About ▾ dropdown (About/Journey/Projects/Stats/Books); tab bar unchanged;
+  footer + sitemap wired (sitemap also gained missing /journey, /ask).
+- Distinction (owner asked): Course = become (learn), Session = run (bounded
+  protocol with metrics). Cross-linked.
+
+## 13. Standing working agreements
 
 - Ship via feature branch → tests → PR → CI green → merge → verify LIVE on nathamuni.com.
 - Never expand Meta permissions; never scrape; visitor traffic never touches the

@@ -189,17 +189,16 @@ a tracked requirement.
   verified:true; ~40 lines in worker/index.mjs following existing patterns.
   Trigger phrase: "set up email verification".
 
-## 2026-07-14 — new feature request (owner unclear, asked for detailed shaping)
+## 2026-07-14 — v21 GO (branched session)
 
-1. **Courses**: group existing content (videos + blog + book concepts) into
-   full structured courses — theory as text + his videos + concrete action
-   steps, organized as "what, for whom, what we'll do" plans.
-2. **Sessions**: AI-planned guided sessions per topic (his example: diet —
-   what metrics to follow, process steps like "take a blood test first",
-   health guidance plans) using AI knowledge + his content.
-3. Design answered in chat (2026-07-14): data-driven /courses from verified
-   content w/ localStorage progress; /sessions two-tier (curated AI-drafted
-   blueprints reviewed by owner first, then twin-powered personalization);
-   hard safety framing for health topics ("my tested process, not medical
-   advice"; no diagnoses, no prescriptions). Awaiting owner's picks:
-   naming, first courses, tier order.
+1. Build Courses NOW from available data + best practices; may include
+   articles/blog refs/videos (diet etc.) WITHOUT affecting credibility →
+   three-label model: "☬ Tested on myself" / "Research-backed (cited)" /
+   "Standard practice (framed, confirm with professional)" + health
+   disclaimers. Owner approved building on my judgment.
+2. Nav verdict requested: 11 flat links = janky → regroup: 7 visible
+   (Home Feed Videos Moments Courses Blog Ask) + "About ▾" dropdown
+   (About Journey Projects Stats Books). Mobile tab bar unchanged.
+3. Distinction defined: Course = become (theory+videos+actions, self-paced);
+   Session = run (bounded protocol: steps, metrics, checkpoints). Sessions
+   are practice protocols; courses link to them.
