@@ -5,6 +5,9 @@ export interface Video {
   title: string
   instagramUrl: string
   youtubeUrl?: string
+  /** Present once the daily sync cross-posts this reel to YouTube (see scripts/youtube-upload.mjs). */
+  youtubeId?: string
+  youtubeStatus?: 'private' | 'public' | 'unlisted' | 'failed' | 'skipped-too-large'
   thumbnail: string | null
   /** 'reel' (video) or 'post' (photo/carousel). Absent = reel (pre-posts entries). */
   mediaType?: 'reel' | 'post'
