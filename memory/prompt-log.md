@@ -188,3 +188,18 @@ a tracked requirement.
   (free 100/day), `/api/verify?token=` promotes to `join:<email>` with
   verified:true; ~40 lines in worker/index.mjs following existing patterns.
   Trigger phrase: "set up email verification".
+
+## 2026-07-14 — new feature request (owner unclear, asked for detailed shaping)
+
+1. **Courses**: group existing content (videos + blog + book concepts) into
+   full structured courses — theory as text + his videos + concrete action
+   steps, organized as "what, for whom, what we'll do" plans.
+2. **Sessions**: AI-planned guided sessions per topic (his example: diet —
+   what metrics to follow, process steps like "take a blood test first",
+   health guidance plans) using AI knowledge + his content.
+3. Design answered in chat (2026-07-14): data-driven /courses from verified
+   content w/ localStorage progress; /sessions two-tier (curated AI-drafted
+   blueprints reviewed by owner first, then twin-powered personalization);
+   hard safety framing for health topics ("my tested process, not medical
+   advice"; no diagnoses, no prescriptions). Awaiting owner's picks:
+   naming, first courses, tier order.
