@@ -213,3 +213,14 @@ a tracked requirement.
 3. Sessions need a proper TIMELINE ("time billing" — what happens when) and a
    FLOW MAP of the steps; plus a way for visitors to actually track the
    metrics → in-browser MetricTracker (localStorage, sparkline, private).
+
+## 2026-07-14 — v23 (evening)
+
+1. Progress (courses/sessions/metrics) is localStorage-only = not permanent →
+   add OPTIONAL simple email+password accounts to persist it; MUST state why
+   the data is collected at the point of asking ("only to keep your progress;
+   no newsletters, no tracking"). Built free on Workers+KV: PBKDF2 hashing,
+   HMAC session tokens, rate-limited auth, progress JSON per user.
+2. Sessions text "has the very AI touch — the em dashes" → humanize copy,
+   plain sentences, structured points, Good/Bad example pairs per step, more
+   visually appealing. Owner: "do anything as recommended."
