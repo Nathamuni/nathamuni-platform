@@ -14,6 +14,7 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { buildVideoMetadata, getYoutubeAccessToken, uploadToYoutube } from './youtube-upload.mjs'
 
 const SITE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const VIDEOS_JSON = join(SITE_ROOT, 'lib', 'videos.json')
@@ -28,6 +29,23 @@ if (!TOKEN) {
   console.error('IG_ACCESS_TOKEN is not set')
   process.exit(1)
 }
+
+// YouTube cross-post: fully optional, inert until all three secrets are set.
+// Uploads happen inline (not as a separate later script) because Instagram's
+// media_url is a short-lived CDN link only valid while we're iterating the
+// freshly-fetched API response — it can't be re-fetched from stored data.
+const YT_CLIENT_ID = process.env.YOUTUBE_CLIENT_ID
+const YT_CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET
+const YT_REFRESH_TOKEN = process.env.YOUTUBE_REFRESH_TOKEN
+const YT_ENABLED = Boolean(YT_CLIENT_ID && YT_CLIENT_SECRET && YT_REFRESH_TOKEN)
+// New API projects upload videos locked to private until Google's API audit
+// passes — flip to 'public'/'unlisted' via this env var once approved.
+const YT_PRIVACY = process.env.YOUTUBE_PRIVACY || 'private'
+// Quota + runtime guard: ~1600 units per upload against a 10,000/day YouTube
+// quota, and each upload holds the whole file in runner memory.
+const YT_MAX_PER_RUN = Number(process.env.YOUTUBE_MAX_PER_RUN || 3)
+const YT_MAX_BYTES = 300 * 1024 * 1024
+console.log(YT_ENABLED ? `YouTube cross-post: enabled (privacy=${YT_PRIVACY})` : 'YouTube cross-post: disabled (secrets not set)')
 
 const CATEGORY_RULES = [
   ['Calisthenics & Fitness', ['workout', 'fitness', 'calisthenic', 'gym', 'push-up', 'pushup', 'cardio', 'running', 'physique', 'muscle', 'training', 'kalari']],
@@ -180,7 +198,50 @@ const syncable = media.filter(
 console.log(`API media: ${media.length} total, ${syncable.length} syncable; site library: ${videos.length}`)
 if (!engagementSupported) console.log('Engagement counts (likes/comments) unavailable this run.')
 
+/**
+ * Best-effort cross-post to YouTube for one video entry. Never throws —
+ * failures are recorded on the entry itself so the Instagram sync (the part
+ * that matters most) is never blocked or broken by a YouTube-side problem.
+ */
+async function crossPostToYoutube(entry, media) {
+  try {
+    const mediaRes = await fetch(media.media_url)
+    if (!mediaRes.ok) {
+      entry.youtubeStatus = 'failed'
+      return
+    }
+    const contentType = mediaRes.headers.get('content-type') || 'video/mp4'
+    const buf = Buffer.from(await mediaRes.arrayBuffer())
+    if (buf.length > YT_MAX_BYTES) {
+      console.warn(`  youtube: skipping ${entry.id} — ${(buf.length / 1e6).toFixed(0)}MB exceeds the safety cap`)
+      entry.youtubeStatus = 'skipped-too-large'
+      return
+    }
+    const accessToken = await getYoutubeAccessToken({
+      clientId: YT_CLIENT_ID,
+      clientSecret: YT_CLIENT_SECRET,
+      refreshToken: YT_REFRESH_TOKEN,
+    })
+    const metadata = buildVideoMetadata(entry)
+    const youtubeId = await uploadToYoutube({
+      accessToken,
+      videoBuffer: buf,
+      contentType,
+      metadata,
+      privacyStatus: YT_PRIVACY,
+    })
+    entry.youtubeId = youtubeId
+    entry.youtubeUrl = `https://youtube.com/shorts/${youtubeId}`
+    entry.youtubeStatus = YT_PRIVACY
+    console.log(`  youtube: uploaded -> ${entry.youtubeUrl} (${YT_PRIVACY})`)
+  } catch (err) {
+    console.warn(`  youtube: upload failed for ${entry.id}: ${err.message}`)
+    entry.youtubeStatus = 'failed'
+  }
+}
+
 const additions = []
+let ytUploadedThisRun = 0
 for (const m of syncable) {
   const shortcode = m.permalink.replace(/\/$/, '').split('/').pop()
   if (knownShortcodes.has(shortcode)) continue
@@ -189,6 +250,12 @@ for (const m of syncable) {
   const thumbSource = m.media_type === 'VIDEO' ? m.thumbnail_url : m.media_url
   const gotThumb = await downloadThumbnail(thumbSource, shortcode)
   if (!gotThumb) entry.thumbnail = null
+
+  if (YT_ENABLED && !DRY_RUN && m.media_type === 'VIDEO' && ytUploadedThisRun < YT_MAX_PER_RUN) {
+    await crossPostToYoutube(entry, m)
+    if (entry.youtubeId) ytUploadedThisRun++
+  }
+
   additions.push(entry)
   console.log(`+ ${entry.publishedDate}  [${entry.category}]  ${entry.title}`)
 }
