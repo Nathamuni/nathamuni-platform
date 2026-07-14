@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { Nav } from './Nav'
 
 vi.mock('next/navigation', () => ({
@@ -7,23 +7,23 @@ vi.mock('next/navigation', () => ({
 }))
 
 describe('Nav', () => {
-  it('links to every top-level route', () => {
+  it('links to every primary route in the visible bar', () => {
     render(<Nav />)
-    const expectedHrefs = [
-      '/',
-      '/feed',
-      '/videos',
-      '/moments',
-      '/about',
-      '/blog',
-      '/books',
-      '/projects',
-      '/stats',
-      '/journey',
-      '/ask',
-    ]
+    const expectedHrefs = ['/', '/feed', '/videos', '/moments', '/courses', '/sessions', '/blog', '/ask']
     const links = screen.getAllByRole('link')
     expectedHrefs.forEach((href) => {
+      expect(links.some((link) => link.getAttribute('href') === href)).toBe(true)
+    })
+  })
+
+  it('groups the identity pages behind the About dropdown', () => {
+    render(<Nav />)
+    const aboutHrefs = ['/about', '/journey', '/projects', '/stats', '/books']
+    expect(screen.queryByTestId('nav-about-dropdown')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('nav-about-menu'))
+    const dropdown = screen.getByTestId('nav-about-dropdown')
+    const links = Array.from(dropdown.querySelectorAll('a'))
+    aboutHrefs.forEach((href) => {
       expect(links.some((link) => link.getAttribute('href') === href)).toBe(true)
     })
   })
