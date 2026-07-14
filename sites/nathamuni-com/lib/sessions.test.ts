@@ -103,4 +103,25 @@ describe('sessions', () => {
       }
     }
   })
+
+  it('every session has a non-empty timeline with non-empty phase/span/focus', () => {
+    for (const session of getAllSessions()) {
+      expect(session.timeline.length).toBeGreaterThan(0)
+      for (const block of session.timeline) {
+        expect(block.phase.length).toBeGreaterThan(0)
+        expect(block.span.length).toBeGreaterThan(0)
+        expect(block.focus.length).toBeGreaterThan(0)
+        expect(block.stepIndexes.length).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('every timeline covers each step index exactly once', () => {
+    for (const session of getAllSessions()) {
+      const covered = session.timeline.flatMap((block) => block.stepIndexes)
+      expect(new Set(covered).size).toBe(covered.length) // no step listed twice
+      const sorted = covered.slice().sort((a, b) => a - b)
+      expect(sorted).toEqual(session.steps.map((_, i) => i)) // and none missing
+    }
+  })
 })

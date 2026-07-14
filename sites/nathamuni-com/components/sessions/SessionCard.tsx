@@ -14,7 +14,10 @@ export function SessionCard({ session }: { session: Session }) {
       >
         <div className="ssn-card-top">
           <span className="ssn-card-duration tabular-nums">{session.durationLabel}</span>
-          <span className="ssn-card-metric-count">{session.metrics.length} metrics</span>
+          <span className="ssn-card-chips">
+            <span className="ssn-card-phase-count">{session.timeline.length} phases</span>
+            <span className="ssn-card-metric-count">{session.metrics.length} metrics</span>
+          </span>
         </div>
         <h2 className="ssn-card-title">{session.title}</h2>
         <p className="ssn-card-promise">{session.promise}</p>

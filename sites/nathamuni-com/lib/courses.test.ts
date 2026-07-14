@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getAllCourses, getCourseBySlug } from './courses'
+import { getAllCourses, getCourseBySlug, getActionCount, getReadTimeMinutes } from './courses'
 import { getVideoBySlug } from './videos'
 import { getPostBySlug } from './blog'
 
@@ -53,13 +53,53 @@ describe('courses data', () => {
     }
   })
 
-  it('every block has substantial theory text (80-160 words)', () => {
+  it('every block has a short lead sentence (non-empty, <=120 chars)', () => {
     for (const course of getAllCourses()) {
       for (const mod of course.modules) {
         for (const block of mod.blocks) {
-          const wordCount = block.text.trim().split(/\s+/).length
-          expect(wordCount, `${course.slug} / ${mod.title} (${block.label}) word count`).toBeGreaterThanOrEqual(80)
-          expect(wordCount, `${course.slug} / ${mod.title} (${block.label}) word count`).toBeLessThanOrEqual(160)
+          expect(block.lead.length, `${course.slug} / ${mod.title} (${block.label}) lead`).toBeGreaterThan(0)
+          expect(block.lead.length, `${course.slug} / ${mod.title} (${block.label}) lead length`).toBeLessThanOrEqual(120)
+        }
+      }
+    }
+  })
+
+  it('every block body is 1-3 short paragraphs, each non-empty', () => {
+    for (const course of getAllCourses()) {
+      for (const mod of course.modules) {
+        for (const block of mod.blocks) {
+          expect(block.body.length, `${course.slug} / ${mod.title} (${block.label}) body paragraph count`).toBeGreaterThanOrEqual(1)
+          expect(block.body.length, `${course.slug} / ${mod.title} (${block.label}) body paragraph count`).toBeLessThanOrEqual(3)
+          for (const para of block.body) {
+            expect(para.length, `${course.slug} / ${mod.title} (${block.label}) body paragraph text`).toBeGreaterThan(0)
+          }
+        }
+      }
+    }
+  })
+
+  it('bullets, where present, are a non-empty list of non-empty enumerable items', () => {
+    for (const course of getAllCourses()) {
+      for (const mod of course.modules) {
+        for (const block of mod.blocks) {
+          if (block.bullets === undefined) continue
+          expect(block.bullets.length, `${course.slug} / ${mod.title} (${block.label}) bullets`).toBeGreaterThan(0)
+          for (const bullet of block.bullets) {
+            expect(bullet.length, `${course.slug} / ${mod.title} (${block.label}) bullet text`).toBeGreaterThan(0)
+          }
+        }
+      }
+    }
+  })
+
+  it('every block carries substantial combined theory content (lead + body + bullets, 40-200 words)', () => {
+    for (const course of getAllCourses()) {
+      for (const mod of course.modules) {
+        for (const block of mod.blocks) {
+          const combined = [block.lead, ...block.body, ...(block.bullets ?? [])].join(' ').trim()
+          const wordCount = combined.split(/\s+/).length
+          expect(wordCount, `${course.slug} / ${mod.title} (${block.label}) combined word count`).toBeGreaterThanOrEqual(40)
+          expect(wordCount, `${course.slug} / ${mod.title} (${block.label}) combined word count`).toBeLessThanOrEqual(200)
         }
       }
     }
@@ -125,6 +165,22 @@ describe('courses data', () => {
     const course = getCourseBySlug('the-consistency-system')
     expect(course?.title).toBe('The Consistency System')
     expect(getCourseBySlug('does-not-exist')).toBeUndefined()
+  })
+
+  it('getActionCount sums actions across all modules', () => {
+    for (const course of getAllCourses()) {
+      const expected = course.modules.reduce((sum, m) => sum + m.actions.length, 0)
+      expect(getActionCount(course), `${course.slug} action count`).toBe(expected)
+      expect(getActionCount(course), `${course.slug} action count positive`).toBeGreaterThan(0)
+    }
+  })
+
+  it('getReadTimeMinutes returns a positive, finite estimate for every course', () => {
+    for (const course of getAllCourses()) {
+      const minutes = getReadTimeMinutes(course)
+      expect(Number.isFinite(minutes), `${course.slug} read time`).toBe(true)
+      expect(minutes, `${course.slug} read time positive`).toBeGreaterThanOrEqual(1)
+    }
   })
 
   it('every course has at least one video and one module with a block referencing real content', () => {

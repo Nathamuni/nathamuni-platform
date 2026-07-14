@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { Step } from '@/lib/sessions'
+import { stepAnchorId, type Step } from '@/lib/sessions'
 import { CredibilityBadge } from './CredibilityBadge'
 
 function storageKey(slug: string): string {
@@ -63,7 +63,11 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
         {steps.map((step, index) => {
           const inputId = `${slug}-step-${index}`
           return (
-            <li key={step.title} className={`ssn-step${completed[index] ? ' ssn-step-done' : ''}`}>
+            <li
+              key={step.title}
+              id={stepAnchorId(slug, index)}
+              className={`ssn-step${completed[index] ? ' ssn-step-done' : ''}`}
+            >
               <div className="ssn-step-head">
                 <span className="ssn-step-number tabular-nums" aria-hidden="true">
                   {String(index + 1).padStart(2, '0')}
@@ -129,6 +133,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           border: 1px solid rgba(178, 148, 255, 0.14);
           backdrop-filter: blur(20px);
           transition: border-color 0.25s ease, background 0.25s ease;
+          scroll-margin-top: 5.5rem;
         }
         .ssn-step-done {
           border-color: rgba(34, 211, 238, 0.4);

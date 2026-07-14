@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getAllCourses, getCourseBySlug } from '@/lib/courses'
+import { getAllCourses, getCourseBySlug, getActionCount, getReadTimeMinutes } from '@/lib/courses'
 import { SITE_URL } from '@/lib/site'
 import { CoursesStyles } from '@/components/courses/CoursesStyles'
 import { DisclaimerCard } from '@/components/courses/DisclaimerCard'
@@ -41,6 +41,10 @@ export default async function CoursePage({
   const course = getCourseBySlug(slug)
   if (!course) notFound()
 
+  const moduleCount = course.modules.length
+  const actionCount = getActionCount(course)
+  const readMinutes = getReadTimeMinutes(course)
+
   const courseJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Course',
@@ -69,19 +73,24 @@ export default async function CoursePage({
           <span className="crs-level-chip">
             {course.level === 'beginner' ? 'Beginner' : 'Intermediate'}
           </span>
-          <span className="crs-module-count">
-            {course.modules.length} module{course.modules.length === 1 ? '' : 's'}
-          </span>
         </div>
         <h1 className="post-title">{course.title}</h1>
+        <p className="crs-meta-row" data-testid="course-meta">
+          {moduleCount} module{moduleCount === 1 ? '' : 's'}
+          <span aria-hidden="true"> · </span>
+          {actionCount} action{actionCount === 1 ? '' : 's'}
+          <span aria-hidden="true"> · </span>~{readMinutes} min read
+        </p>
         <p className="crs-hero-forwhom" data-testid="course-forwhom">
-          <strong>For:</strong> {course.forWhom}
+          <em>For {course.forWhom}</em>
         </p>
         <div>
           <p className="crs-hero-outcomes-heading">What we&apos;re going to do</p>
-          <ul className="crs-hero-outcomes" data-testid="course-outcomes">
+          <ul className="crs-hero-outcomes-chips" data-testid="course-outcomes">
             {course.outcomes.map((outcome) => (
-              <li key={outcome}>{outcome}</li>
+              <li key={outcome} className="crs-outcome-chip">
+                {outcome}
+              </li>
             ))}
           </ul>
         </div>

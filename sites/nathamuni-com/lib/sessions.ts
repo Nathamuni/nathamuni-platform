@@ -33,6 +33,23 @@ export interface Metric {
   cadence: string
 }
 
+/**
+ * One block of time on a session's timeline — maps a span of days/weeks
+ * onto the step(s) that happen during it. Derived from the steps' own
+ * text, never a new claim: every step index must appear in exactly one
+ * phase across a session's timeline.
+ */
+export interface TimelinePhase {
+  /** Short phase name, e.g. 'Week 1' or 'Before you start'. */
+  phase: string
+  /** Small-caps span label, e.g. 'Days 1–7'. */
+  span: string
+  /** One line: what happens in this phase. */
+  focus: string
+  /** Zero-based indexes into this session's `steps` covered by this phase. */
+  stepIndexes: number[]
+}
+
 export interface Session {
   slug: string
   title: string
@@ -44,8 +61,15 @@ export interface Session {
   hue: number
   metrics: Metric[]
   steps: Step[]
+  /** When each step happens, mapped onto the session's real duration. */
+  timeline: TimelinePhase[]
   relatedVideoIds?: string[]
   relatedBlogSlugs?: string[]
+}
+
+/** DOM anchor id for a step's card — used by SessionFlow to scroll-link into StepTracker. */
+export function stepAnchorId(slug: string, index: number): string {
+  return `step-${slug}-${index}`
 }
 
 const SESSIONS: Session[] = [
@@ -115,6 +139,32 @@ const SESSIONS: Session[] = [
         checkpoint: 'You have a second panel (or 12 weeks of logs) to compare against day one.',
       },
     ],
+    timeline: [
+      {
+        phase: 'Before you start',
+        span: 'Day 0',
+        focus: 'Get the baseline blood panel booked and read.',
+        stepIndexes: [0],
+      },
+      {
+        phase: 'Week 1',
+        span: 'Week 1',
+        focus: 'Log exactly what you already eat — change nothing yet.',
+        stepIndexes: [1],
+      },
+      {
+        phase: 'Weeks 2–4',
+        span: 'Weeks 2–4',
+        focus: 'Hit your protein target and run the weekly checkpoint.',
+        stepIndexes: [2, 3],
+      },
+      {
+        phase: 'After the reset',
+        span: 'Weeks 8–12',
+        focus: 'Re-test what was flagged and compare against day one.',
+        stepIndexes: [4],
+      },
+    ],
     relatedVideoIds: [
       'self-experience-facts-free',
       'ask-me-for-personal-tips',
@@ -181,6 +231,32 @@ const SESSIONS: Session[] = [
         },
       },
     ],
+    timeline: [
+      {
+        phase: 'Weeks 1–2',
+        span: 'Weeks 1–2',
+        focus: 'Run the daily 15-minute Part 1 routine, every day, no exceptions.',
+        stepIndexes: [0],
+      },
+      {
+        phase: 'Week 3',
+        span: 'Week 3',
+        focus: 'Layer in Part 2 on top of the same daily 15 minutes.',
+        stepIndexes: [1],
+      },
+      {
+        phase: 'Throughout',
+        span: 'After every session',
+        focus: 'Run the post-training alignment routine while tissue is still warm.',
+        stepIndexes: [2],
+      },
+      {
+        phase: 'After week 3',
+        span: 'Ongoing',
+        focus: "Understand why range of motion and tendon adaptation move on different clocks.",
+        stepIndexes: [3],
+      },
+    ],
     relatedVideoIds: ['run-with-me', 'thanks-for-visiting', 'workout-anywhere-even-out-of-station'],
     relatedBlogSlugs: ['tendon-patience-why-planche-and-maltese-take-years'],
   },
@@ -243,6 +319,26 @@ const SESSIONS: Session[] = [
         },
       },
     ],
+    timeline: [
+      {
+        phase: 'Day 1',
+        span: 'Day 1',
+        focus: 'Make the one deletion — gone, not paused.',
+        stepIndexes: [0],
+      },
+      {
+        phase: 'Days 1–7',
+        span: 'Days 1–7',
+        focus: 'Run the one daily action and the evening 2-line log, every day.',
+        stepIndexes: [1, 2],
+      },
+      {
+        phase: 'Day 7',
+        span: 'Day 7',
+        focus: 'Decide, in writing, what the daily action becomes on day 8.',
+        stepIndexes: [3],
+      },
+    ],
     relatedBlogSlugs: ['motivation-is-a-feeling-systems-are-infrastructure'],
   },
   {
@@ -301,6 +397,26 @@ const SESSIONS: Session[] = [
         detail:
           "Turn off your wifi, or physically disconnect, and run the loop again. If it works exactly the same with no network, day two's job is done. While you're at it, note two things honestly: how fast it felt (tokens per second, or just a gut 'fast enough' or 'too slow') and how good the output actually was for your specific use case, not compared to a giant cloud model. Small local models trade some raw capability for full offline control — this is where you find out, on your own use case, whether that trade was worth it for you.",
         checkpoint: "The tool ran fully offline and you've written down both the speed and the honest quality verdict.",
+      },
+    ],
+    timeline: [
+      {
+        phase: 'Saturday AM',
+        span: 'Saturday morning',
+        focus: 'Install Ollama, pull a small model, and pick one real use case.',
+        stepIndexes: [0, 1],
+      },
+      {
+        phase: 'Saturday PM',
+        span: 'Saturday afternoon',
+        focus: 'Build the thinnest possible loop that completes the use case end to end.',
+        stepIndexes: [2],
+      },
+      {
+        phase: 'Sunday',
+        span: 'Sunday',
+        focus: 'Run it fully offline and write down the honest speed and quality verdict.',
+        stepIndexes: [3],
       },
     ],
     relatedVideoIds: ['my-local-ai-app-chat-habits-personas'],
