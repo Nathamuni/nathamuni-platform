@@ -58,10 +58,20 @@ export default function SessionsPage() {
           background: hsla(var(--cat), 80%, 55%, 0.12);
           border: 1px solid hsla(var(--cat), 70%, 60%, 0.35);
         }
+        .ssn-card-chips {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .ssn-card-phase-count,
         .ssn-card-metric-count {
           font-size: 0.65rem;
           color: rgba(255, 255, 255, 0.4);
           white-space: nowrap;
+        }
+        .ssn-card-phase-count {
+          padding-right: 0.5rem;
+          border-right: 1px solid rgba(255, 255, 255, 0.14);
         }
         .ssn-card-title {
           margin: 0;

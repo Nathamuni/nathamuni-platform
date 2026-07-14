@@ -118,14 +118,18 @@
     display: none;
   }
   .site-nav-links a,
-  .site-nav-links .nav-menu-btn {
+  .nav-menu-btn {
     @apply text-white/65 hover:text-white transition-all py-1.5 px-2.5 sm:px-3 rounded-full whitespace-nowrap;
   }
-  .site-nav-links .nav-menu-btn {
+  .nav-menu-btn {
     @apply cursor-pointer bg-transparent text-sm inline-flex items-center gap-1;
   }
-  .site-nav-links .nav-menu-btn:hover {
+  .nav-menu-btn:hover {
     background: rgba(178, 148, 255, 0.12);
+  }
+  .nav-menu-btn.is-active {
+    @apply text-white;
+    background: linear-gradient(120deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.25));
   }
   .site-nav-links a:hover {
     background: rgba(178, 148, 255, 0.12);

@@ -202,3 +202,14 @@ a tracked requirement.
 3. Distinction defined: Course = become (theory+videos+actions, self-paced);
    Session = run (bounded protocol: steps, metrics, checkpoints). Sessions
    are practice protocols; courses link to them.
+
+## 2026-07-14 — v22 feedback
+
+1. About dropdown not opening → root cause: mask-image on .site-nav-links
+   erased the dropdown's paint; menu moved outside the masked list. NEVER put
+   overflowing children inside .site-nav-links.
+2. Courses content "too janky and too texty, difficult to read" → readability
+   redesign (scannable modules, shorter chunks, visual rhythm).
+3. Sessions need a proper TIMELINE ("time billing" — what happens when) and a
+   FLOW MAP of the steps; plus a way for visitors to actually track the
+   metrics → in-browser MetricTracker (localStorage, sparkline, private).

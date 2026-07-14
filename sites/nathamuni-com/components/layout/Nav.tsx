@@ -40,7 +40,7 @@ function isActive(pathname: string | null, href: string): boolean {
 
 function AboutMenu({ pathname }: { pathname: string | null }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLLIElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const groupActive = ABOUT_LINKS.some((l) => isActive(pathname, l.href))
 
   useEffect(() => {
@@ -59,8 +59,10 @@ function AboutMenu({ pathname }: { pathname: string | null }) {
     }
   }, [open])
 
+  // Rendered OUTSIDE .site-nav-links: that list is masked for scroll-fade,
+  // which erases anything painted beyond the bar — including this dropdown.
   return (
-    <li className="relative" ref={ref}>
+    <div className="relative hidden sm:block" ref={ref}>
       <button
         type="button"
         className={groupActive ? 'is-active nav-menu-btn' : 'nav-menu-btn'}
@@ -102,7 +104,7 @@ function AboutMenu({ pathname }: { pathname: string | null }) {
           ))}
         </ul>
       )}
-    </li>
+    </div>
   )
 }
 
@@ -126,8 +128,8 @@ export function Nav() {
               </Link>
             </li>
           ))}
-          <AboutMenu pathname={pathname} />
         </ul>
+        <AboutMenu pathname={pathname} />
       </nav>
       <nav className="tab-bar" aria-label="Primary" data-testid="tab-bar">
         {TAB_LINKS.map((tab) => (

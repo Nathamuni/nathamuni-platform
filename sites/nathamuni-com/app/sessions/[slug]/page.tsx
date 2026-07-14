@@ -7,6 +7,9 @@ import { getPostBySlug } from '@/lib/blog'
 import { SITE_URL } from '@/lib/site'
 import { DisclaimerCard } from '@/components/sessions/DisclaimerCard'
 import { MetricsTable } from '@/components/sessions/MetricsTable'
+import { MetricTracker } from '@/components/sessions/MetricTracker'
+import { SessionFlow } from '@/components/sessions/SessionFlow'
+import { SessionTimeline } from '@/components/sessions/SessionTimeline'
 import { StepTracker } from '@/components/sessions/StepTracker'
 import { VideoCard } from '@/components/video/VideoCard'
 
@@ -80,7 +83,12 @@ export default async function SessionDetailPage({
 
       <DisclaimerCard />
 
+      <SessionFlow slug={session.slug} steps={session.steps} promise={session.promise} />
+
+      <SessionTimeline hue={session.hue} timeline={session.timeline} />
+
       <MetricsTable metrics={session.metrics} />
+      <MetricTracker slug={session.slug} metrics={session.metrics} />
 
       <div className="ssn-session-protocol">
         <h2 className="section-title">The protocol</h2>
