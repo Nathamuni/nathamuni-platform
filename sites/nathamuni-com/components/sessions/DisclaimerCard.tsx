@@ -9,7 +9,7 @@ export function DisclaimerCard() {
         !
       </span>
       <p>
-        This is my tested process, not medical advice. I&apos;m an engineer, not a doctor — confirm
+        This is my tested process, not medical advice. I&apos;m an engineer, not a doctor. Confirm
         health decisions (especially blood work, diet changes, training with injuries) with a
         professional.
       </p>

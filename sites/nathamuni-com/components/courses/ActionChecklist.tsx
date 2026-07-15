@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { loadItem, saveItem } from '@/lib/progress'
 
 interface ActionChecklistProps {
   slug: string
@@ -15,23 +16,42 @@ interface ActionChecklistProps {
  * localStorage after mount, so there's nothing for reduced-motion users to
  * be bothered by (no animation here at all).
  */
+/** Reads the persisted ticks for one module, or null if there's nothing (yet). */
+function readChecked(storageKey: string, actions: string[]): boolean[] | null {
+  try {
+    const raw = loadItem(storageKey)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) return actions.map((_, i) => Boolean(parsed[i]))
+  } catch {
+    /* localStorage unavailable (privacy mode) — keep defaults */
+  }
+  return null
+}
+
 export function ActionChecklist({ slug, moduleIndex, actions }: ActionChecklistProps) {
   const storageKey = `course-${slug}-${moduleIndex}`
   const [checked, setChecked] = useState<boolean[]>(() => actions.map(() => false))
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(storageKey)
-      if (!raw) return
-      const parsed = JSON.parse(raw)
-      if (Array.isArray(parsed)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating persisted ticks after mount is the point.
-        setChecked(actions.map((_, i) => Boolean(parsed[i])))
-      }
-    } catch {
-      /* localStorage unavailable (privacy mode) — keep defaults */
+    const persisted = readChecked(storageKey, actions)
+    if (persisted) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrating persisted ticks after mount is the point.
+      setChecked(persisted)
     }
     // Re-run only when the storage key itself changes (i.e. a different module).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey])
+
+  // A login mid-session applies server progress and fires this event so the
+  // checklist re-reads localStorage instead of staying stuck on stale state.
+  useEffect(() => {
+    function onProgressApplied() {
+      const persisted = readChecked(storageKey, actions)
+      if (persisted) setChecked(persisted)
+    }
+    window.addEventListener('nm-progress-applied', onProgressApplied)
+    return () => window.removeEventListener('nm-progress-applied', onProgressApplied)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey])
 
@@ -40,11 +60,7 @@ export function ActionChecklist({ slug, moduleIndex, actions }: ActionChecklistP
       setChecked((prev) => {
         const next = prev.slice()
         next[index] = !next[index]
-        try {
-          window.localStorage.setItem(storageKey, JSON.stringify(next))
-        } catch {
-          /* ignore — nothing we can do if storage is unavailable */
-        }
+        saveItem(storageKey, JSON.stringify(next))
         return next
       })
     },

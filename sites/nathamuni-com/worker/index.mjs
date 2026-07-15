@@ -12,6 +12,8 @@
  * content hash — they recompute automatically whenever the library changes.
  */
 
+import { handleAuth } from './auth.mjs'
+
 const MODEL = '@cf/baai/bge-m3'
 const TOP_K = 12
 const EMBED_BATCH = 90
@@ -417,6 +419,14 @@ const worker = {
       } catch (err) {
         console.error('join fatal:', err.message)
         return Response.json({ error: 'Could not save that just now — try again.' }, { status: 500 })
+      }
+    }
+    if (pathname.startsWith('/api/auth/')) {
+      try {
+        return await handleAuth(request, env, pathname.slice('/api/auth/'.length))
+      } catch (err) {
+        console.error('auth fatal:', err.message)
+        return Response.json({ error: 'Something went wrong — try again.' }, { status: 500 })
       }
     }
     return env.ASSETS.fetch(request)

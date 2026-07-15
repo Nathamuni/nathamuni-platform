@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, type KeyboardEvent } from 'react'
+import { useCallback, useEffect, useState, type KeyboardEvent } from 'react'
 import type { Metric } from '@/lib/sessions'
+import { loadItem, saveItem } from '@/lib/progress'
 
 interface MetricEntry {
   date: string
@@ -24,7 +25,7 @@ function isEntry(value: unknown): value is MetricEntry {
 
 function loadEntries(slug: string, index: number): MetricEntry[] {
   try {
-    const raw = window.localStorage.getItem(storageKey(slug, index))
+    const raw = loadItem(storageKey(slug, index))
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
@@ -36,11 +37,7 @@ function loadEntries(slug: string, index: number): MetricEntry[] {
 }
 
 function saveEntries(slug: string, index: number, entries: MetricEntry[]): void {
-  try {
-    window.localStorage.setItem(storageKey(slug, index), JSON.stringify(entries))
-  } catch {
-    /* privacy mode — tracker still works in-memory for this visit */
-  }
+  saveItem(storageKey(slug, index), JSON.stringify(entries))
 }
 
 /** 120×32 gradient sparkline over the last 7 entries, with a dot on the last point. */
@@ -133,6 +130,17 @@ function MetricRow({ slug, metric, index }: { slug: string; metric: Metric; inde
     setEntries(loadEntries(slug, index))
   }, [slug, index])
 
+  const rehydrate = useCallback(() => {
+    setEntries(loadEntries(slug, index))
+  }, [slug, index])
+
+  // A login mid-session applies server progress and fires this event so the
+  // tracker re-reads localStorage instead of staying stuck on stale state.
+  useEffect(() => {
+    window.addEventListener('nm-progress-applied', rehydrate)
+    return () => window.removeEventListener('nm-progress-applied', rehydrate)
+  }, [rehydrate])
+
   function logValue(): void {
     const trimmed = draft.trim()
     if (trimmed === '') return
@@ -221,7 +229,7 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           <MetricRow key={metric.name} slug={slug} metric={metric} index={index} />
         ))}
       </div>
-      <p className="ssn-tracker-privacy">Logged only in your browser — nothing leaves this device.</p>
+      <p className="ssn-tracker-privacy">Logged only in your browser. Nothing leaves this device.</p>
 
       <style>{`
         .ssn-tracker {
