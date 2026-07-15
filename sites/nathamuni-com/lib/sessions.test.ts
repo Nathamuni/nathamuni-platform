@@ -124,4 +124,46 @@ describe('sessions', () => {
       expect(sorted).toEqual(session.steps.map((_, i) => i)) // and none missing
     }
   })
+
+  // Regression guard for the "AI touch" copy cleanup: em dashes (and the
+  // hedgy "it's not X, it's Y" construction they tend to prop up) should
+  // never creep back into session/promise/step prose. Reference citation
+  // labels are exempt — those are factual source titles, not our voice.
+  it('never uses an em dash in session promise, forWhom, metrics, timeline, or step text', () => {
+    const emDash = /—/
+    for (const session of getAllSessions()) {
+      expect(session.promise).not.toMatch(emDash)
+      expect(session.forWhom).not.toMatch(emDash)
+      for (const metric of session.metrics) {
+        expect(metric.name).not.toMatch(emDash)
+        expect(metric.how).not.toMatch(emDash)
+        expect(metric.cadence).not.toMatch(emDash)
+      }
+      for (const block of session.timeline) {
+        expect(block.phase).not.toMatch(emDash)
+        expect(block.span).not.toMatch(emDash)
+        expect(block.focus).not.toMatch(emDash)
+      }
+      for (const step of session.steps) {
+        expect(step.title).not.toMatch(emDash)
+        expect(step.detail).not.toMatch(emDash)
+        expect(step.checkpoint).not.toMatch(emDash)
+        if (step.example) {
+          expect(step.example.good).not.toMatch(emDash)
+          expect(step.example.bad).not.toMatch(emDash)
+        }
+      }
+    }
+  })
+
+  it('every step example (when present) has non-empty good and bad text', () => {
+    for (const session of getAllSessions()) {
+      for (const step of session.steps) {
+        if (step.example) {
+          expect(step.example.good.length).toBeGreaterThan(0)
+          expect(step.example.bad.length).toBeGreaterThan(0)
+        }
+      }
+    }
+  })
 })

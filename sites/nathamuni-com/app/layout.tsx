@@ -6,6 +6,8 @@ import { ScrollProgress } from '@/components/fx/ScrollProgress'
 import { Companion } from '@/components/fx/Companion'
 import { BackToTop } from '@/components/fx/BackToTop'
 import { Footer } from '@/components/layout/Footer'
+import { AuthProvider } from '@/components/account/AuthProvider'
+import { AccountWidget } from '@/components/account/AccountWidget'
 import { SOCIAL_LINKS } from '@/lib/social'
 import { SITE_URL } from '@/lib/site'
 import { PROFILE } from '@/lib/profile'
@@ -71,13 +73,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
-        <Nav />
-        <ScrollReveal />
-        <ScrollProgress />
-        <main>{children}</main>
-        <Footer />
-        <Companion />
-        <BackToTop />
+        <AuthProvider>
+          <Nav />
+          <ScrollReveal />
+          <ScrollProgress />
+          <main>{children}</main>
+          <Footer />
+          <Companion />
+          <AccountWidget />
+          <BackToTop />
+        </AuthProvider>
       </body>
     </html>
   )

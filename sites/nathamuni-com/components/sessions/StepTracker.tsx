@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { stepAnchorId, type Step } from '@/lib/sessions'
+import { loadItem, saveItem } from '@/lib/progress'
 import { CredibilityBadge } from './CredibilityBadge'
+import { StepExample } from './StepExample'
 
 function storageKey(slug: string): string {
   return `session-${slug}`
@@ -10,7 +12,7 @@ function storageKey(slug: string): string {
 
 function loadCompleted(slug: string, count: number): boolean[] {
   try {
-    const raw = window.localStorage.getItem(storageKey(slug))
+    const raw = loadItem(storageKey(slug))
     if (!raw) return new Array(count).fill(false)
     const parsed: unknown = JSON.parse(raw)
     if (Array.isArray(parsed)) {
@@ -39,15 +41,23 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- steps.length is stable per session slug.
   }, [slug])
 
+  const rehydrate = useCallback(() => {
+    setCompleted(loadCompleted(slug, steps.length))
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- steps.length is stable per session slug.
+  }, [slug])
+
+  // A login mid-session applies server progress and fires this event so the
+  // tracker re-reads localStorage instead of staying stuck on stale state.
+  useEffect(() => {
+    window.addEventListener('nm-progress-applied', rehydrate)
+    return () => window.removeEventListener('nm-progress-applied', rehydrate)
+  }, [rehydrate])
+
   function toggle(index: number) {
     setCompleted((prev) => {
       const next = prev.slice()
       next[index] = !next[index]
-      try {
-        window.localStorage.setItem(storageKey(slug), JSON.stringify(next))
-      } catch {
-        /* privacy mode — checklist still works, just in-memory for this visit */
-      }
+      saveItem(storageKey(slug), JSON.stringify(next))
       return next
     })
   }
@@ -76,6 +86,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
                 <CredibilityBadge label={step.label} />
               </div>
               <p className="ssn-step-detail">{step.detail}</p>
+              {step.example && <StepExample example={step.example} />}
               <label className="ssn-step-checkpoint" htmlFor={inputId}>
                 <input
                   id={inputId}
