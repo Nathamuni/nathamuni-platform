@@ -25,7 +25,7 @@ describe('MetricTracker', () => {
     for (const metric of METRICS) {
       expect(screen.getByText(metric.name)).toBeInTheDocument()
     }
-    expect(screen.getByText(/nothing leaves this device/i)).toBeInTheDocument()
+    expect(screen.getByText(/logged in your browser/i)).toBeInTheDocument()
   })
 
   it('logging a value adds an entry and persists it to localStorage', () => {

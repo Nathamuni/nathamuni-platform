@@ -6,7 +6,9 @@ import { getVideoBySlug } from '@/lib/videos'
 import { getPostBySlug } from '@/lib/blog'
 import { SITE_URL } from '@/lib/site'
 import { DisclaimerCard } from '@/components/sessions/DisclaimerCard'
+import { HealthTools } from '@/components/sessions/HealthTools'
 import { MetricsTable } from '@/components/sessions/MetricsTable'
+import { SessionSky } from '@/components/sessions/SessionSky'
 import { MetricTracker } from '@/components/sessions/MetricTracker'
 import { SessionFlow } from '@/components/sessions/SessionFlow'
 import { SessionTimeline } from '@/components/sessions/SessionTimeline'
@@ -81,7 +83,11 @@ export default async function SessionDetailPage({
       <p className="ssn-session-promise">{session.promise}</p>
       <p className="ssn-session-forwhom">For: {session.forWhom}</p>
 
+      <SessionSky />
+
       <DisclaimerCard />
+
+      {session.healthTools && <HealthTools />}
 
       <SessionFlow slug={session.slug} steps={session.steps} promise={session.promise} />
 

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { stepAnchorId, type Step } from '@/lib/sessions'
 import { loadItem, saveItem } from '@/lib/progress'
+import { SaveNudge } from '@/components/account/SaveNudge'
 import { CredibilityBadge } from './CredibilityBadge'
 import { StepExample } from './StepExample'
 
@@ -69,6 +70,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
       <p className="ssn-protocol-progress" aria-live="polite">
         {mounted ? `${doneCount} / ${steps.length} steps done` : `${steps.length} steps`}
       </p>
+      <SaveNudge show={mounted && doneCount >= 2} />
       <ol className="ssn-protocol-list">
         {steps.map((step, index) => {
           const inputId = `${slug}-step-${index}`

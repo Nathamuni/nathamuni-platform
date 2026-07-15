@@ -73,6 +73,8 @@ export interface Session {
   timeline: TimelinePhase[]
   relatedVideoIds?: string[]
   relatedBlogSlugs?: string[]
+  /** Show the BMI + protein "Your numbers" card on this session's page. */
+  healthTools?: boolean
 }
 
 /** DOM anchor id for a step's card — used by SessionFlow to scroll-link into StepTracker. */
@@ -86,6 +88,7 @@ const SESSIONS: Session[] = [
     title: 'Diet Reset',
     promise: 'Stop guessing what to eat. Get a number, then hit it, every day, for a month.',
     durationLabel: '4 weeks',
+    healthTools: true,
     forWhom: 'Anyone starting from zero on food. No diet history, no baseline, just guesswork.',
     hue: 38,
     metrics: [
@@ -309,6 +312,7 @@ const SESSIONS: Session[] = [
     title: 'The 7-Day Reset',
     promise: "One week. One deletion. One daily action you can't skip. That's the whole reset.",
     durationLabel: '1 week',
+    healthTools: true,
     forWhom: 'Anyone whose life feels noisy and directionless and needs a hard restart, not a new app.',
     hue: 270,
     metrics: [
