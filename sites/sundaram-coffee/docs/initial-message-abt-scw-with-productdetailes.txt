@@ -1,0 +1,173 @@
+ So now I'm planning to create a new website for the first one, so the website is actually for the '/home/nathamuni/ Projects/Nathamuni-website/sites/sundaram-coffee' So for now I am going to give you the details I don't have any assert, but I need to generate it from the image generation. So I want you to first analyze the given information and ask any question about the relevant details so that you can actually find that matter, my details as sufficient. And if I said so, you can make it as the best combination of things to make a static, like, let's say, that should be also complied with the email as well so that I could I would actually, uh, post the content and the people can view that as well as people can send the email to my business address. For that one, is the post made to the analysis and only tell me. I will give you the company information, uh, and the product information now. here is the detailes :
+  Sundaram Coffee Works
+  Product Catalogue & Price List
+
+  Coffee Powder
+  We offer premium coffee powders sourced from renowned coffee-growing regions of South India. Our products are available in both Pure Coffee and 80:20 Coffee-Chicory Blend variants.
+  1. Chikmagalur Coffee
+  Variant
+  Price
+  Pure Coffee
+  ₹1,250/kg
+  80:20 Coffee-Chicory Blend
+  ₹1,050/kg
+
+  Description:
+  Premium coffee sourced from Chikmagalur, known for its rich aroma, smooth taste, and strong flavour.
+
+  2. Delicious Coffee
+  Variant
+  Price
+  Pure Coffee
+  ₹1,100/kg
+  80:20 Coffee-Chicory Blend
+  ₹950/kg
+
+  Description:
+  A balanced blend offering excellent aroma and taste, suitable for everyday consumption.
+
+  Traditional Pickles
+  Unless otherwise specified, all pickles are available in 300 g packs.
+  No.
+  Product
+  Pack Size
+  Price
+  1
+  Lemon Pickle
+  300 g
+  ₹145
+  2
+  Cut Mango Pickle
+  300 g
+  ₹145
+  3
+  Mango Thokku
+  300 g
+  ₹145
+  4
+  Aavakai Pickle
+  300 g
+  ₹145
+  5
+  Gooseberry (Amla) Pickle
+  300 g
+  ₹145
+  6
+  Mango Ginger Pickle
+  300 g
+  ₹145
+  7
+  Pirandai Thokku
+  300 g
+  ₹160
+  8
+  Tamarind Chilli Pickle
+  300 g
+  ₹145
+  9
+  Maavadu Pickle
+  300 g
+  ₹275
+  10
+  Neem Leaf Balls (Vepilai Katti) – 4 Pieces
+  4 Pieces
+  ₹70
+  11
+  Coriander Thokku
+  300 g
+  ₹145
+  12
+  Salted Citron Pickle (Less Spicy)
+  300 g
+  ₹145
+  13
+  Spicy Citron Pickle
+  300 g
+  ₹145
+  14
+  Citron Pickle
+  300 g
+  ₹145
+  15
+  Garlic Pickle
+  300 g
+  ₹160
+
+
+  Appalam & Traditional Fryums
+  Pirandai Ulundhu Appalam
+  Price: ₹450/kg
+  Available Pack Sizes
+  100 g
+  200 g
+  250 g
+
+  Rice Appalam
+  Price: ₹420/kg
+  Available Pack Sizes
+  200 g
+  300 g
+
+  Elai Vadam
+  Price: ₹450/kg
+  Available Pack Size
+  200 g
+
+  Pepper Appalam
+  Price: ₹500/kg
+  Available Pack Size
+  200 g
+
+  Appala Poo
+  Price: ₹300/kg
+  Available Pack Sizes
+  Available in any quantity or weight as per customer requirement.
+
+  Notes
+  Coffee is available in Pure Coffee and 80:20 Coffee-Chicory Blend variants.
+  Pickles are packed hygienically to preserve freshness and authentic homemade taste.
+  Appalam and fryums are available in multiple pack sizes for retail and bulk orders.
+  Bulk quantities can be packed on request.
+
+
+
+  For the kind information, the present side does not going to have a payment section in this online purchase as well... as a go, but it it it will have a contact button so that when clicking on it, people can mail or call us as a brand so that we can directly connect to those things, and then we'll get those actual messages or their requirement through the call or anything like that. So whatever they want, they can pick it and then if they, uh, actually check out there, it will get... it will send us a email with their email address. Or, uh, if they signed in as well as we have a call option for them to actually call. That should be the requirement mainly. So the actual, uh, purpose of this project is I purchased the domain called nathamuni.com So in that, I now want To connect multiple sites as a business size where for my clients I am going to create it for free and then doing the process of, like, just showing off their online presence, uh, without handling the payment, I'm going to do that for every different, uh, businesses. So, uh, for initially, this is my business. I have pasted so that I want you to actually make the display idea of what the process could be. I also require you to actually generate, uh, it could be better if we have some in... video, like, that could be generated. as the home page hero section with the text in the mist in the left side and the video is slightly, um, like, transparent to the right side and slightly got less and then with the cloudy text in the left side. So like that, I want to create a coffee video like that thing that is going to be happening for this project. So, uh, do you get the overall idea of what we are going to do?
+  Here is the expected for I am going to build now.
+
+  # Project Context & Development Prompt
+
+  We are building the **Nathamuni Digital Presence Platform**, a reusable platform that helps small businesses create a professional online presence using a single shared infrastructure under the domain **nathamuni.com**. The objective is not to build one website, but to create a scalable framework where multiple business websites can be hosted as subdomains (for example: `business-name.nathamuni.com`) using the same reusable architecture and components.
+
+  The platform targets small businesses, local shops, restaurants, manufacturers, freelancers, service providers, and Instagram businesses that need a professional website without the complexity or cost of building one from scratch. Each business website should be lightweight, mobile-first, fast, visually professional, SEO-friendly, and easy to customize using business data rather than custom code.
+
+  The current phase is to build the **first demonstration website**, which will act as the master template for all future business websites. The first sample business may be a coffee business, but the architecture must remain generic and reusable so it can later support any business category by simply changing the business data.
+
+  Every business website should be capable of containing:
+
+  * Hero section with branding and call-to-action
+  * About the business
+  * Products or services
+  * Categories or collections (where applicable)
+  * Why choose us / unique selling points
+  * Photo gallery
+  * Customer reviews and testimonials
+  * Contact information
+  * WhatsApp integration
+  * Phone and email contact
+  * Google Maps location
+  * Business hours
+  * Frequently Asked Questions
+  * Social media links
+  * Feedback or enquiry form
+  * Footer with platform branding
+
+  The platform should be designed with reusable layouts, reusable UI components, reusable sections, and reusable data models so that future websites can be generated with minimal effort. Avoid business-specific logic wherever possible, and instead build configurable components that can be populated from structured business information.
+
+  The initial technical stack uses GitHub for version control, Cloudflare Pages for hosting, Cloudflare DNS for domain management, and Cloudflare Email Routing for professional email forwarding. The architecture should remain static-first, simple, performant, and inexpensive to operate while allowing future expansion into a client dashboard, automated website generation, reusable templates, and self-service business management.
+
+  Every implementation should support the long-term vision of making **nathamuni.com** a platform capable of hosting many professional business websites rather than a collection of unrelated individual projects.
+
+
+  I want you to analyze my intention and I want you to give a clear analogy of things how we can proceed for this website building and hosting. At present, I had purchased Cloudflare Domain as nathamuni.com nothing more
+
+
