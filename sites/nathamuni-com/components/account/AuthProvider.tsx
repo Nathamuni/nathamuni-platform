@@ -148,3 +148,8 @@ export function useAuth(): AuthContextValue {
   }
   return ctx
 }
+
+/** Like useAuth, but null outside an AuthProvider — for optional add-ons. */
+export function useOptionalAuth(): AuthContextValue | null {
+  return useContext(AuthContext)
+}

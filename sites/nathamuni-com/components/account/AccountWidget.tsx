@@ -187,6 +187,16 @@ export function AccountWidget() {
   const [submitting, setSubmitting] = useState(false)
   const cardRef = useRef<HTMLDivElement | null>(null)
 
+  // A SaveNudge anywhere on the page can pop this dialog open.
+  useEffect(() => {
+    function onOpenRequest() {
+      setOpen(true)
+      setTab('signup')
+    }
+    window.addEventListener('nm-open-account', onOpenRequest)
+    return () => window.removeEventListener('nm-open-account', onOpenRequest)
+  }, [])
+
   useEffect(() => {
     if (!open) return
     function onKey(event: KeyboardEvent) {
