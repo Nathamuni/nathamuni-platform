@@ -5,6 +5,7 @@ import { getAllSessions, getSessionBySlug } from '@/lib/sessions'
 import { getVideoBySlug } from '@/lib/videos'
 import { getPostBySlug } from '@/lib/blog'
 import { SITE_URL } from '@/lib/site'
+import { CompletionRitual } from '@/components/sessions/CompletionRitual'
 import { DisclaimerCard } from '@/components/sessions/DisclaimerCard'
 import { HealthTools } from '@/components/sessions/HealthTools'
 import { MetricsTable } from '@/components/sessions/MetricsTable'
@@ -105,6 +106,7 @@ export default async function SessionDetailPage({
         <h2 className="section-title">The protocol</h2>
         <StepTracker slug={session.slug} steps={session.steps} />
       </div>
+      <CompletionRitual slug={session.slug} stepCount={session.steps.length} />
 
       {relatedPosts.length > 0 && (
         <aside className="ssn-session-reading" data-testid="session-related-posts">
