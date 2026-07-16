@@ -399,57 +399,9 @@ async function handleSearch(request, env) {
   )
 }
 
-/**
- * Ambient weather for the session-page sky. Uses Cloudflare's request geo
- * (no permission prompt, no precision beyond city) + Open-Meteo (free, no
- * key). Cached at the edge ~30min per rounded coordinate so visitor traffic
- * barely touches the upstream. Failure = empty object; the sky stays clear.
- */
-async function handleSky(request) {
-  const lat = Number(request.cf?.latitude)
-  const lon = Number(request.cf?.longitude)
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return Response.json({}, { headers: { 'cache-control': 'public, max-age=1800' } })
-  }
-  // Round to ~10km so nearby visitors share one cache entry (and we never
-  // echo anyone's precise location back).
-  const rLat = lat.toFixed(1)
-  const rLon = lon.toFixed(1)
-  const cache = caches.default
-  const cacheKey = new Request(`https://nathamuni.com/__sky/${rLat},${rLon}`)
-  const cached = await cache.match(cacheKey)
-  if (cached) return cached
-
-  const upstream = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${rLat}&longitude=${rLon}&current=temperature_2m,weather_code`,
-    { signal: AbortSignal.timeout(4000) }
-  )
-  if (!upstream.ok) {
-    return Response.json({}, { headers: { 'cache-control': 'public, max-age=600' } })
-  }
-  const data = await upstream.json()
-  const body = {
-    code: data?.current?.weather_code ?? null,
-    tempC: data?.current?.temperature_2m ?? null,
-  }
-  const response = Response.json(body, {
-    headers: { 'cache-control': 'public, max-age=1800' },
-  })
-  await cache.put(cacheKey, response.clone())
-  return response
-}
-
 const worker = {
   async fetch(request, env) {
     const { pathname } = new URL(request.url)
-    if (pathname === '/api/sky') {
-      try {
-        return await handleSky(request)
-      } catch (err) {
-        console.error('sky error:', err.message)
-        return Response.json({}, { status: 200 })
-      }
-    }
     if (pathname === '/api/search') {
       try {
         return await handleSearch(request, env)
