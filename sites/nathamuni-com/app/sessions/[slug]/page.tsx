@@ -12,6 +12,7 @@ import { MetricTracker } from '@/components/sessions/MetricTracker'
 import { SessionFlow } from '@/components/sessions/SessionFlow'
 import { SessionRunner } from '@/components/sessions/SessionRunner'
 import { StepTracker } from '@/components/sessions/StepTracker'
+import { TheaterMode } from '@/components/sessions/TheaterMode'
 import { VideoCard } from '@/components/video/VideoCard'
 
 export function generateStaticParams() {
@@ -93,7 +94,9 @@ export default async function SessionDetailPage({
         hue={session.hue}
         durationLabel={session.durationLabel}
         timeline={session.timeline}
-      />
+      >
+        <TheaterMode slug={session.slug} hue={session.hue} steps={session.steps} />
+      </SessionRunner>
 
       <MetricsTable metrics={session.metrics} />
       <MetricTracker slug={session.slug} metrics={session.metrics} />
