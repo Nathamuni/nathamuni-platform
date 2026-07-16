@@ -1,7 +1,14 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from './AuthProvider'
+
+/** Only these sections have progress worth saving — the pill stays out of the way everywhere else. */
+function isProgressPage(pathname: string | null): boolean {
+  if (!pathname) return false
+  return pathname.startsWith('/courses') || pathname.startsWith('/sessions')
+}
 
 const WHY_LINE =
   'Email + password only, so your course and session progress follows you to any device. No newsletters, no tracking, nothing shared.'
@@ -179,6 +186,7 @@ const ACCT_CSS = `
  */
 export function AccountWidget() {
   const { authed, email, loading, available, signup, login, logout } = useAuth()
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('login')
   const [emailInput, setEmailInput] = useState('')
@@ -214,6 +222,7 @@ export function AccountWidget() {
   }, [open])
 
   if (loading) return null
+  if (!isProgressPage(pathname)) return null
 
   if (!available) {
     return (

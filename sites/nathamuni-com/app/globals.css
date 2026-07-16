@@ -30,6 +30,14 @@
   h2,
   h3 {
     @apply font-display;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a,
+  button {
+    touch-action: manipulation;
   }
   ::selection {
     background: rgba(139, 92, 246, 0.5);
@@ -147,25 +155,47 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   .tab-item {
-    @apply flex flex-col items-center gap-0.5 py-2 text-white/55 transition-colors;
+    @apply relative flex flex-col items-center gap-1 text-white/55 transition-colors;
+    /* ≥44px touch target + instant taps on mobile */
+    min-height: 52px;
+    padding-top: 8px;
+    touch-action: manipulation;
   }
-  .tab-item:active {
-    transform: scale(0.94);
+  .tab-item:active .tab-icon {
+    transform: scale(0.88);
   }
   .tab-icon {
-    @apply text-lg leading-none;
+    width: 22px;
+    height: 22px;
+    display: block;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tab-icon svg {
+    width: 100%;
+    height: 100%;
   }
   .tab-label {
     @apply text-[0.62rem] tracking-wide;
   }
   .tab-item.is-active {
-    color: #e9d5ff;
+    color: #c4b5fd;
   }
-  .tab-item.is-active .tab-icon {
-    background: linear-gradient(120deg, #a78bfa, #f0abfc);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  /* Active indicator: a slim gradient bar sliding in above the icon. */
+  .tab-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 18px;
+    height: 2.5px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #a78bfa, #22d3ee);
+    opacity: 0;
+    transform: scaleX(0.3);
+    transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tab-item.is-active::before {
+    opacity: 1;
+    transform: scaleX(1);
   }
   @media (max-width: 639px) {
     body {
