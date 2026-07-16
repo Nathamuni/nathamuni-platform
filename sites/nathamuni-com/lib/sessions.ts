@@ -52,6 +52,9 @@ export interface TimelinePhase {
   phase: string
   /** Small-caps span label, e.g. 'Days 1–7'. */
   span: string
+  /** Inclusive 1-indexed calendar-day range this phase covers. Omit for
+   *  "ongoing / after every session" phases that have no fixed window. */
+  days?: [number, number]
   /** One line: what happens in this phase. */
   focus: string
   /** Zero-based indexes into this session's `steps` covered by this phase. */
@@ -174,24 +177,28 @@ const SESSIONS: Session[] = [
       {
         phase: 'Before you start',
         span: 'Day 0',
+        days: [1, 1],
         focus: 'Get the baseline blood panel booked and read.',
         stepIndexes: [0],
       },
       {
         phase: 'Week 1',
         span: 'Week 1',
+        days: [2, 8],
         focus: 'Log exactly what you already eat. Change nothing yet.',
         stepIndexes: [1],
       },
       {
         phase: 'Weeks 2–4',
         span: 'Weeks 2–4',
+        days: [9, 28],
         focus: 'Hit your protein target and run the weekly checkpoint.',
         stepIndexes: [2, 3],
       },
       {
         phase: 'After the reset',
         span: 'Weeks 8–12',
+        days: [50, 84],
         focus: 'Re-test what was flagged and compare against day one.',
         stepIndexes: [4],
       },
@@ -282,12 +289,14 @@ const SESSIONS: Session[] = [
       {
         phase: 'Weeks 1–2',
         span: 'Weeks 1–2',
+        days: [1, 14],
         focus: 'Run the daily 15-minute Part 1 routine, every day, no exceptions.',
         stepIndexes: [0],
       },
       {
         phase: 'Week 3',
         span: 'Week 3',
+        days: [15, 21],
         focus: 'Layer in Part 2 on top of the same daily 15 minutes.',
         stepIndexes: [1],
       },
@@ -387,18 +396,21 @@ const SESSIONS: Session[] = [
       {
         phase: 'Day 1',
         span: 'Day 1',
+        days: [1, 1],
         focus: 'Make the one deletion. Gone, not paused.',
         stepIndexes: [0],
       },
       {
         phase: 'Days 1–7',
         span: 'Days 1–7',
+        days: [2, 7],
         focus: 'Run the one daily action and the evening 2-line log, every day.',
         stepIndexes: [1, 2],
       },
       {
         phase: 'Day 7',
         span: 'Day 7',
+        days: [7, 7],
         focus: 'Decide, in writing, what the daily action becomes on day 8.',
         stepIndexes: [3],
       },
@@ -483,18 +495,21 @@ const SESSIONS: Session[] = [
       {
         phase: 'Saturday AM',
         span: 'Saturday morning',
+        days: [1, 1],
         focus: 'Install Ollama, pull a small model, and pick one real use case.',
         stepIndexes: [0, 1],
       },
       {
         phase: 'Saturday PM',
         span: 'Saturday afternoon',
+        days: [1, 1],
         focus: 'Build the thinnest possible loop that completes the use case end to end.',
         stepIndexes: [2],
       },
       {
         phase: 'Sunday',
         span: 'Sunday',
+        days: [2, 2],
         focus: 'Run it fully offline and write down the honest speed and quality verdict.',
         stepIndexes: [3],
       },
