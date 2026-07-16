@@ -1,0 +1,665 @@
+/* ============================================================
+   Design tokens
+   Color tokens (--ink, --brand, --surface, …) are injected on
+   :root from layout.tsx, derived from business.json themeHue.
+   ============================================================ */
+:root {
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 22px;
+  --shadow-card: 0 1px 2px hsl(var(--hue) 40% 20% / 0.05),
+    0 10px 30px -12px hsl(var(--hue) 45% 25% / 0.18);
+  --shadow-lift: 0 2px 4px hsl(var(--hue) 40% 20% / 0.06),
+    0 18px 44px -16px hsl(var(--hue) 45% 25% / 0.26);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --step-1: clamp(1.17rem, 1.1rem + 0.35vw, 1.33rem);
+  --step-2: clamp(1.37rem, 1.26rem + 0.55vw, 1.66rem);
+  --step-3: clamp(1.6rem, 1.42rem + 0.9vw, 2.07rem);
+  --step-4: clamp(1.9rem, 1.6rem + 1.5vw, 2.6rem);
+  --step-5: clamp(2.4rem, 1.9rem + 2.6vw, 3.55rem);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  line-height: 1.15;
+  text-wrap: balance;
+  color: var(--brand-deep);
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--step-5);
+}
+
+h2 {
+  font-size: var(--step-4);
+}
+
+h3 {
+  font-size: var(--step-3);
+}
+
+h4 {
+  font-size: var(--step-1);
+}
+
+p {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--brand);
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--brand-deep);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.contact-cta :focus-visible,
+.site-footer :focus-visible {
+  outline-color: var(--cream);
+}
+
+/* ============================================================
+   Layout helpers
+   ============================================================ */
+.container {
+  width: min(100% - 2.5rem, 68rem);
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: clamp(var(--space-7), 7vw, var(--space-8));
+}
+
+.eyebrow {
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: var(--space-3);
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: var(--space-4);
+  z-index: 10;
+  padding: var(--space-3) var(--space-5);
+  background: var(--brand-deep);
+  color: var(--cream);
+  border-radius: var(--radius-s);
+  text-decoration: none;
+  transform: translateY(-300%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* ============================================================
+   Buttons — 48px+ touch targets
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  padding: var(--space-3) var(--space-6);
+  border-radius: 999px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--step-0);
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--brand-deep);
+  color: var(--cream);
+  box-shadow: var(--shadow-card);
+}
+
+.btn-primary:hover {
+  background: var(--brand);
+  box-shadow: var(--shadow-lift);
+}
+
+.btn-outline {
+  border-color: var(--brand-deep);
+  color: var(--brand-deep);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--brand-soft);
+}
+
+.btn-cream {
+  background: var(--cream);
+  color: var(--brand-deep);
+  box-shadow: var(--shadow-card);
+}
+
+.btn-cream:hover {
+  background: var(--brand-soft);
+  box-shadow: var(--shadow-lift);
+}
+
+/* ============================================================
+   Hero — copy in the mist on the left, art on the right
+   ============================================================ */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(92svh, 56rem);
+  padding-block: clamp(var(--space-7), 8vw, var(--space-8));
+  overflow: hidden;
+  background:
+    radial-gradient(58rem 32rem at 8% 18%, hsl(var(--hue) 65% 92% / 0.9), transparent 65%),
+    radial-gradient(40rem 26rem at 28% 78%, hsl(var(--hue) 55% 88% / 0.7), transparent 70%),
+    radial-gradient(46rem 30rem at 88% 30%, hsl(var(--hue) 45% 90% / 0.55), transparent 70%),
+    linear-gradient(180deg, var(--cream), var(--surface));
+}
+
+/* soft drifting mist layer over the headline side */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(30rem 14rem at 18% 30%, hsl(var(--hue) 70% 97% / 0.85), transparent 70%),
+    radial-gradient(24rem 12rem at 10% 60%, hsl(var(--hue) 60% 95% / 0.7), transparent 70%);
+  filter: blur(6px);
+}
+
+.hero-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-7);
+  align-items: center;
+}
+
+.hero-copy {
+  max-width: 36rem;
+}
+
+.hero-tagline {
+  margin-top: var(--space-5);
+  font-size: var(--step-1);
+  color: var(--ink-soft);
+  max-width: 30rem;
+  text-wrap: pretty;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.hero-art {
+  justify-self: center;
+  width: min(72vw, 21rem);
+}
+
+.hero-cup {
+  width: 100%;
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 24px 32px hsl(var(--hue) 45% 30% / 0.16));
+}
+
+.hero-beans {
+  position: absolute;
+  bottom: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 34rem);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+@media (min-width: 56rem) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .hero-art {
+    width: min(100%, 24rem);
+    justify-self: end;
+  }
+
+  .hero-beans {
+    left: auto;
+    right: 4%;
+    bottom: -1rem;
+    transform: none;
+    width: 26rem;
+  }
+}
+
+/* ============================================================
+   About
+   ============================================================ */
+.about {
+  background: var(--surface);
+}
+
+.about-inner {
+  display: grid;
+  justify-items: start;
+}
+
+.about-copy {
+  max-width: 46rem;
+}
+
+.about-body {
+  margin-top: var(--space-5);
+  font-size: var(--step-1);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* ============================================================
+   Catalogue
+   ============================================================ */
+.catalogue {
+  background:
+    linear-gradient(180deg, var(--surface), var(--cream) 12%, var(--cream) 88%, var(--surface));
+}
+
+.category {
+  margin-top: clamp(var(--space-7), 6vw, var(--space-8));
+}
+
+.category-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  border-bottom: 2px solid var(--line);
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.category-intro {
+  margin-top: var(--space-3);
+  color: var(--ink-soft);
+  max-width: 34rem;
+  text-wrap: pretty;
+}
+
+.category-art {
+  flex: 0 0 auto;
+  width: clamp(4.5rem, 10vw, 6.5rem);
+  height: auto;
+  opacity: 0.9;
+}
+
+/* rich feature cards (products with descriptions / multiple variants) */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+@media (min-width: 44rem) {
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.feature-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  padding: clamp(var(--space-5), 4vw, var(--space-6));
+  box-shadow: var(--shadow-card);
+}
+
+.feature-desc {
+  margin-top: var(--space-3);
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.variant-list {
+  margin-top: var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.variant-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.variant-label {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.variant-dots {
+  flex: 1;
+  min-width: 1.5rem;
+  border-bottom: 2px dotted var(--line);
+  transform: translateY(-0.3em);
+}
+
+.variant-price {
+  font-weight: 700;
+  color: var(--brand-deep);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* compact scannable price grid (pickles, appalam) */
+.compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+  gap: var(--space-4);
+}
+
+.compact-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+}
+
+.compact-card h4 {
+  font-size: var(--step-0);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  background: var(--brand-soft);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  white-space: nowrap;
+}
+
+.compact-price {
+  margin-top: auto;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: var(--step-2);
+  font-weight: 600;
+  color: var(--brand-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Why us
+   ============================================================ */
+.why-grid {
+  margin-top: var(--space-6);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-5);
+}
+
+.why-card {
+  background: var(--surface-warm);
+  border-radius: var(--radius-l);
+  padding: var(--space-6) var(--space-5);
+}
+
+.why-card h3 {
+  font-size: var(--step-1);
+  margin-top: var(--space-4);
+}
+
+.why-card p {
+  margin-top: var(--space-2);
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+  line-height: 1.6;
+}
+
+.why-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--brand);
+  border: 1px solid var(--line);
+}
+
+/* ============================================================
+   Notes
+   ============================================================ */
+.notes h2 {
+  font-size: var(--step-2);
+}
+
+.notes-list {
+  margin-top: var(--space-5);
+  display: grid;
+  gap: var(--space-3);
+  max-width: 46rem;
+}
+
+.notes-list li {
+  position: relative;
+  padding: var(--space-4) var(--space-5) var(--space-4) var(--space-6);
+  background: var(--surface-raised);
+  border-left: 4px solid var(--brand);
+  border-radius: var(--radius-s);
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+   Contact CTA band
+   ============================================================ */
+.contact-cta {
+  background:
+    radial-gradient(40rem 20rem at 85% 0%, hsl(var(--hue) 55% 30% / 0.55), transparent 70%),
+    var(--brand-deep);
+  color: var(--cream);
+}
+
+.contact-inner {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+}
+
+.contact-cta h2 {
+  color: var(--cream);
+  max-width: 24ch;
+}
+
+.contact-sub {
+  margin-top: var(--space-4);
+  max-width: 40rem;
+  color: hsl(var(--hue) 45% 88%);
+  text-wrap: pretty;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.site-footer {
+  background: var(--brand-deep);
+  border-top: 1px solid hsl(var(--hue) 40% 30%);
+  color: hsl(var(--hue) 45% 88%);
+  padding-block: var(--space-6);
+  font-size: var(--step--1);
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.site-footer a {
+  color: var(--cream);
+  font-weight: 600;
+}
+
+/* ============================================================
+   Motion — everything lives behind prefers-reduced-motion
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* gentle reveal on load */
+  .hero-copy,
+  .hero-art {
+    animation: rise 0.8s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  }
+
+  .hero-art {
+    animation-delay: 0.15s;
+  }
+
+  .hero-beans {
+    animation: fade 1.2s ease 0.3s both;
+  }
+
+  /* rising steam over the tumbler */
+  .steam path {
+    animation: steam 4.2s ease-in-out infinite;
+  }
+
+  .steam path:nth-child(2) {
+    animation-delay: 1.4s;
+  }
+
+  .steam path:nth-child(3) {
+    animation-delay: 2.6s;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.35;
+    }
+  }
+
+  @keyframes steam {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    35% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+  }
+}

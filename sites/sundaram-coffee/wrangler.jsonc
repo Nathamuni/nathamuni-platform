@@ -1,0 +1,16 @@
+{
+  // Assets-only Worker serving the static export for Sundaram Coffee Works.
+  // Deploy: npm run build && npx wrangler deploy
+  "name": "sundaram-coffee",
+  "compatibility_date": "2026-01-01",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    {
+      "pattern": "sundaram-coffee.nathamuni.com",
+      "custom_domain": true
+    }
+  ]
+}
