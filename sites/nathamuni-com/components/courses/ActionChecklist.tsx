@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { loadItem, saveItem } from '@/lib/progress'
+import { SaveNudge } from '@/components/account/SaveNudge'
 
 interface ActionChecklistProps {
   slug: string
@@ -67,25 +68,30 @@ export function ActionChecklist({ slug, moduleIndex, actions }: ActionChecklistP
     [storageKey]
   )
 
+  const doneCount = checked.filter(Boolean).length
+
   return (
-    <ul className="crs-actions" data-testid="action-checklist">
-      {actions.map((action, i) => {
-        const id = `${storageKey}-${i}`
-        return (
-          <li key={id} className="crs-action-item">
-            <label htmlFor={id} className="crs-action-label" data-checked={checked[i]}>
-              <input
-                id={id}
-                type="checkbox"
-                className="crs-action-checkbox"
-                checked={checked[i]}
-                onChange={() => toggle(i)}
-              />
-              <span>{action}</span>
-            </label>
-          </li>
-        )
-      })}
-    </ul>
+    <>
+      <ul className="crs-actions" data-testid="action-checklist">
+        {actions.map((action, i) => {
+          const id = `${storageKey}-${i}`
+          return (
+            <li key={id} className="crs-action-item">
+              <label htmlFor={id} className="crs-action-label" data-checked={checked[i]}>
+                <input
+                  id={id}
+                  type="checkbox"
+                  className="crs-action-checkbox"
+                  checked={checked[i]}
+                  onChange={() => toggle(i)}
+                />
+                <span>{action}</span>
+              </label>
+            </li>
+          )
+        })}
+      </ul>
+      <SaveNudge show={doneCount >= 2} />
+    </>
   )
 }

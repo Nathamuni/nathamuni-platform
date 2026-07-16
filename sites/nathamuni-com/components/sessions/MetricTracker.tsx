@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type KeyboardEvent } from 'react'
 import type { Metric } from '@/lib/sessions'
 import { loadItem, saveItem } from '@/lib/progress'
+import { currentStreakDays } from '@/lib/streak'
 import { SaveNudge } from '@/components/account/SaveNudge'
 
 interface MetricEntry {
@@ -120,6 +121,28 @@ function TrendArrow({ entries }: { entries: MetricEntry[] }) {
   )
 }
 
+/**
+ * "N-day streak" chip with a small flame — only from 2 consecutive days, so
+ * a first log isn't celebrated for nothing.
+ */
+function StreakChip({ entries }: { entries: MetricEntry[] }) {
+  const streak = currentStreakDays(entries.map((e) => e.date))
+  if (streak < 2) return null
+  return (
+    <span className="ssn-tracker-streak" data-testid="streak-chip">
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+        className="ssn-tracker-streak-flame"
+      >
+        <path d="M12 2c.7 3.2-.7 5-2.2 6.6C8.2 10.3 7 12 7 14.4A5.3 5.3 0 0 0 12.3 20a5.6 5.6 0 0 0 5.7-5.7c0-2.2-1-3.9-2-5.4-.4 1.1-1 1.9-1.9 2.4.3-3.4-.7-6.8-2.1-9.3Z" />
+      </svg>
+      <span className="tabular-nums">{streak}-day streak</span>
+    </span>
+  )
+}
+
 function MetricRow({
   slug,
   metric,
@@ -220,6 +243,7 @@ function MetricRow({
             <span className="ssn-tracker-stat-value tabular-nums">{entries.length}</span>
             <span className="ssn-tracker-stat-label">{entries.length === 1 ? 'entry' : 'entries'}</span>
           </span>
+          <StreakChip entries={entries} />
           <Sparkline entries={entries} gradientId={gradientId} />
           <TrendArrow entries={entries} />
         </div>
@@ -360,6 +384,22 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           text-transform: uppercase;
           letter-spacing: 0.06em;
           color: rgba(255, 255, 255, 0.4);
+        }
+        .ssn-tracker-streak {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.25rem 0.6rem;
+          border-radius: 999px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #fbbf24;
+          background: rgba(251, 191, 36, 0.12);
+          border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        .ssn-tracker-streak-flame {
+          width: 12px;
+          height: 12px;
         }
         .ssn-tracker-spark {
           margin-left: auto;

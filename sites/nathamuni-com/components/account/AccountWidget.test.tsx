@@ -21,9 +21,16 @@ function mockMe(response: unknown, status = 200) {
   }) as unknown as typeof fetch
 }
 
+// The widget only renders on progress pages (/courses, /sessions).
+let mockPathname = '/sessions/diet-reset'
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockPathname,
+}))
+
 describe('AccountWidget', () => {
   beforeEach(() => {
     window.localStorage.clear()
+    mockPathname = '/sessions/diet-reset'
   })
 
   afterEach(() => {
@@ -40,6 +47,19 @@ describe('AccountWidget', () => {
     )
 
     expect(await screen.findByTestId('account-widget-toggle')).toHaveTextContent('Save my progress')
+  })
+
+  it('stays hidden outside the progress sections', async () => {
+    mockPathname = '/blog'
+    mockMe({ authed: false })
+    render(
+      <AuthProvider>
+        <AccountWidget />
+      </AuthProvider>
+    )
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    expect(screen.queryByTestId('account-widget')).toBeNull()
   })
 
   it('opening the pill shows the why-line and both tabs', async () => {
