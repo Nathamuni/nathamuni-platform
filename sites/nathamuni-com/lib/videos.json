@@ -3059,7 +3059,10 @@
     "featured": false,
     "publishedDate": "2026-07-14",
     "likeCount": 115,
-    "commentsCount": 14
+    "commentsCount": 14,
+    "youtubeId": "jl18excws8U",
+    "youtubeUrl": "https://youtube.com/shorts/jl18excws8U",
+    "youtubeStatus": "public"
   },
   {
     "id": "oruvagaila-nalaathan-irukuuuu",
@@ -3076,6 +3079,9 @@
     "featured": false,
     "publishedDate": "2026-07-14",
     "likeCount": 156,
-    "commentsCount": 6
+    "commentsCount": 6,
+    "youtubeId": "eA1CfxesNWA",
+    "youtubeUrl": "https://youtube.com/shorts/eA1CfxesNWA",
+    "youtubeStatus": "public"
   }
 ]
