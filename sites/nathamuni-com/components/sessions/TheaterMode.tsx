@@ -43,9 +43,22 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
   const acquireWakeLock = useCallback(async () => {
     try {
       const nav = navigator as Navigator & {
-        wakeLock?: { request: (type: 'screen') => Promise<{ release: () => Promise<void> }> }
+        wakeLock?: {
+          request: (type: 'screen') => Promise<
+            { release: () => Promise<void> } & EventTarget
+          >
+        }
       }
-      if (nav.wakeLock) wakeLockRef.current = await nav.wakeLock.request('screen')
+      if (nav.wakeLock) {
+        const sentinel = await nav.wakeLock.request('screen')
+        wakeLockRef.current = sentinel
+        // The browser auto-releases the sentinel (e.g. on tab hide) and fires
+        // 'release' on it without us calling release() — null the ref so the
+        // visibilitychange handler's re-acquire guard can fire again.
+        sentinel.addEventListener('release', () => {
+          if (wakeLockRef.current === sentinel) wakeLockRef.current = null
+        })
+      }
     } catch {
       /* unsupported or denied — the session works without it */
     }
@@ -86,6 +99,12 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
       clearTimeout(timer)
       document.removeEventListener('visibilitychange', onVisibility)
       document.removeEventListener('keydown', onKey)
+      // Guaranteed teardown even on unmount (route change, back button) while
+      // the overlay is open — same cleanup close() performs.
+      void wakeLockRef.current?.release().catch(() => {})
+      wakeLockRef.current = null
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => {})
+      document.body.style.overflow = ''
     }
   }, [open, acquireWakeLock, close])
 

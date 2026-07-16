@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import type { RenderResult } from '@testing-library/react'
 import { TheaterMode } from './TheaterMode'
 import type { Step } from '@/lib/sessions'
 
@@ -13,9 +14,10 @@ beforeEach(() => {
   vi.useFakeTimers()
 })
 
-function open() {
-  render(<TheaterMode slug="test-session" hue={270} steps={STEPS} />)
+function open(): RenderResult {
+  const result = render(<TheaterMode slug="test-session" hue={270} steps={STEPS} />)
   fireEvent.click(screen.getByRole('button', { name: /focus mode/i }))
+  return result
 }
 
 describe('TheaterMode', () => {
@@ -49,5 +51,12 @@ describe('TheaterMode', () => {
     expect(screen.getByText(/protocol complete/i)).toBeTruthy()
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('restores body scroll on unmount while the overlay is open', () => {
+    const { unmount } = open()
+    expect(document.body.style.overflow).toBe('hidden')
+    unmount()
+    expect(document.body.style.overflow).toBe('')
   })
 })
