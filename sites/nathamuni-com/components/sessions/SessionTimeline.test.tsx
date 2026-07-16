@@ -8,6 +8,11 @@ const TIMELINE: TimelinePhase[] = [
   { phase: 'The rest of the week', span: 'Days 2–7', focus: 'Keep doing the thing.', stepIndexes: [1, 2] },
 ]
 
+const TL: TimelinePhase[] = [
+  { phase: 'Setup', span: 'Day 1', days: [1, 1], focus: 'Get ready', stepIndexes: [0] },
+  { phase: 'Run', span: 'Days 2–7', days: [2, 7], focus: 'Do it', stepIndexes: [1] },
+]
+
 describe('SessionTimeline', () => {
   it('renders every phase name, span, and focus line', () => {
     render(<SessionTimeline hue={38} timeline={TIMELINE} />)
@@ -24,5 +29,18 @@ describe('SessionTimeline', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
+  })
+})
+
+describe('SessionTimeline activeIndex', () => {
+  it('marks the active phase with a Now chip', () => {
+    render(<SessionTimeline hue={270} timeline={TL} activeIndex={1} />)
+    const now = screen.getByText('Now')
+    expect(now.closest('li')?.textContent).toContain('Run')
+    expect(now.closest('li')?.className).toContain('ssn-timeline-phase-active')
+  })
+  it('renders no Now chip without activeIndex', () => {
+    render(<SessionTimeline hue={270} timeline={TL} />)
+    expect(screen.queryByText('Now')).toBeNull()
   })
 })
