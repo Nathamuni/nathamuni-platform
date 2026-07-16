@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { loadItem, saveItem } from '@/lib/progress'
-import { SaveNudge } from '@/components/account/SaveNudge'
+import { earnSaveNudge } from '@/components/account/SaveNudge'
 
 interface ActionChecklistProps {
   slug: string
@@ -64,14 +64,27 @@ export function ActionChecklist({ slug, moduleIndex, actions }: ActionChecklistP
         saveItem(storageKey, JSON.stringify(next))
         return next
       })
+      // Let the course progress ring/cards recount live.
+      window.dispatchEvent(new Event('nm-course-ticked'))
     },
     [storageKey]
   )
 
   const doneCount = checked.filter(Boolean).length
+  const pct = actions.length > 0 ? Math.round((doneCount / actions.length) * 100) : 0
+
+  // Real work done → offer (via the global overlay) to keep it.
+  useEffect(() => {
+    if (doneCount >= 2) earnSaveNudge()
+  }, [doneCount])
 
   return (
     <>
+      {doneCount > 0 && (
+        <div className="crs-actions-progress" data-testid="checklist-progress" aria-hidden="true">
+          <span className="crs-actions-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+      )}
       <ul className="crs-actions" data-testid="action-checklist">
         {actions.map((action, i) => {
           const id = `${storageKey}-${i}`
@@ -91,7 +104,6 @@ export function ActionChecklist({ slug, moduleIndex, actions }: ActionChecklistP
           )
         })}
       </ul>
-      <SaveNudge show={doneCount >= 2} />
     </>
   )
 }

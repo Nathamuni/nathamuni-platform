@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, type KeyboardEvent } from 'react'
 import type { Metric } from '@/lib/sessions'
 import { loadItem, saveItem } from '@/lib/progress'
 import { currentStreakDays } from '@/lib/streak'
-import { SaveNudge } from '@/components/account/SaveNudge'
+import { earnSaveNudge } from '@/components/account/SaveNudge'
 
 interface MetricEntry {
   date: string
@@ -143,17 +143,7 @@ function StreakChip({ entries }: { entries: MetricEntry[] }) {
   )
 }
 
-function MetricRow({
-  slug,
-  metric,
-  index,
-  onHasData,
-}: {
-  slug: string
-  metric: Metric
-  index: number
-  onHasData: () => void
-}) {
+function MetricRow({ slug, metric, index }: { slug: string; metric: Metric; index: number }) {
   const [mounted, setMounted] = useState(false)
   const [entries, setEntries] = useState<MetricEntry[]>([])
   const [draft, setDraft] = useState('')
@@ -161,10 +151,7 @@ function MetricRow({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR-safe hydration: reads localStorage only after mount.
     setMounted(true)
-    const loaded = loadEntries(slug, index)
-    setEntries(loaded)
-    if (loaded.length > 0) onHasData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- onHasData is a stable parent setter.
+    setEntries(loadEntries(slug, index))
   }, [slug, index])
 
   const rehydrate = useCallback(() => {
@@ -187,7 +174,7 @@ function MetricRow({
     setEntries(next)
     saveEntries(slug, index, next)
     setDraft('')
-    onHasData()
+    earnSaveNudge()
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
@@ -260,17 +247,14 @@ function MetricRow({
  * output never mismatches a localStorage-hydrated client render.
  */
 export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric[] }) {
-  const [hasData, setHasData] = useState(false)
-  const markHasData = useCallback(() => setHasData(true), [])
   return (
     <div className="ssn-tracker glass-card" data-testid="metric-tracker">
       <h2 className="section-title ssn-tracker-title">Track it</h2>
       <div className="ssn-tracker-list">
         {metrics.map((metric, index) => (
-          <MetricRow key={metric.name} slug={slug} metric={metric} index={index} onHasData={markHasData} />
+          <MetricRow key={metric.name} slug={slug} metric={metric} index={index} />
         ))}
       </div>
-      <SaveNudge show={hasData} />
       <p className="ssn-tracker-privacy">Logged in your browser — and to your account if you save one.</p>
 
       <style>{`

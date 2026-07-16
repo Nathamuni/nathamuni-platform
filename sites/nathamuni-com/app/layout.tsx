@@ -8,6 +8,7 @@ import { BackToTop } from '@/components/fx/BackToTop'
 import { Footer } from '@/components/layout/Footer'
 import { AuthProvider } from '@/components/account/AuthProvider'
 import { AccountWidget } from '@/components/account/AccountWidget'
+import { SaveNudgeHost } from '@/components/account/SaveNudge'
 import { SOCIAL_LINKS } from '@/lib/social'
 import { SITE_URL } from '@/lib/site'
 import { PROFILE } from '@/lib/profile'
@@ -81,6 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <Companion />
           <AccountWidget />
+          <SaveNudgeHost />
           <BackToTop />
         </AuthProvider>
       </body>

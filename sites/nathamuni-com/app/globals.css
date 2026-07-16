@@ -61,6 +61,39 @@
     0%, 100% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(12px, -18px) scale(1.06); }
   }
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-4deg); }
+    75% { transform: rotate(4deg); }
+  }
+  /* ---------- hover life ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .category-tile:hover .category-tile-icon,
+    .hero-search:hover .hero-search-icon,
+    .tab-item:hover .tab-icon {
+      animation: wiggle 0.45s ease-in-out;
+    }
+    .category-tile-icon {
+      animation: float-y 4.5s ease-in-out infinite;
+    }
+    .link-more:hover {
+      transform: translateX(3px);
+    }
+  }
+  .link-more {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hero-search-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    display: inline-block;
+  }
   .anim-fade-up {
     animation: fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
