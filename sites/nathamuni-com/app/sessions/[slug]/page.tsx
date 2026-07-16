@@ -10,7 +10,7 @@ import { HealthTools } from '@/components/sessions/HealthTools'
 import { MetricsTable } from '@/components/sessions/MetricsTable'
 import { MetricTracker } from '@/components/sessions/MetricTracker'
 import { SessionFlow } from '@/components/sessions/SessionFlow'
-import { SessionTimeline } from '@/components/sessions/SessionTimeline'
+import { SessionRunner } from '@/components/sessions/SessionRunner'
 import { StepTracker } from '@/components/sessions/StepTracker'
 import { VideoCard } from '@/components/video/VideoCard'
 
@@ -88,7 +88,12 @@ export default async function SessionDetailPage({
 
       <SessionFlow slug={session.slug} steps={session.steps} promise={session.promise} />
 
-      <SessionTimeline hue={session.hue} timeline={session.timeline} />
+      <SessionRunner
+        slug={session.slug}
+        hue={session.hue}
+        durationLabel={session.durationLabel}
+        timeline={session.timeline}
+      />
 
       <MetricsTable metrics={session.metrics} />
       <MetricTracker slug={session.slug} metrics={session.metrics} />
