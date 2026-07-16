@@ -9,6 +9,24 @@
  * YOUTUBE_CLIENT_ID/YOUTUBE_CLIENT_SECRET/YOUTUBE_REFRESH_TOKEN are all set.
  */
 
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// Single source of truth stays lib/social.ts — parsed here rather than
+// duplicated, so the Instagram handle in every video description can never
+// drift out of sync with the one shown on the site itself.
+const SOCIAL_TS = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'social.ts'),
+  'utf8'
+)
+const INSTAGRAM_PROFILE_URL =
+  SOCIAL_TS.match(/instagram:\s*'([^']+)'/)?.[1] ?? 'https://www.instagram.com/nathamuni_/'
+const INSTAGRAM_HANDLE = `@${INSTAGRAM_PROFILE_URL.replace(/\/$/, '').split('/').pop()}`
+// Bare domain form (no https://www, no trailing slash) — still auto-links on
+// YouTube, just reads cleaner in the description.
+const INSTAGRAM_CLEAN_LINK = INSTAGRAM_PROFILE_URL.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+
 const CATEGORY_MAP = {
   'Calisthenics & Fitness': '17', // Sports
   'AI & Builds': '28', // Science & Technology
@@ -24,7 +42,12 @@ export function buildVideoMetadata(entry) {
     .slice(0, 8)
     .map((t) => `#${t.replace(/\s+/g, '')}`)
     .join(' ')
-  const description = [entry.detailedDescription || entry.title, hashtags, `Originally posted on Instagram: ${entry.instagramUrl}`]
+  const description = [
+    entry.detailedDescription || entry.title,
+    hashtags,
+    `📸 Follow ${INSTAGRAM_HANDLE} on Instagram for the daily reels, behind-the-scenes, and everything before it lands anywhere else:\n${INSTAGRAM_CLEAN_LINK}`,
+    `🔗 Watch the original: ${entry.instagramUrl}`,
+  ]
     .filter(Boolean)
     .join('\n\n')
     .slice(0, 4900)
