@@ -546,6 +546,16 @@ const CSS = `
   font-weight: 700;
   color: hsla(var(--cat, 262), 90%, 80%, 1);
 }
+/* Peak-end: the finished ring turns gold. */
+.crs-ring-done {
+  background:
+    radial-gradient(closest-side, #17103a 82%, transparent 83%),
+    conic-gradient(#fbbf24, #f59e0b);
+  box-shadow: 0 0 24px -4px rgba(251, 191, 36, 0.5);
+}
+.crs-ring-done .crs-ring-value {
+  color: #fbbf24;
+}
 .crs-ring-label {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.6);
