@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getAllCourses, getCourseBySlug, getActionCount, getReadTimeMinutes } from '@/lib/courses'
 import { SITE_URL } from '@/lib/site'
 import { CoursesStyles } from '@/components/courses/CoursesStyles'
+import { CourseProgressRing } from '@/components/courses/CourseProgress'
 import { DisclaimerCard } from '@/components/courses/DisclaimerCard'
 import { ModuleSection } from '@/components/courses/ModuleSection'
 
@@ -84,6 +85,10 @@ export default async function CoursePage({
         <p className="crs-hero-forwhom" data-testid="course-forwhom">
           <em>For {course.forWhom}</em>
         </p>
+        <CourseProgressRing
+          slug={course.slug}
+          moduleActionCounts={course.modules.map((m) => m.actions.length)}
+        />
         <div>
           <p className="crs-hero-outcomes-heading">What we&apos;re going to do</p>
           <ul className="crs-hero-outcomes-chips" data-testid="course-outcomes">

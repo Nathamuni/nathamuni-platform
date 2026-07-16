@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Session } from '@/lib/sessions'
 import { TiltCard } from '@/components/fx/TiltCard'
+import { SessionProgressLine } from './SessionProgressLine'
 
 /** Index card — deliberately duration + "run this" forward, distinct from a course card. */
 export function SessionCard({ session }: { session: Session }) {
@@ -22,6 +23,7 @@ export function SessionCard({ session }: { session: Session }) {
         <h2 className="ssn-card-title">{session.title}</h2>
         <p className="ssn-card-promise">{session.promise}</p>
         <p className="ssn-card-forwhom">{session.forWhom}</p>
+        <SessionProgressLine slug={session.slug} totalSteps={session.steps.length} />
         <span className="ssn-card-cta">Run this →</span>
       </Link>
     </TiltCard>

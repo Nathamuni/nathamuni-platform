@@ -38,7 +38,18 @@ export default function HomePage() {
             className="hero-search anim-fade-up anim-delay-3"
             data-testid="hero-search-link"
           >
-            <span aria-hidden>🔍</span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+              className="hero-search-icon"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.8-3.8" />
+            </svg>
             <span>Search all {videos.length} — try &ldquo;discipline&rdquo; or &ldquo;push-ups&rdquo;</span>
           </Link>
           <div className="hero-stats anim-fade-up anim-delay-3" data-testid="hero-stats">

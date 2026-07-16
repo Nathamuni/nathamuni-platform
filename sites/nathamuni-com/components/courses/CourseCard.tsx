@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Course } from '@/lib/courses'
 import { getActionCount, getReadTimeMinutes } from '@/lib/courses'
 import { TiltCard } from '@/components/fx/TiltCard'
+import { CourseProgressLine } from './CourseProgress'
 
 const LEVEL_LABEL: Record<Course['level'], string> = {
   beginner: 'Beginner',
@@ -38,6 +39,10 @@ export function CourseCard({ course }: { course: Course }) {
           {actionCount} action{actionCount === 1 ? '' : 's'}
           <span aria-hidden="true"> · </span>~{readMinutes} min read
         </p>
+        <CourseProgressLine
+          slug={course.slug}
+          moduleActionCounts={course.modules.map((m) => m.actions.length)}
+        />
         <span className="crs-course-card-cta">
           View course
           <span aria-hidden="true">→</span>

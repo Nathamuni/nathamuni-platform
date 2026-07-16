@@ -6,6 +6,12 @@
  * app/courses/[slug]/page.tsx.
  */
 const CSS = `
+/* Registered so the conic ring's fill can animate smoothly when ticking. */
+@property --pct {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
 .crs-header {
   max-width: 48rem;
 }
@@ -484,6 +490,91 @@ const CSS = `
   height: 20px;
   accent-color: #8b5cf6;
   cursor: pointer;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .crs-action-checkbox:checked {
+    animation: crs-tick-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+@keyframes crs-tick-pop {
+  0% { transform: scale(0.8); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Live checklist progress bar ---- */
+.crs-actions-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+.crs-actions-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Course progress ring (detail hero) ---- */
+.crs-ring-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.2rem;
+}
+.crs-ring {
+  --pct: 0;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(closest-side, #17103a 82%, transparent 83%),
+    conic-gradient(
+      hsla(var(--cat, 262), 85%, 65%, 1) calc(var(--pct) * 1%),
+      rgba(255, 255, 255, 0.1) 0
+    );
+  transition: --pct 0.6s ease-out;
+}
+.crs-ring-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: hsla(var(--cat, 262), 90%, 80%, 1);
+}
+.crs-ring-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---- Course card progress line ---- */
+.crs-card-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.crs-card-progress-bar {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.crs-card-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.crs-card-progress-pct {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: hsla(var(--cat, 262), 90%, 78%, 1);
 }
 
 /* ---- References footer ---- */

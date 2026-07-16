@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { stepAnchorId, type Step } from '@/lib/sessions'
 import { loadItem, saveItem } from '@/lib/progress'
-import { SaveNudge } from '@/components/account/SaveNudge'
+import { earnSaveNudge } from '@/components/account/SaveNudge'
 import { CredibilityBadge } from './CredibilityBadge'
 import { StepExample } from './StepExample'
 
@@ -65,12 +65,16 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
 
   const doneCount = completed.filter(Boolean).length
 
+  // Real work done → offer (via the global overlay) to keep it.
+  useEffect(() => {
+    if (mounted && doneCount >= 2) earnSaveNudge()
+  }, [mounted, doneCount])
+
   return (
     <div className="ssn-protocol" data-testid="step-tracker">
       <p className="ssn-protocol-progress" aria-live="polite">
         {mounted ? `${doneCount} / ${steps.length} steps done` : `${steps.length} steps`}
       </p>
-      <SaveNudge show={mounted && doneCount >= 2} />
       <ol className="ssn-protocol-list">
         {steps.map((step, index) => {
           const inputId = `${slug}-step-${index}`
