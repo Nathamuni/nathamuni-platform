@@ -23,7 +23,8 @@ describe('CourseProgress', () => {
     window.localStorage.setItem('course-systems-1', JSON.stringify([false, true]))
     render(<CourseProgressRing slug="systems" moduleActionCounts={[3, 2]} />)
     expect(screen.getByTestId('course-progress-ring')).toHaveTextContent('60%')
-    expect(screen.getByTestId('course-progress-ring')).toHaveTextContent('3/5 actions done')
+    // Goal gradient: past halfway, the label reframes around what's left.
+    expect(screen.getByTestId('course-progress-ring')).toHaveTextContent('3/5 — only 2 actions left')
   })
 
   it('line says continue mid-way and Done at 100%', () => {

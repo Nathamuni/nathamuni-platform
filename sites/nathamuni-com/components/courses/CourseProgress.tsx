@@ -58,10 +58,11 @@ export function CourseProgressRing({
   const { done, total, pct } = useCourseProgress(slug, moduleActionCounts)
   if (done === 0) return null
 
+  const remaining = total - done
   return (
     <div className="crs-ring-wrap" data-testid="course-progress-ring">
       <div
-        className="crs-ring"
+        className={`crs-ring${pct === 100 ? ' crs-ring-done' : ''}`}
         style={{ '--pct': pct } as React.CSSProperties}
         role="img"
         aria-label={`${done} of ${total} actions done (${pct}%)`}
@@ -69,7 +70,11 @@ export function CourseProgressRing({
         <span className="crs-ring-value tabular-nums">{pct}%</span>
       </div>
       <span className="crs-ring-label">
-        {done}/{total} actions done{pct === 100 ? ' — complete' : ''}
+        {pct === 100
+          ? 'Course complete — every action done.'
+          : pct >= 50
+            ? `${done}/${total} — only ${remaining} action${remaining === 1 ? '' : 's'} left`
+            : `${done}/${total} actions done`}
       </span>
     </div>
   )
