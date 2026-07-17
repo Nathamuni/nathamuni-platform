@@ -55,7 +55,9 @@
   /* ---------- motion ---------- */
   @keyframes fade-up {
     from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    /* End at `none`: a retained transform (fill-mode: both) would make this
+       element the containing block for position:fixed overlays (lightboxes). */
+    to { opacity: 1; transform: none; }
   }
   @keyframes drift {
     0%, 100% { transform: translate(0, 0) scale(1); }
