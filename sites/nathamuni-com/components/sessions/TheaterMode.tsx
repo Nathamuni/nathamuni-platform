@@ -37,6 +37,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
   const [open, setOpen] = useState(false)
   const [settled, setSettled] = useState(false)
   const [completed, setCompleted] = useState<boolean[]>(() => new Array(steps.length).fill(false))
+  const [reviewIndex, setReviewIndex] = useState<number | null>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null)
 
@@ -67,6 +68,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
   const close = useCallback(() => {
     setOpen(false)
     setSettled(false)
+    setReviewIndex(null)
     void wakeLockRef.current?.release().catch(() => {})
     wakeLockRef.current = null
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => {})
@@ -120,9 +122,12 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
     })
   }
 
-  const currentIndex = completed.findIndex((done) => !done)
-  const allDone = currentIndex === -1
-  const step = allDone ? null : steps[currentIndex]
+  const firstUnchecked = completed.findIndex((done) => !done)
+  const allDone = firstUnchecked === -1
+  // Reviewing = browsing an already-finished protocol; never mutates checks.
+  const reviewing = allDone && reviewIndex !== null
+  const currentIndex = reviewing ? reviewIndex : firstUnchecked
+  const step = currentIndex >= 0 && currentIndex < steps.length ? steps[currentIndex] : null
   const doneCount = completed.filter(Boolean).length
 
   return (
@@ -145,13 +150,53 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               <p className="ssn-theater-entry-title">Settle in.</p>
               <p className="ssn-theater-entry-sub">One step at a time. Nothing else.</p>
             </div>
+          ) : reviewing && step ? (
+            <div className="ssn-theater-step">
+              <p className="ssn-theater-count tabular-nums">
+                Reviewing · step {currentIndex + 1} of {steps.length}
+              </p>
+              <div className="ssn-theater-head">
+                <h3 className="ssn-theater-title">{step.title}</h3>
+                <CredibilityBadge label={step.label} />
+              </div>
+              <p className="ssn-theater-detail">{step.detail}</p>
+              <p className="ssn-theater-checkpoint">Done when: {step.checkpoint}</p>
+              <div className="ssn-theater-nav">
+                <button
+                  type="button"
+                  className="ssn-theater-back"
+                  disabled={currentIndex === 0}
+                  onClick={() => setReviewIndex(currentIndex - 1)}
+                >
+                  ← Back
+                </button>
+                {currentIndex < steps.length - 1 ? (
+                  <button
+                    type="button"
+                    className="ssn-theater-done"
+                    onClick={() => setReviewIndex(currentIndex + 1)}
+                  >
+                    Next →
+                  </button>
+                ) : (
+                  <button type="button" className="ssn-theater-done" onClick={close}>
+                    Finish
+                  </button>
+                )}
+              </div>
+            </div>
           ) : allDone ? (
             <div className="ssn-theater-step">
               <p className="ssn-theater-count">Protocol complete</p>
               <h3 className="ssn-theater-title">Every step is done. Well run.</h3>
-              <button type="button" className="ssn-theater-done" onClick={close}>
-                Finish
-              </button>
+              <div className="ssn-theater-nav">
+                <button type="button" className="ssn-theater-done" onClick={() => setReviewIndex(0)}>
+                  Review the steps
+                </button>
+                <button type="button" className="ssn-theater-back" onClick={close}>
+                  Finish
+                </button>
+              </div>
             </div>
           ) : (
             step && (
@@ -184,10 +229,30 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               align-items: center;
               justify-content: center;
               padding: 1.5rem;
+              background: #0d0a1f;
+            }
+            /* Breathing dark gradient: two hued glows slowly swelling and
+               relaxing on an ~8s cycle — calm, not weather. Sits behind the
+               content and is fully disabled under prefers-reduced-motion. */
+            .ssn-theater::before {
+              content: '';
+              position: absolute;
+              inset: 0;
+              pointer-events: none;
               background:
-                radial-gradient(120% 90% at 50% 110%, hsla(var(--cat), 70%, 40%, 0.22), transparent 60%),
-                radial-gradient(100% 70% at 50% -20%, hsla(var(--cat), 80%, 55%, 0.12), transparent 55%),
-                #0d0a1f;
+                radial-gradient(120% 90% at 50% 110%, hsla(var(--cat), 70%, 40%, 0.28), transparent 60%),
+                radial-gradient(100% 70% at 50% -20%, hsla(var(--cat), 80%, 55%, 0.16), transparent 55%);
+              animation: ssn-theater-breathe 8s ease-in-out infinite;
+            }
+            @keyframes ssn-theater-breathe {
+              0%, 100% { opacity: 0.55; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.06); }
+            }
+            .ssn-theater-step,
+            .ssn-theater-entry,
+            .ssn-theater-exit {
+              position: relative;
+              z-index: 1;
             }
             .ssn-theater-entry {
               text-align: center;
@@ -268,10 +333,34 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               from { opacity: 0; transform: translateY(8px); }
               to { opacity: 1; transform: none; }
             }
+            .ssn-theater-nav {
+              display: flex;
+              align-items: center;
+              gap: 0.7rem;
+              flex-wrap: wrap;
+            }
+            .ssn-theater-back {
+              padding: 0.75rem 1.4rem;
+              border-radius: 0.85rem;
+              border: 1px solid rgba(255, 255, 255, 0.25);
+              background: none;
+              color: rgba(255, 255, 255, 0.75);
+              font-size: 0.95rem;
+              font-weight: 600;
+              cursor: pointer;
+            }
+            .ssn-theater-back:disabled {
+              opacity: 0.35;
+              cursor: default;
+            }
             @media (prefers-reduced-motion: reduce) {
               .ssn-theater-entry,
               .ssn-theater-step {
                 animation: none;
+              }
+              .ssn-theater::before {
+                animation: none;
+                opacity: 1;
               }
             }
           `}</style>
