@@ -107,7 +107,9 @@ export function SaveNudgeHost() {
         <path d="M12 12v5M9.8 14.2 12 12l2.2 2.2" />
       </svg>
       <div className="nudge-toast-body">
-        <span className="nudge-toast-text">Nice progress — it lives only in this browser.</span>
+        <span className="nudge-toast-text">
+          This progress exists only in this browser — one cleared cache and it&apos;s gone.
+        </span>
         <button type="button" className="nudge-toast-cta" onClick={openAccount}>
           Keep it on any device
         </button>

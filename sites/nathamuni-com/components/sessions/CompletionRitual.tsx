@@ -93,16 +93,15 @@ export function CompletionRitual({ slug, stepCount }: { slug: string; stepCount:
   if (!done) return null
 
   return (
-    <section className="ssn-complete" data-testid="completion-ritual" aria-live="polite">
-      <p className="ssn-complete-title">🏁 Protocol complete</p>
-      {day !== null && <p className="ssn-complete-days tabular-nums">Finished on day {day} of your run.</p>}
-      <p className="ssn-complete-ask">How do you feel?</p>
-      <div className="ssn-complete-moods" role="group" aria-label="How do you feel?">
+    <section className="ssn-ritual" data-testid="completion-ritual" aria-live="polite">
+      <p className="ssn-ritual-title">How do you feel?</p>
+      {day !== null && <p className="ssn-ritual-days tabular-nums">Finished on day {day} of your run.</p>}
+      <div className="ssn-ritual-moods" role="group" aria-label="How do you feel?">
         {MOODS.map((m) => (
           <button
             key={m.value}
             type="button"
-            className={`ssn-complete-mood${todayMood === m.value ? ' ssn-complete-mood-active' : ''}`}
+            className={`ssn-ritual-mood${todayMood === m.value ? ' ssn-ritual-mood-active' : ''}`}
             aria-label={m.label}
             title={m.label}
             onClick={() => logMood(m.value)}
@@ -111,9 +110,9 @@ export function CompletionRitual({ slug, stepCount }: { slug: string; stepCount:
           </button>
         ))}
       </div>
-      {todayMood !== null && <p className="ssn-complete-logged">Logged — see you tomorrow.</p>}
+      {todayMood !== null && <p className="ssn-ritual-logged">Logged — see you tomorrow.</p>}
       <style>{`
-        .ssn-complete {
+        .ssn-ritual {
           display: flex;
           flex-direction: column;
           gap: 0.6rem;
@@ -122,24 +121,23 @@ export function CompletionRitual({ slug, stepCount }: { slug: string; stepCount:
           border: 1px solid hsla(var(--cat), 70%, 60%, 0.45);
           background: hsla(var(--cat), 70%, 55%, 0.1);
         }
-        .ssn-complete-title {
+        .ssn-ritual-title {
           margin: 0;
           font-size: 1.05rem;
           font-weight: 800;
           color: #fff;
         }
-        .ssn-complete-days,
-        .ssn-complete-ask {
+        .ssn-ritual-days {
           margin: 0;
           font-size: 0.85rem;
           color: rgba(255, 255, 255, 0.7);
         }
-        .ssn-complete-moods {
+        .ssn-ritual-moods {
           display: flex;
           gap: 0.5rem;
           flex-wrap: wrap;
         }
-        .ssn-complete-mood {
+        .ssn-ritual-mood {
           font-size: 1.3rem;
           line-height: 1;
           padding: 0.5rem 0.65rem;
@@ -149,20 +147,20 @@ export function CompletionRitual({ slug, stepCount }: { slug: string; stepCount:
           cursor: pointer;
           transition: border-color 0.2s ease, transform 0.15s ease;
         }
-        .ssn-complete-mood:hover {
+        .ssn-ritual-mood:hover {
           transform: scale(1.08);
         }
-        .ssn-complete-mood-active {
+        .ssn-ritual-mood-active {
           border-color: hsl(var(--cat) 80% 65%);
           background: hsla(var(--cat), 70%, 55%, 0.2);
         }
-        .ssn-complete-logged {
+        .ssn-ritual-logged {
           margin: 0;
           font-size: 0.78rem;
           color: hsl(var(--cat) 85% 72%);
         }
         @media (prefers-reduced-motion: reduce) {
-          .ssn-complete-mood:hover {
+          .ssn-ritual-mood:hover {
             transform: none;
           }
         }

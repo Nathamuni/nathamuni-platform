@@ -1,0 +1,99 @@
+{
+  "name": "Sundaram Coffee Works",
+  "tagline": "Premium South Indian coffee powders & authentic homemade traditionals",
+  "description": "Premium coffee powders sourced from the renowned coffee-growing regions of South India, alongside traditional pickles and appalam made the homemade way.",
+  "domain": "sundaram-coffee.nathamuni.com",
+  "themeHue": 28,
+  "features": ["hero", "about", "catalogue", "why-us", "notes", "contact-cta"],
+  "about": {
+    "heading": "Rooted in tradition, roasted to perfection",
+    "body": "Sundaram Coffee Works brings you coffee the way South India has always loved it — freshly ground, deeply aromatic, available as pure coffee or the classic 80:20 coffee-chicory blend. Beside the coffee sits our family table of traditionals: pickles packed hygienically to preserve their authentic homemade taste, and appalam in every size a kitchen could need."
+  },
+  "contact": {
+    "phone": "+91 00000 00000",
+    "phoneNote": "PLACEHOLDER — replace with the real business number",
+    "email": "hello@sundaram-coffee.example",
+    "emailNote": "PLACEHOLDER — replace once Cloudflare Email Routing is set up"
+  },
+  "whyUs": [
+    { "title": "Single-origin sourcing", "detail": "Coffee from Chikmagalur and South India's best growing regions." },
+    { "title": "Pure or classic blend", "detail": "Every coffee available as pure powder or the 80:20 coffee-chicory blend." },
+    { "title": "Homemade, hygienic", "detail": "Pickles packed to preserve freshness and authentic homemade taste." },
+    { "title": "Retail to bulk", "detail": "Multiple pack sizes, and bulk quantities packed on request." }
+  ],
+  "categories": [
+    {
+      "name": "Coffee Powder",
+      "intro": "Available in Pure Coffee and 80:20 Coffee-Chicory Blend variants.",
+      "products": [
+        {
+          "name": "Chikmagalur Coffee",
+          "description": "Premium coffee sourced from Chikmagalur — rich aroma, smooth taste, strong flavour.",
+          "variants": [
+            { "label": "Pure Coffee", "price": "₹1,250/kg" },
+            { "label": "80:20 Coffee-Chicory Blend", "price": "₹1,050/kg" }
+          ]
+        },
+        {
+          "name": "Delicious Coffee",
+          "description": "A balanced blend with excellent aroma and taste, made for everyday brewing.",
+          "variants": [
+            { "label": "Pure Coffee", "price": "₹1,100/kg" },
+            { "label": "80:20 Coffee-Chicory Blend", "price": "₹950/kg" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Traditional Pickles",
+      "intro": "Packed hygienically in 300 g packs unless noted — freshness and homemade taste, preserved.",
+      "products": [
+        { "name": "Lemon Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Cut Mango Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Mango Thokku", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Aavakai Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Gooseberry (Amla) Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Mango Ginger Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Pirandai Thokku", "variants": [{ "label": "300 g", "price": "₹160" }] },
+        { "name": "Tamarind Chilli Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Maavadu Pickle", "variants": [{ "label": "300 g", "price": "₹275" }] },
+        { "name": "Neem Leaf Balls (Vepilai Katti)", "variants": [{ "label": "4 pieces", "price": "₹70" }] },
+        { "name": "Coriander Thokku", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Salted Citron Pickle (Less Spicy)", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Spicy Citron Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Citron Pickle", "variants": [{ "label": "300 g", "price": "₹145" }] },
+        { "name": "Garlic Pickle", "variants": [{ "label": "300 g", "price": "₹160" }] }
+      ]
+    },
+    {
+      "name": "Appalam & Traditional Fryums",
+      "intro": "Multiple pack sizes for retail and bulk orders.",
+      "products": [
+        {
+          "name": "Pirandai Ulundhu Appalam",
+          "variants": [{ "label": "100 g / 200 g / 250 g packs", "price": "₹450/kg" }]
+        },
+        {
+          "name": "Rice Appalam",
+          "variants": [{ "label": "200 g / 300 g packs", "price": "₹420/kg" }]
+        },
+        {
+          "name": "Elai Vadam",
+          "variants": [{ "label": "200 g pack", "price": "₹450/kg" }]
+        },
+        {
+          "name": "Pepper Appalam",
+          "variants": [{ "label": "200 g pack", "price": "₹500/kg" }]
+        },
+        {
+          "name": "Appala Poo",
+          "variants": [{ "label": "Any quantity, packed to order", "price": "₹300/kg" }]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "No online payment — pick what you need and reach us by call or email; we take it from there.",
+    "Bulk quantities can be packed on request."
+  ]
+}

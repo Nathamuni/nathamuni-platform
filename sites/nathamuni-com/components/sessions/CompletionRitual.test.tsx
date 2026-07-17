@@ -13,13 +13,13 @@ describe('CompletionRitual', () => {
   it('renders nothing while steps remain', () => {
     setSteps([true, false])
     render(<CompletionRitual slug="test-session" stepCount={2} />)
-    expect(screen.queryByText(/protocol complete/i)).toBeNull()
+    expect(screen.queryByTestId('completion-ritual')).toBeNull()
   })
 
   it('appears when all steps are done', () => {
     setSteps([true, true])
     render(<CompletionRitual slug="test-session" stepCount={2} />)
-    expect(screen.getByText(/protocol complete/i)).toBeTruthy()
+    expect(screen.getByTestId('completion-ritual')).toBeTruthy()
   })
 
   it('appears live when the last step completes elsewhere', () => {
@@ -29,7 +29,7 @@ describe('CompletionRitual', () => {
     act(() => {
       window.dispatchEvent(new Event('nm-session-steps-changed'))
     })
-    expect(screen.getByText(/protocol complete/i)).toBeTruthy()
+    expect(screen.getByTestId('completion-ritual')).toBeTruthy()
   })
 
   it('logs a mood for today, replacing a same-day entry', () => {

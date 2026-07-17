@@ -69,6 +69,10 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
   }
 
   const doneCount = completed.filter(Boolean).length
+  const remaining = steps.length - doneCount
+  const complete = mounted && steps.length > 0 && remaining === 0
+  // Goal gradient: once past halfway, reframe around the shrinking finish line.
+  const pastHalfway = mounted && doneCount > 0 && doneCount >= steps.length / 2
 
   // Real work done → offer (via the global overlay) to keep it.
   useEffect(() => {
@@ -78,8 +82,47 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
   return (
     <div className="ssn-protocol" data-testid="step-tracker">
       <p className="ssn-protocol-progress" aria-live="polite">
-        {mounted ? `${doneCount} / ${steps.length} steps done` : `${steps.length} steps`}
+        {!mounted && `${steps.length} steps`}
+        {mounted && complete && 'All steps done'}
+        {mounted && !complete && pastHalfway && (
+          <>
+            {doneCount} / {steps.length} —{' '}
+            <strong className="ssn-protocol-almost">
+              only {remaining} {remaining === 1 ? 'step' : 'steps'} left
+            </strong>
+          </>
+        )}
+        {mounted && !complete && !pastHalfway && `${doneCount} / ${steps.length} steps done`}
       </p>
+      {mounted && doneCount > 0 && !complete && (
+        <div className="ssn-protocol-bar" aria-hidden="true">
+          <span
+            className="ssn-protocol-bar-fill"
+            style={{ width: `${Math.round((doneCount / steps.length) * 100)}%` }}
+          />
+        </div>
+      )}
+      {complete && (
+        <div className="ssn-complete" data-testid="protocol-complete" role="status">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="ssn-complete-icon"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8.5 12.5 2.5 2.5 5-5.5" />
+          </svg>
+          <span>
+            <strong>Protocol complete.</strong> You ran the whole thing — most people never finish
+            week one.
+          </span>
+        </div>
+      )}
       <ol className="ssn-protocol-list">
         {steps.map((step, index) => {
           const inputId = `${slug}-step-${index}`
@@ -136,6 +179,40 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           text-transform: uppercase;
           letter-spacing: 0.08em;
           color: rgba(255, 255, 255, 0.45);
+        }
+        .ssn-protocol-almost {
+          color: #22d3ee;
+        }
+        .ssn-protocol-bar {
+          height: 4px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.1);
+          overflow: hidden;
+        }
+        .ssn-protocol-bar-fill {
+          display: block;
+          height: 100%;
+          border-radius: 999px;
+          background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+          transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .ssn-complete {
+          display: flex;
+          align-items: center;
+          gap: 0.7rem;
+          padding: 0.85rem 1rem;
+          border-radius: 14px;
+          border: 1px solid rgba(251, 191, 36, 0.4);
+          background: linear-gradient(120deg, rgba(251, 191, 36, 0.12), rgba(139, 92, 246, 0.1));
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.85);
+          animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .ssn-complete-icon {
+          width: 26px;
+          height: 26px;
+          flex-shrink: 0;
+          color: #fbbf24;
         }
         .ssn-protocol-list {
           display: flex;
