@@ -44,6 +44,20 @@ describe('TheaterMode', () => {
     expect(screen.getByText('Second move')).toBeTruthy()
   })
 
+  it('after completion, Review the steps browses without changing checks', () => {
+    window.localStorage.setItem('session-test-session', JSON.stringify([true, true]))
+    open()
+    act(() => vi.advanceTimersByTime(3000))
+    fireEvent.click(screen.getByRole('button', { name: /review the steps/i }))
+    expect(screen.getByText('First move')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /back/i })).toHaveProperty('disabled', true)
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByText('Second move')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    expect(screen.getByText('First move')).toBeTruthy()
+    expect(JSON.parse(window.localStorage.getItem('session-test-session') ?? '[]')).toEqual([true, true])
+  })
+
   it('shows completion when every step is done and Escape closes', () => {
     window.localStorage.setItem('session-test-session', JSON.stringify([true, true]))
     open()

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Story } from "@/lib/stories";
-import { ThumbPeek } from "@/components/fx/ThumbPeek";
+import { SOCIAL_LINKS } from "@/lib/social";
 import { ThoughtCard } from "./ThoughtCard";
 
 function formatDate(iso: string): string {
@@ -84,6 +84,66 @@ function buildGridItems(stories: Story[]): GridItem[] {
   return items;
 }
 
+/** Hover previews loop the first few seconds only — enough to tease the clip. */
+const PREVIEW_SECONDS = 5;
+/** If playback hasn't started this long after opening, offer Instagram instead. */
+const STALL_TIMEOUT_MS = 15_000;
+
+/**
+ * Card media: poster by default; on mouse hover (desktop only,
+ * reduced-motion-safe) the first PREVIEW_SECONDS of the clip loop muted in
+ * place. The video element only mounts while hovered, so the grid never
+ * downloads clips on its own.
+ */
+function MomentCardMedia({ story }: { story: Story }) {
+  const [preview, setPreview] = useState(false);
+
+  return (
+    <span
+      className="moment-card-media"
+      onPointerEnter={(e) => {
+        if (e.pointerType !== "mouse") return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+        setPreview(true);
+      }}
+      onPointerLeave={() => setPreview(false)}
+    >
+      {story.poster ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={story.poster}
+          alt=""
+          loading="lazy"
+          className="moment-poster"
+        />
+      ) : (
+        <span className="moment-poster bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">
+          <span aria-hidden className="text-2xl text-white/70">
+            ▶
+          </span>
+        </span>
+      )}
+      {preview && (
+        <video
+          src={story.video}
+          muted
+          playsInline
+          autoPlay
+          loop
+          preload="none"
+          className="moment-hover-preview"
+          data-testid="moment-hover-preview"
+          onTimeUpdate={(e) => {
+            const v = e.currentTarget;
+            if (v.currentTime > PREVIEW_SECONDS) v.currentTime = 0;
+          }}
+        />
+      )}
+    </span>
+  );
+}
+
 /**
  * Grid of archived stories with a tap-to-play lightbox. These clips are
  * self-hosted (Instagram deletes stories after 24h, so there is nothing to
@@ -93,26 +153,45 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const active = activeIndex !== null ? stories[activeIndex] : null;
   const gridItems = useMemo(() => buildGridItems(stories), [stories]);
+  const [playbackStarted, setPlaybackStarted] = useState(false);
+  const [stalled, setStalled] = useState(false);
+
+  // Slow-connection escape hatch: if the clip hasn't started playing
+  // STALL_TIMEOUT_MS after opening (or switching stories), surface an
+  // Instagram link instead of leaving the visitor staring at a black box.
+  const resetStall = useCallback(() => {
+    setPlaybackStarted(false);
+    setStalled(false);
+  }, []);
+
+  useEffect(() => {
+    if (activeIndex === null) return;
+    const timer = window.setTimeout(() => setStalled(true), STALL_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex]);
 
   const goPrev = useCallback(() => {
+    resetStall();
     setActiveIndex((i) =>
       i === null ? i : (i - 1 + stories.length) % stories.length,
     );
-  }, [stories.length]);
+  }, [stories.length, resetStall]);
 
   const goNext = useCallback(() => {
+    resetStall();
     setActiveIndex((i) => (i === null ? i : (i + 1) % stories.length));
-  }, [stories.length]);
+  }, [stories.length, resetStall]);
 
   const close = useCallback(() => setActiveIndex(null), []);
 
   const handleEnded = useCallback(() => {
+    resetStall();
     setActiveIndex((i) => {
       if (i === null) return i;
       if (i === stories.length - 1) return null;
       return i + 1;
     });
-  }, [stories.length]);
+  }, [stories.length, resetStall]);
 
   useEffect(() => {
     if (activeIndex === null) return;
@@ -144,30 +223,13 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
               key={item.story.id}
               type="button"
               className="moment-card"
-              onClick={() => setActiveIndex(item.storyIndex)}
+              onClick={() => {
+                resetStall();
+                setActiveIndex(item.storyIndex);
+              }}
               aria-label={`Play story from ${formatDate(item.story.date)}`}
             >
-              {item.story.poster ? (
-                <ThumbPeek
-                  src={item.story.poster}
-                  hue={340}
-                  className="thumb-peek-region"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.story.poster}
-                    alt=""
-                    loading="lazy"
-                    className="moment-poster"
-                  />
-                </ThumbPeek>
-              ) : (
-                <div className="moment-poster bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">
-                  <span aria-hidden className="text-2xl text-white/70">
-                    ▶
-                  </span>
-                </div>
-              )}
+              <MomentCardMedia story={item.story} />
               <span className="moment-play" aria-hidden>
                 ▶
               </span>
@@ -201,8 +263,21 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
                 autoPlay
                 playsInline
                 onEnded={handleEnded}
+                onPlaying={() => setPlaybackStarted(true)}
                 className="moment-video"
               />
+              {stalled && !playbackStarted && (
+                <div className="moment-stall" data-testid="moment-stall">
+                  <p>This clip is taking a while to load.</p>
+                  <a
+                    href={SOCIAL_LINKS.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Watch on Instagram ↗
+                  </a>
+                </div>
+              )}
               {stories.length > 1 && (
                 <>
                   <button
