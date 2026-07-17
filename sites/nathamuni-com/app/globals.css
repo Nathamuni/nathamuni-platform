@@ -968,12 +968,31 @@
   .moment-poster {
     @apply w-full h-full object-cover;
   }
+  .moment-card-media {
+    @apply block w-full h-full relative;
+  }
+  .moment-hover-preview {
+    @apply absolute inset-0 w-full h-full object-cover;
+    animation: peek-fade 0.25s ease;
+  }
+  .moment-stall {
+    @apply absolute inset-x-4 bottom-16 z-10 flex flex-col items-center gap-2 rounded-2xl px-4 py-3 text-center text-sm text-white/85;
+    background: rgba(13, 10, 31, 0.88);
+    border: 1px solid rgba(178, 148, 255, 0.3);
+    backdrop-filter: blur(10px);
+    animation: peek-fade 0.3s ease;
+  }
+  .moment-stall a {
+    @apply font-semibold;
+    color: #e879a9;
+  }
   .moment-play {
-    @apply absolute inset-0 flex items-center justify-center text-2xl text-white/85;
+    /* Decorative — must not swallow the hover that starts the card preview. */
+    @apply absolute inset-0 flex items-center justify-center text-2xl text-white/85 pointer-events-none;
     background: linear-gradient(to top, rgba(13, 10, 31, 0.55), transparent 45%);
   }
   .moment-date {
-    @apply absolute bottom-1.5 inset-x-0 text-center text-[0.6rem] text-white/80;
+    @apply absolute bottom-1.5 inset-x-0 text-center text-[0.6rem] text-white/80 pointer-events-none;
   }
 
   /* ---------- thought cards (moments wall interstitials) ---------- */

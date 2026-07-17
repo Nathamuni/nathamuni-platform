@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { MomentsWall } from './MomentsWall'
 import type { Story } from '@/lib/stories'
 
@@ -187,5 +187,85 @@ describe('MomentsWall', () => {
     expect(screen.getByTestId('moment-lightbox').querySelector('video')?.getAttribute('src')).toBe(
       '/stories/m7.mp4'
     )
+  })
+
+  describe('hover preview', () => {
+    it('mounts a muted looping preview video on mouse hover and removes it on leave', () => {
+      render(<MomentsWall stories={stories} />)
+      const card = screen.getAllByRole('button', { name: /^Play story from/ })[0]
+      const media = card.querySelector('.moment-card-media')!
+      fireEvent.pointerEnter(media, { pointerType: 'mouse' })
+      const preview = screen.getByTestId('moment-hover-preview') as HTMLVideoElement
+      expect(preview.getAttribute('src')).toBe('/stories/s1.mp4')
+      expect(preview.muted).toBe(true)
+      fireEvent.pointerLeave(media, { pointerType: 'mouse' })
+      expect(screen.queryByTestId('moment-hover-preview')).not.toBeInTheDocument()
+    })
+
+    it('does not mount a preview for touch pointers', () => {
+      render(<MomentsWall stories={stories} />)
+      const card = screen.getAllByRole('button', { name: /^Play story from/ })[0]
+      fireEvent.pointerEnter(card.querySelector('.moment-card-media')!, { pointerType: 'touch' })
+      expect(screen.queryByTestId('moment-hover-preview')).not.toBeInTheDocument()
+    })
+
+    it('rewinds the preview once it passes the teaser window', () => {
+      render(<MomentsWall stories={stories} />)
+      const media = screen
+        .getAllByRole('button', { name: /^Play story from/ })[0]
+        .querySelector('.moment-card-media')!
+      fireEvent.pointerEnter(media, { pointerType: 'mouse' })
+      const preview = screen.getByTestId('moment-hover-preview') as HTMLVideoElement
+      Object.defineProperty(preview, 'currentTime', { value: 6, writable: true })
+      fireEvent.timeUpdate(preview)
+      expect(preview.currentTime).toBe(0)
+    })
+  })
+
+  describe('stall fallback', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('shows an Instagram link if playback has not started after 15s', () => {
+      vi.useFakeTimers()
+      render(<MomentsWall stories={stories} />)
+      openLightbox(0)
+      expect(screen.queryByTestId('moment-stall')).not.toBeInTheDocument()
+      act(() => {
+        vi.advanceTimersByTime(15_000)
+      })
+      const stall = screen.getByTestId('moment-stall')
+      expect(stall.querySelector('a')?.getAttribute('href')).toContain('instagram.com')
+    })
+
+    it('never shows the fallback once playback has started', () => {
+      vi.useFakeTimers()
+      render(<MomentsWall stories={stories} />)
+      openLightbox(0)
+      fireEvent.playing(screen.getByTestId('moment-lightbox').querySelector('video')!)
+      act(() => {
+        vi.advanceTimersByTime(15_000)
+      })
+      expect(screen.queryByTestId('moment-stall')).not.toBeInTheDocument()
+    })
+
+    it('resets the stall timer when navigating to another story', () => {
+      vi.useFakeTimers()
+      render(<MomentsWall stories={stories} />)
+      openLightbox(0)
+      act(() => {
+        vi.advanceTimersByTime(14_000)
+      })
+      fireEvent.click(screen.getByTestId('moment-nav-next'))
+      act(() => {
+        vi.advanceTimersByTime(14_000)
+      })
+      expect(screen.queryByTestId('moment-stall')).not.toBeInTheDocument()
+      act(() => {
+        vi.advanceTimersByTime(1_000)
+      })
+      expect(screen.getByTestId('moment-stall')).toBeInTheDocument()
+    })
   })
 })
