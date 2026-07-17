@@ -63,6 +63,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
       const next = prev.slice()
       next[index] = !next[index]
       saveItem(storageKey(slug), JSON.stringify(next))
+      window.dispatchEvent(new Event('nm-session-steps-changed'))
       return next
     })
   }
