@@ -25,13 +25,13 @@ describe('TheaterMode', () => {
     open()
     expect(screen.getByText(/settle in/i)).toBeTruthy()
     expect(screen.queryByText('First move')).toBeNull()
-    act(() => vi.advanceTimersByTime(4000))
+    act(() => vi.advanceTimersByTime(3000))
     expect(screen.getByText('First move')).toBeTruthy()
   })
 
   it('marking done persists to the shared session key and advances', () => {
     open()
-    act(() => vi.advanceTimersByTime(4000))
+    act(() => vi.advanceTimersByTime(3000))
     fireEvent.click(screen.getByRole('button', { name: /done/i }))
     expect(JSON.parse(window.localStorage.getItem('session-test-session') ?? '[]')).toEqual([true, false])
     expect(screen.getByText('Second move')).toBeTruthy()
@@ -40,14 +40,14 @@ describe('TheaterMode', () => {
   it('resumes at the first unchecked step', () => {
     window.localStorage.setItem('session-test-session', JSON.stringify([true, false]))
     open()
-    act(() => vi.advanceTimersByTime(4000))
+    act(() => vi.advanceTimersByTime(3000))
     expect(screen.getByText('Second move')).toBeTruthy()
   })
 
   it('shows completion when every step is done and Escape closes', () => {
     window.localStorage.setItem('session-test-session', JSON.stringify([true, true]))
     open()
-    act(() => vi.advanceTimersByTime(4000))
+    act(() => vi.advanceTimersByTime(3000))
     expect(screen.getByText(/protocol complete/i)).toBeTruthy()
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
