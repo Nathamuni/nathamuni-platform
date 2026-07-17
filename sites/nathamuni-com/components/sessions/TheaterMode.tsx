@@ -5,7 +5,7 @@ import type { Step } from '@/lib/sessions'
 import { loadItem, saveItem } from '@/lib/progress'
 import { CredibilityBadge } from './CredibilityBadge'
 
-const ENTRY_MS = 4000
+const ENTRY_MS = 3000
 
 function storageKey(slug: string): string {
   return `session-${slug}`
@@ -280,18 +280,32 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
 
       <style>{`
         .ssn-theater-open {
-          padding: 0.55rem 1rem;
-          border-radius: 0.75rem;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgba(255, 255, 255, 0.85);
-          font-size: 0.82rem;
-          font-weight: 600;
+          padding: 0.6rem 1.15rem;
+          border-radius: 9999px;
+          border: none;
+          background: linear-gradient(135deg, #f59e0b, #ec4899 55%, #8b5cf6);
+          color: #fff;
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
           cursor: pointer;
-          transition: border-color 0.2s ease;
+          box-shadow: 0 4px 18px rgba(236, 72, 153, 0.35);
+          transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
         .ssn-theater-open:hover {
-          border-color: hsla(var(--cat), 70%, 60%, 0.6);
+          transform: translateY(-1px);
+          box-shadow: 0 6px 24px rgba(236, 72, 153, 0.5);
+        }
+        .ssn-theater-open:focus-visible {
+          outline: 2px solid #fff;
+          outline-offset: 2px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ssn-theater-open,
+          .ssn-theater-open:hover {
+            transform: none;
+            transition: none;
+          }
         }
       `}</style>
     </>
