@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { StepTracker } from './StepTracker'
 import type { Step } from '@/lib/sessions'
 
@@ -39,5 +39,16 @@ describe('StepTracker psychology states', () => {
     render(<StepTracker slug="test-proto" steps={STEPS} />)
     expect(await screen.findByTestId('protocol-complete')).toHaveTextContent('Protocol complete.')
     expect(screen.getByText('All steps done')).toBeInTheDocument()
+  })
+
+  it('dispatches nm-session-steps-changed when a step checkbox is clicked', () => {
+    const eventSpy = vi.fn()
+    window.addEventListener('nm-session-steps-changed', eventSpy)
+
+    render(<StepTracker slug="test-proto" steps={STEPS} />)
+    fireEvent.click(screen.getAllByRole('checkbox')[0])
+
+    expect(eventSpy).toHaveBeenCalled()
+    window.removeEventListener('nm-session-steps-changed', eventSpy)
   })
 })

@@ -10,9 +10,11 @@ import type { TimelinePhase } from '@/lib/sessions'
 export function SessionTimeline({
   hue,
   timeline,
+  activeIndex,
 }: {
   hue: number
   timeline: TimelinePhase[]
+  activeIndex?: number
 }) {
   return (
     <div className="ssn-timeline" style={{ '--cat': hue } as React.CSSProperties} data-testid="session-timeline">
@@ -21,7 +23,7 @@ export function SessionTimeline({
         {timeline.map((block, index) => (
           <li
             key={block.phase}
-            className="ssn-timeline-phase"
+            className={`ssn-timeline-phase${index === activeIndex ? ' ssn-timeline-phase-active' : ''}`}
             style={{ borderColor: `hsla(${hue}, 80%, ${58 + index * 6}%, 0.9)` }}
           >
             <span
@@ -30,6 +32,11 @@ export function SessionTimeline({
               style={{ background: `hsl(${hue} 85% ${64 + index * 6}%)` }}
             />
             <span className="ssn-timeline-span tabular-nums">{block.span}</span>
+            {index === activeIndex && (
+              <span className="ssn-timeline-now" data-testid="timeline-now">
+                Now
+              </span>
+            )}
             <span className="ssn-timeline-name">{block.phase}</span>
             <p className="ssn-timeline-focus">{block.focus}</p>
             <span
@@ -121,6 +128,21 @@ export function SessionTimeline({
           background: hsla(var(--cat), 70%, 55%, 0.16);
           border: 1px solid hsla(var(--cat), 70%, 60%, 0.4);
         }
+        .ssn-timeline-phase-active {
+          background: hsla(var(--cat), 70%, 55%, 0.08);
+          border-radius: 0 0.6rem 0.6rem 0;
+        }
+        .ssn-timeline-now {
+          align-self: flex-start;
+          font-size: 0.6rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          padding: 0.15rem 0.5rem;
+          border-radius: 9999px;
+          color: #0d0a1f;
+          background: hsl(var(--cat) 85% 65%);
+        }
 
         @media (min-width: 768px) {
           .ssn-timeline-rail {
@@ -141,6 +163,9 @@ export function SessionTimeline({
           }
           .ssn-timeline-focus {
             max-width: none;
+          }
+          .ssn-timeline-phase-active {
+            border-radius: 0 0 0.6rem 0.6rem;
           }
         }
       `}</style>

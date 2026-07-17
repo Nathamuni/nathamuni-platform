@@ -51,7 +51,11 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
   // tracker re-reads localStorage instead of staying stuck on stale state.
   useEffect(() => {
     window.addEventListener('nm-progress-applied', rehydrate)
-    return () => window.removeEventListener('nm-progress-applied', rehydrate)
+    window.addEventListener('nm-session-steps-changed', rehydrate)
+    return () => {
+      window.removeEventListener('nm-progress-applied', rehydrate)
+      window.removeEventListener('nm-session-steps-changed', rehydrate)
+    }
   }, [rehydrate])
 
   function toggle(index: number) {
@@ -59,6 +63,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
       const next = prev.slice()
       next[index] = !next[index]
       saveItem(storageKey(slug), JSON.stringify(next))
+      window.dispatchEvent(new Event('nm-session-steps-changed'))
       return next
     })
   }
