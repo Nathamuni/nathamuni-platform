@@ -8,9 +8,10 @@ import type { PulseGraphData, PulseNode } from '@/lib/pulse'
  *
  * Honest framing: this animates a force-directed layout of actual posts,
  * categories, and shared tags — node size is real engagement, edges are real
- * membership. The motion is a visualization, not live inference. It settles
- * into a stable web and fires "signal" pulses along the strongest synapses.
- * Respects prefers-reduced-motion (renders a static settled graph).
+ * membership. The motion is a visualization, not live inference. The graph
+ * unfolds from the center, breathes as one coherent web, and periodically a
+ * category hub "fires" — a cascade of signal pulses chains outward through its
+ * connections, flashing each node it reaches. Respects prefers-reduced-motion.
  */
 
 interface Sim extends PulseNode {
@@ -19,17 +20,24 @@ interface Sim extends PulseNode {
   vx: number
   vy: number
   r: number
+  phase: number
+  flash: number
 }
 
 interface Pulse {
-  edge: number
+  from: number
+  to: number
   t: number
   speed: number
+  hue: number
+  depth: number
 }
 
-function hueColor(hue: number, l = 65, a = 1) {
-  return `hsla(${hue}, 85%, ${l}%, ${a})`
+function hsla(hue: number, s: number, l: number, a: number) {
+  return `hsla(${hue}, ${s}%, ${l}%, ${a})`
 }
+
+const INTRO_MS = 2200
 
 export function PulseGraph({ data }: { data: PulseGraphData }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -52,24 +60,38 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     let dpr = Math.min(2, window.devicePixelRatio || 1)
 
     const idIndex = new Map(data.nodes.map((n, i) => [n.id, i]))
-    // Seed positions deterministically in a spiral so first paint is stable.
+    // Seed nodes in a tight central cluster so the intro visibly *unfolds*
+    // outward into the web instead of jittering in place.
     const nodes: Sim[] = data.nodes.map((n, i) => {
-      const golden = i * 2.399963
-      const rad = 30 + i * 6
+      const a = i * 2.399963
+      const rad = 8 + (i % 7) * 3
       return {
         ...n,
-        x: Math.cos(golden) * rad,
-        y: Math.sin(golden) * rad,
+        x: Math.cos(a) * rad,
+        y: Math.sin(a) * rad,
         vx: 0,
         vy: 0,
         r: 4 + n.weight * (n.kind === 'category' ? 22 : n.kind === 'post' ? 11 : 6),
+        phase: (i * 1.7) % (Math.PI * 2),
+        flash: 0,
       }
     })
     const edges = data.edges
       .map((e) => ({ a: idIndex.get(e.source)!, b: idIndex.get(e.target)!, s: e.strength }))
       .filter((e) => e.a != null && e.b != null)
 
+    // Adjacency for chaining activation cascades.
+    const incident: { edge: number; other: number }[][] = nodes.map(() => [])
+    edges.forEach((e, i) => {
+      incident[e.a].push({ edge: i, other: e.b })
+      incident[e.b].push({ edge: i, other: e.a })
+    })
+    const hubs = nodes.map((n, i) => (n.kind === 'category' ? i : -1)).filter((i) => i >= 0)
+
     const pulses: Pulse[] = []
+    // Effective (breathing) positions, recomputed each frame; used for drawing + hit-test.
+    const ex = new Float64Array(nodes.length)
+    const ey = new Float64Array(nodes.length)
 
     function resize() {
       const rect = wrap!.getBoundingClientRect()
@@ -86,11 +108,9 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     const ro = new ResizeObserver(resize)
     ro.observe(wrap)
 
-    // --- Force simulation ---
     function step(alpha: number) {
       const cx = W / 2
       const cy = H / 2
-      // Repulsion (Coulomb-ish, capped).
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i]
@@ -98,9 +118,10 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
           const dx = a.x - b.x
           const dy = a.y - b.y
           const d2 = dx * dx + dy * dy || 0.01
-          const min = (a.r + b.r + 14) ** 2
-          if (d2 < 90000) {
-            const force = (2600 / d2) * alpha
+          if (d2 < 110000) {
+            // Hubs repel harder so category labels don't collide.
+            const q = (a.kind === 'category' ? 1.8 : 1) * (b.kind === 'category' ? 1.8 : 1)
+            const force = (2800 * q / d2) * alpha
             const d = Math.sqrt(d2)
             const fx = (dx / d) * force
             const fy = (dy / d) * force
@@ -108,9 +129,9 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
             a.vy += fy
             b.vx -= fx
             b.vy -= fy
-            if (d2 < min) {
-              // hard separation so nodes never fully overlap
-              const push = ((Math.sqrt(min) - d) / d) * 0.5
+            const min = a.r + b.r + 16
+            if (d < min) {
+              const push = ((min - d) / d) * 0.5
               a.vx += dx * push
               a.vy += dy * push
               b.vx -= dx * push
@@ -119,125 +140,210 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
           }
         }
       }
-      // Springs along edges.
       for (const e of edges) {
         const a = nodes[e.a]
         const b = nodes[e.b]
         const dx = b.x - a.x
         const dy = b.y - a.y
         const d = Math.sqrt(dx * dx + dy * dy) || 0.01
-        const rest = 70 + (1 - e.s) * 90
+        const rest = 78 + (1 - e.s) * 92
         const f = ((d - rest) / d) * 0.05 * e.s * alpha * 6
         a.vx += dx * f
         a.vy += dy * f
         b.vx -= dx * f
         b.vy -= dy * f
       }
-      // Gravity to center + integrate.
       for (const n of nodes) {
-        n.vx += (cx - n.x) * 0.002 * alpha
-        n.vy += (cy - n.y) * 0.002 * alpha
-        n.vx *= 0.86
-        n.vy *= 0.86
+        n.vx += (cx - n.x) * 0.0022 * alpha
+        n.vy += (cy - n.y) * 0.0022 * alpha
+        n.vx *= 0.85
+        n.vy *= 0.85
         n.x += n.vx
         n.y += n.vy
+      }
+    }
+
+    function fireCascade() {
+      const hub = hubs[Math.floor(Math.random() * hubs.length)]
+      if (hub == null) return
+      nodes[hub].flash = 1
+      for (const { other } of incident[hub]) {
+        pulses.push({
+          from: hub,
+          to: other,
+          t: 0,
+          speed: 0.012 + Math.random() * 0.006,
+          hue: nodes[hub].hue,
+          depth: 0,
+        })
       }
     }
 
     let raf = 0
     let alpha = 1
     let last = performance.now()
-    let pulseClock = 0
+    const t0 = last
+    let nextCascade = t0 + 900
 
     function draw(now: number) {
       const dt = Math.min(50, now - last)
       last = now
+      const elapsed = now - t0
+      const introK = Math.min(1, elapsed / INTRO_MS) // 0..1 unfold progress
 
       if (!reduce) {
-        alpha = Math.max(0.02, alpha * 0.996)
-        step(0.4 + alpha)
-      } else if (alpha > 0.02) {
-        // settle quickly then freeze
-        for (let k = 0; k < 40; k++) step(0.6)
-        alpha = 0
+        alpha = Math.max(0.05, alpha * 0.99)
+        step(0.35 + alpha)
+      } else if (elapsed < 60) {
+        for (let k = 0; k < 60; k++) step(0.6)
       }
 
-      ctx!.clearRect(0, 0, W, H)
+      // Breathing offsets — a coherent slow drift so the whole web feels alive.
+      const amp = reduce ? 0 : 3.4 * introK
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i]
+        n.flash *= 0.93
+        ex[i] = n.x + Math.sin(now * 0.0006 + n.phase) * amp
+        ey[i] = n.y + Math.cos(now * 0.0008 + n.phase * 1.3) * amp
+      }
 
-      // Edges
+      // Background: translucent vignette each frame leaves faint comet trails.
+      const bg = ctx!.createRadialGradient(W / 2, H * 0.42, 0, W / 2, H * 0.42, Math.max(W, H) * 0.7)
+      bg.addColorStop(0, 'rgba(24,14,44,0.32)')
+      bg.addColorStop(1, 'rgba(6,5,16,0.42)')
+      ctx!.fillStyle = bg
+      ctx!.fillRect(0, 0, W, H)
+
+      // --- Synapses (additive neon) ---
+      ctx!.globalCompositeOperation = 'lighter'
       for (const e of edges) {
         const a = nodes[e.a]
         const b = nodes[e.b]
-        const grad = ctx!.createLinearGradient(a.x, a.y, b.x, b.y)
-        grad.addColorStop(0, hueColor(a.hue, 60, 0.05 + e.s * 0.18))
-        grad.addColorStop(1, hueColor(b.hue, 60, 0.05 + e.s * 0.18))
+        const boost = Math.max(a.flash, b.flash)
+        const alphaLine = (0.05 + e.s * 0.14) * introK + boost * 0.4
+        const grad = ctx!.createLinearGradient(ex[e.a], ey[e.a], ex[e.b], ey[e.b])
+        grad.addColorStop(0, hsla(a.hue, 90, 62, alphaLine))
+        grad.addColorStop(1, hsla(b.hue, 90, 62, alphaLine))
         ctx!.strokeStyle = grad
-        ctx!.lineWidth = 0.6 + e.s * 1.1
+        ctx!.lineWidth = (0.5 + e.s * 1.4) * (1 + boost)
         ctx!.beginPath()
-        ctx!.moveTo(a.x, a.y)
-        ctx!.lineTo(b.x, b.y)
+        ctx!.moveTo(ex[e.a], ey[e.a])
+        ctx!.lineTo(ex[e.b], ey[e.b])
         ctx!.stroke()
       }
 
-      // Spawn + advance signal pulses along strong edges.
+      // --- Signal pulses (comets that chain outward) ---
       if (!reduce) {
-        pulseClock += dt
-        if (pulseClock > 90 && pulses.length < 70) {
-          pulseClock = 0
-          // bias toward stronger edges
-          const e = Math.floor(Math.random() * edges.length)
-          if (edges[e] && Math.random() < 0.3 + edges[e].s) {
-            pulses.push({ edge: e, t: 0, speed: 0.006 + Math.random() * 0.01 })
-          }
-        }
         for (let i = pulses.length - 1; i >= 0; i--) {
           const p = pulses[i]
           p.t += p.speed * (dt / 16)
-          if (p.t >= 1) {
-            pulses.splice(i, 1)
-            continue
-          }
-          const e = edges[p.edge]
-          if (!e) {
-            pulses.splice(i, 1)
-            continue
-          }
-          const a = nodes[e.a]
-          const b = nodes[e.b]
-          const x = a.x + (b.x - a.x) * p.t
-          const y = a.y + (b.y - a.y) * p.t
-          const fade = Math.sin(p.t * Math.PI)
+          const ax = ex[p.from]
+          const ay = ey[p.from]
+          const bx = ex[p.to]
+          const by = ey[p.to]
+          const x = ax + (bx - ax) * p.t
+          const y = ay + (by - ay) * p.t
+          const fade = Math.sin(Math.min(1, p.t) * Math.PI)
+          const rr = 1.6 + fade * 2.2
+          const g = ctx!.createRadialGradient(x, y, 0, x, y, rr * 3)
+          g.addColorStop(0, hsla(p.hue, 95, 82, 0.9 * fade + 0.1))
+          g.addColorStop(1, hsla(p.hue, 95, 60, 0))
+          ctx!.fillStyle = g
           ctx!.beginPath()
-          ctx!.arc(x, y, 1.8 + fade * 1.6, 0, Math.PI * 2)
-          ctx!.fillStyle = hueColor(b.hue, 78, 0.5 + fade * 0.5)
-          ctx!.shadowColor = hueColor(b.hue, 78, 0.9)
-          ctx!.shadowBlur = 8
+          ctx!.arc(x, y, rr * 3, 0, Math.PI * 2)
           ctx!.fill()
-          ctx!.shadowBlur = 0
+          if (p.t >= 1) {
+            nodes[p.to].flash = Math.min(1, nodes[p.to].flash + 0.9)
+            // Chain onward through the reached node's other synapses.
+            if (p.depth < 2) {
+              for (const { other } of incident[p.to]) {
+                if (other !== p.from && Math.random() < 0.55) {
+                  pulses.push({
+                    from: p.to,
+                    to: other,
+                    t: 0,
+                    speed: 0.011 + Math.random() * 0.006,
+                    hue: nodes[p.to].hue,
+                    depth: p.depth + 1,
+                  })
+                }
+              }
+            }
+            pulses.splice(i, 1)
+          }
+        }
+        if (now >= nextCascade && pulses.length < 140 && introK >= 1) {
+          fireCascade()
+          nextCascade = now + 2600 + Math.random() * 1600
         }
       }
 
-      // Nodes
-      const pulseGlow = reduce ? 0 : (Math.sin(now / 900) + 1) / 2
-      for (const n of nodes) {
-        const glow = n.kind === 'category' ? 10 + pulseGlow * 10 : n.kind === 'post' ? 6 : 3
+      // --- Nodes: additive halo + solid gradient core ---
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i]
+        const x = ex[i]
+        const y = ey[i]
+        const pop = 1 + n.flash * 0.5
+        const r = n.r * (0.4 + 0.6 * introK) * pop
+        const haloR = r * (2.4 + n.flash * 1.6)
+        const halo = ctx!.createRadialGradient(x, y, 0, x, y, haloR)
+        const hI = (n.kind === 'category' ? 0.5 : 0.32) * introK + n.flash * 0.5
+        halo.addColorStop(0, hsla(n.hue, 95, 68, hI))
+        halo.addColorStop(1, hsla(n.hue, 95, 60, 0))
+        ctx!.fillStyle = halo
         ctx!.beginPath()
-        ctx!.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx!.fillStyle = hueColor(n.hue, n.kind === 'tag' ? 55 : 62, n.kind === 'category' ? 0.9 : 0.75)
-        ctx!.shadowColor = hueColor(n.hue, 70, 0.9)
-        ctx!.shadowBlur = glow
+        ctx!.arc(x, y, haloR, 0, Math.PI * 2)
         ctx!.fill()
-        ctx!.shadowBlur = 0
+      }
+      ctx!.globalCompositeOperation = 'source-over'
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i]
+        const x = ex[i]
+        const y = ey[i]
+        const pop = 1 + n.flash * 0.5
+        const r = n.r * (0.4 + 0.6 * introK) * pop
+        const core = ctx!.createRadialGradient(x - r * 0.3, y - r * 0.3, 0, x, y, r)
+        core.addColorStop(0, hsla(n.hue, 100, 92, 1))
+        core.addColorStop(0.55, hsla(n.hue, 88, 64 + n.flash * 20, 1))
+        core.addColorStop(1, hsla(n.hue, 82, 44, 0.92))
+        ctx!.fillStyle = core
+        ctx!.beginPath()
+        ctx!.arc(x, y, r, 0, Math.PI * 2)
+        ctx!.fill()
         if (n.kind === 'category') {
           ctx!.beginPath()
-          ctx!.arc(n.x, n.y, n.r + 3 + pulseGlow * 3, 0, Math.PI * 2)
-          ctx!.strokeStyle = hueColor(n.hue, 80, 0.4)
-          ctx!.lineWidth = 1
+          ctx!.arc(x, y, r + 3 + n.flash * 6, 0, Math.PI * 2)
+          ctx!.strokeStyle = hsla(n.hue, 90, 80, 0.35 + n.flash * 0.5)
+          ctx!.lineWidth = 1.2
           ctx!.stroke()
-          ctx!.fillStyle = 'rgba(255,255,255,0.92)'
-          ctx!.font = '600 11px ui-sans-serif, system-ui'
-          ctx!.textAlign = 'center'
-          ctx!.fillText(n.label, n.x, n.y - n.r - 8)
+        }
+      }
+
+      // --- Category labels (chip + vertical de-collision) ---
+      if (introK > 0.5) {
+        const cats = hubs
+          .map((i) => ({ i, x: ex[i], y: ey[i] - nodes[i].r - 12 }))
+          .sort((a, b) => a.y - b.y)
+        for (let k = 1; k < cats.length; k++) {
+          if (cats[k].y - cats[k - 1].y < 16 && Math.abs(cats[k].x - cats[k - 1].x) < 90) {
+            cats[k].y = cats[k - 1].y + 16
+          }
+        }
+        ctx!.font = '600 11px ui-sans-serif, system-ui, sans-serif'
+        ctx!.textAlign = 'center'
+        ctx!.textBaseline = 'middle'
+        for (const c of cats) {
+          const label = nodes[c.i].label
+          const w = ctx!.measureText(label).width + 14
+          ctx!.fillStyle = 'rgba(10,8,24,0.72)'
+          const rx = c.x - w / 2
+          const ry = c.y - 9
+          const rad = 7
+          ctx!.beginPath()
+          ctx!.roundRect(rx, ry, w, 18, rad)
+          ctx!.fill()
+          ctx!.fillStyle = hsla(nodes[c.i].hue, 60, 90, 0.95 * introK)
+          ctx!.fillText(label, c.x, c.y)
         }
       }
 
@@ -245,22 +351,23 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     }
     raf = requestAnimationFrame(draw)
 
-    // --- Hover / tap tooltip ---
     function pick(clientX: number, clientY: number) {
       const rect = canvas!.getBoundingClientRect()
       const px = clientX - rect.left
       const py = clientY - rect.top
       let best: Sim | null = null
       let bestD = Infinity
-      for (const n of nodes) {
-        const d = (n.x - px) ** 2 + (n.y - py) ** 2
-        if (d < (n.r + 8) ** 2 && d < bestD) {
+      for (let i = 0; i < nodes.length; i++) {
+        const d = (ex[i] - px) ** 2 + (ey[i] - py) ** 2
+        if (d < (nodes[i].r + 9) ** 2 && d < bestD) {
           bestD = d
-          best = n
+          best = nodes[i]
         }
       }
-      if (best) setHovered({ node: best, x: px, y: py })
-      else setHovered(null)
+      if (best) {
+        best.flash = Math.max(best.flash, 0.8)
+        setHovered({ node: best, x: px, y: py })
+      } else setHovered(null)
     }
     const onMove = (e: PointerEvent) => pick(e.clientX, e.clientY)
     const onLeave = () => setHovered(null)
@@ -280,9 +387,9 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       ref={wrapRef}
       className="relative w-full rounded-3xl overflow-hidden"
       style={{
-        height: 'min(72vh, 620px)',
+        height: 'min(74vh, 640px)',
         background:
-          'radial-gradient(circle at 50% 40%, rgba(40,20,70,0.55), rgba(8,6,20,0.9))',
+          'radial-gradient(circle at 50% 40%, rgba(30,16,58,0.7), rgba(6,5,16,0.96))',
         border: '1px solid rgba(178,148,255,0.18)',
       }}
     >
@@ -294,7 +401,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
             left: Math.min(hovered.x + 12, 999),
             top: hovered.y + 12,
             background: 'rgba(13,10,31,0.94)',
-            border: `1px solid ${hueColor(hovered.node.hue, 70, 0.5)}`,
+            border: `1px solid ${hsla(hovered.node.hue, 85, 70, 0.5)}`,
             backdropFilter: 'blur(10px)',
           }}
         >
