@@ -1,0 +1,10 @@
+{
+  "username": "nathamuni_",
+  "followersCount": 4773,
+  "mediaCount": 163,
+  "reachLast30Days": null,
+  "profileViewsLast30Days": null,
+  "onlineFollowersByHour": null,
+  "fetchedAt": "2026-07-18",
+  "_note": "Seeded manually 2026-07-18 from the profile screen. The daily instagram-insights.mjs job overwrites this with live API data (reach + online-hours) once it runs with the insights-scoped token."
+}
