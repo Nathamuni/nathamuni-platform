@@ -39,6 +39,11 @@ jobs:
           YOUTUBE_PRIVACY: ${{ vars.YOUTUBE_PRIVACY }}
         run: node scripts/instagram-sync.mjs
 
+      - name: Fetch account insights (followers, reach, active-hours)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node scripts/instagram-insights.mjs
+
       - name: Commit and push if the library changed
         run: |
           if git diff --quiet; then
@@ -47,6 +52,6 @@ jobs:
           fi
           git config user.name "instagram-sync[bot]"
           git config user.email "actions@github.com"
-          git add lib/videos.json lib/stories.json public/images/thumbnails public/stories
+          git add lib/videos.json lib/stories.json lib/insights.json public/images/thumbnails public/stories
           git commit -m "FEAT: auto-sync new reels from Instagram"
           git push
