@@ -21,6 +21,7 @@ const ABOUT_LINKS = [
   { href: '/journey', label: 'Journey' },
   { href: '/projects', label: 'Projects' },
   { href: '/stats', label: 'Stats' },
+  { href: '/pulse', label: 'Pulse' },
   { href: '/books', label: 'Books' },
 ]
 
