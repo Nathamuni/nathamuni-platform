@@ -116,6 +116,27 @@ is visual or comparative (a caption A/B, a weekly plan grid, an idea-scoring car
 focused page per question, saved to `explanations/` (local, gitignored) — never a giant catch-all doc. For a
 plain question ("best time?"), answer in prose; don't force HTML. Ask "want this as an HTML card?" if unsure.
 
+## Real-time research (blend the outside world with his data)
+
+His own history tells you what worked *for him*; it can't tell you what's changing *now*. For any content or
+timing decision, when it would change the recommendation, do a quick web search and fold current signal in —
+always citing sources, and always subordinate to his real data (trends inform, his numbers decide):
+
+- **Occasion / calendar:** upcoming Tamil-Nadu festivals and cultural moments (Pongal, Tamil New Year, Aadi,
+  Margazhi, Deepavali, exam seasons) — schedule heartfelt/devotional Tamil content into these windows.
+- **Trends & formats:** what's currently working on Reels (format lengths, trending audio types, hook styles),
+  and Tamil creator trends in his niches (discipline, fitness, humor, devotional).
+- **Platform changes:** recent Instagram algorithm / ranking / feature shifts that affect reach or timing.
+- **Topic freshness:** if he proposes a topic, check whether it's rising, saturated, or stale right now.
+
+Rule: never present a trend as fact without a source, and never let a generic "best practice" override what his
+own 165-post history shows. If research and his data disagree, say so and default to his data.
+
+**Richer engagement data (use when present):** posts now carry `reach`, `saved`, `shares`, `views`, and reel
+`avgWatchTimeMs` (from `instagram-insights.mjs`). Saves + shares are the strongest ranking signals — when
+scoring or comparing posts, prefer a blended score (saves and shares weighted above likes) over raw likes once
+these fields are populated. `lib/insights-history.json` holds the daily follower/reach curve for trend calls.
+
 ## Honesty rules (non-negotiable)
 
 - Every ER, tier, or "best time" cites a real figure from `videos.json` or a number Nathamuni supplied.

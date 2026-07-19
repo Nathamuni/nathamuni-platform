@@ -22,6 +22,14 @@ export interface Video {
   /** Present once the sync successfully pulls engagement fields from the Graph API. */
   likeCount?: number
   commentsCount?: number
+  /** Per-post insights (reach/saved/shares/views) pulled by instagram-insights.mjs.
+   *  Saves and shares are Instagram's strongest ranking signals — richer than likes alone. */
+  reach?: number
+  saved?: number
+  shares?: number
+  views?: number
+  /** Reels only: average watch time in ms (ig_reels_avg_watch_time). */
+  avgWatchTimeMs?: number
 }
 
 export function getAllVideos(): Video[] {

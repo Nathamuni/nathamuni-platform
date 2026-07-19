@@ -52,6 +52,6 @@ jobs:
           fi
           git config user.name "instagram-sync[bot]"
           git config user.email "actions@github.com"
-          git add lib/videos.json lib/stories.json lib/insights.json public/images/thumbnails public/stories
+          git add lib/videos.json lib/stories.json lib/insights.json lib/insights-history.json public/images/thumbnails public/stories
           git commit -m "FEAT: auto-sync new reels from Instagram"
           git push
