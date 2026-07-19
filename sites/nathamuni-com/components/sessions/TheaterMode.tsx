@@ -38,6 +38,27 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
   const [settled, setSettled] = useState(false)
   const [completed, setCompleted] = useState<boolean[]>(() => new Array(steps.length).fill(false))
   const [reviewIndex, setReviewIndex] = useState<number | null>(null)
+  // Fade the step content out, swap, then back in (~0.5s) so moving between
+  // steps feels lively rather than an instant jump.
+  const [fading, setFading] = useState(false)
+  const fadeTimer = useRef<number | null>(null)
+  const changeStep = useCallback((apply: () => void) => {
+    const reduce =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      apply()
+      return
+    }
+    setFading(true)
+    if (fadeTimer.current) window.clearTimeout(fadeTimer.current)
+    fadeTimer.current = window.setTimeout(() => {
+      apply()
+      setFading(false)
+    }, 240)
+  }, [])
+  useEffect(() => () => {
+    if (fadeTimer.current) window.clearTimeout(fadeTimer.current)
+  }, [])
   const overlayRef = useRef<HTMLDivElement>(null)
   const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null)
 
@@ -151,7 +172,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               <p className="ssn-theater-entry-sub">One step at a time. Nothing else.</p>
             </div>
           ) : reviewing && step ? (
-            <div className="ssn-theater-step">
+            <div className={`ssn-theater-step${fading ? ' is-fading' : ''}`}>
               <p className="ssn-theater-count tabular-nums">
                 Reviewing · step {currentIndex + 1} of {steps.length}
               </p>
@@ -165,8 +186,8 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
                 <button
                   type="button"
                   className="ssn-theater-back"
-                  disabled={currentIndex === 0}
-                  onClick={() => setReviewIndex(currentIndex - 1)}
+                  disabled={currentIndex === 0 || fading}
+                  onClick={() => changeStep(() => setReviewIndex(currentIndex - 1))}
                 >
                   ← Back
                 </button>
@@ -174,7 +195,8 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
                   <button
                     type="button"
                     className="ssn-theater-done"
-                    onClick={() => setReviewIndex(currentIndex + 1)}
+                    disabled={fading}
+                    onClick={() => changeStep(() => setReviewIndex(currentIndex + 1))}
                   >
                     Next →
                   </button>
@@ -200,7 +222,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
             </div>
           ) : (
             step && (
-              <div className="ssn-theater-step">
+              <div className={`ssn-theater-step${fading ? ' is-fading' : ''}`}>
                 <p className="ssn-theater-count tabular-nums">
                   Step {currentIndex + 1} of {steps.length} · {doneCount} done
                 </p>
@@ -210,7 +232,12 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
                 </div>
                 <p className="ssn-theater-detail">{step.detail}</p>
                 <p className="ssn-theater-checkpoint">Done when: {step.checkpoint}</p>
-                <button type="button" className="ssn-theater-done" onClick={markCurrentDone}>
+                <button
+                  type="button"
+                  className="ssn-theater-done"
+                  disabled={fading}
+                  onClick={() => changeStep(markCurrentDone)}
+                >
                   Done — next step
                 </button>
               </div>
@@ -275,6 +302,16 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               flex-direction: column;
               gap: 1rem;
               animation: ssn-theater-fade 0.8s ease both;
+              transition: opacity 0.24s ease, transform 0.24s ease;
+            }
+            /* Fade the current step out before the next one swaps in (~0.5s round trip). */
+            .ssn-theater-step.is-fading {
+              opacity: 0;
+              transform: translateY(8px);
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .ssn-theater-step { transition: none; }
+              .ssn-theater-step.is-fading { opacity: 1; transform: none; }
             }
             .ssn-theater-count {
               margin: 0;
