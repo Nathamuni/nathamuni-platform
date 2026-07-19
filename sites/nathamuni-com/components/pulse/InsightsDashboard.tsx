@@ -1,19 +1,22 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import type { DashboardData, Metric } from '@/lib/insights-dashboard'
+import Link from 'next/link'
+import type { DashboardData, Metric, PostLite } from '@/lib/insights-dashboard'
 
 /**
- * Interactive insights dashboard for /pulse. Multiple real-data charts (donut,
- * metric-driven bars, line, distribution, ranked tags) with a metric selector.
- * SVG, no chart deps. Every categorical mark is direct-labeled (identity is
- * never color-alone). Dark-surface theme to match the pulse page.
+ * Interactive insights dashboard for /pulse. Multiple real-data charts with a
+ * metric selector, cursor-following tooltips (one delegated data-tip handler),
+ * and click-to-drill: clicking any mark opens the actual posts behind it.
+ * SVG, no chart deps. Every categorical mark is direct-labeled.
  */
 
 const labelClass = 'text-[0.62rem] uppercase tracking-widest text-white/40'
 const ink = 'rgba(236,233,255,0.88)'
 const mut = 'rgba(236,233,255,0.5)'
 const catColor = (hue: number, l = 60) => `hsl(${hue} 78% ${l}%)`
+
+type Pick = (label: string, predicate: (p: PostLite) => boolean) => void
 
 const METRICS: { key: Metric; label: string }[] = [
   { key: 'posts', label: 'Posts' },
@@ -34,12 +37,10 @@ function Card({ title, sub, children }: { title: string; sub?: string; children:
   )
 }
 
-/** Category share donut. */
-function Donut({ data }: { data: DashboardData }) {
+function Donut({ data, onPick }: { data: DashboardData; onPick: Pick }) {
   const total = data.totalPosts
   const R = 52
   const C = 2 * Math.PI * R
-  // Precompute cumulative offsets so render stays side-effect-free.
   const segments = data.categories.reduce<{ c: (typeof data.categories)[number]; frac: number; offset: number }[]>(
     (acc, c) => {
       const frac = c.posts / total
@@ -64,29 +65,33 @@ function Donut({ data }: { data: DashboardData }) {
             strokeDashoffset={-offset * C}
             className="cursor-pointer"
             data-tip={`${c.category}: ${c.posts} posts (${c.share.toFixed(0)}%) · ${c.medER.toFixed(1)}% median engagement`}
+            onClick={() => onPick(`${c.category} — ${c.posts} posts`, (p) => p.category === c.category)}
           />
         ))}
         <circle cx="65" cy="65" r="34" fill="rgba(10,8,24,0.85)" />
       </svg>
       <div className="flex flex-col gap-1.5 min-w-0">
         {data.categories.map((c) => (
-          <div key={c.category} className="flex items-center gap-2 text-xs">
+          <button
+            key={c.category}
+            onClick={() => onPick(`${c.category} — ${c.posts} posts`, (p) => p.category === c.category)}
+            className="flex items-center gap-2 text-xs text-left hover:opacity-80"
+          >
             <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: catColor(c.hue) }} />
             <span className="truncate" style={{ color: ink }}>{c.category}</span>
             <span className="ml-auto tabular-nums" style={{ color: mut }}>{c.share.toFixed(0)}%</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>
   )
 }
 
-/** Metric-driven bar chart (weekday or category). */
 function MetricBars({
   rows,
   metric,
 }: {
-  rows: { label: string; value: number; hue?: number; note: string }[]
+  rows: { label: string; value: number; hue?: number; note: string; onClick: () => void }[]
   metric: Metric
 }) {
   const max = Math.max(1, ...rows.map((r) => r.value))
@@ -96,7 +101,11 @@ function MetricBars({
       {rows.map((r) => {
         const pct = Math.max(3, (r.value / max) * 100)
         return (
-          <div key={r.label} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5">
+          <button
+            key={r.label}
+            onClick={r.onClick}
+            className="flex-1 h-full flex flex-col items-center justify-end gap-1.5"
+          >
             <span className="text-[0.6rem] tabular-nums" style={{ color: mut }}>{fmt(r.value)}</span>
             <div
               data-tip={r.note}
@@ -109,15 +118,14 @@ function MetricBars({
               }}
             />
             <span className="text-[0.58rem] text-center leading-tight" style={{ color: mut }}>{r.label}</span>
-          </div>
+          </button>
         )
       })}
     </div>
   )
 }
 
-/** Monthly cadence line + area. */
-function MonthLine({ data }: { data: DashboardData }) {
+function MonthLine({ data, onPick }: { data: DashboardData; onPick: Pick }) {
   const W = 320
   const H = 120
   const pad = { l: 6, r: 6, t: 10, b: 18 }
@@ -141,11 +149,12 @@ function MonthLine({ data }: { data: DashboardData }) {
           <circle
             cx={x(i)}
             cy={y(m.posts)}
-            r="6"
+            r="7"
             fill="hsl(286 90% 80%)"
             fillOpacity="0.001"
             className="cursor-pointer"
             data-tip={`${m.label}: ${m.posts} posts · ${m.medER.toFixed(1)}% median engagement`}
+            onClick={() => onPick(`${m.label} — ${m.posts} posts`, (p) => p.monthKey === m.monthKey)}
           />
           <circle cx={x(i)} cy={y(m.posts)} r="2.6" fill="hsl(286 90% 80%)" style={{ pointerEvents: 'none' }} />
           <text x={x(i)} y={H - 5} textAnchor="middle" fontSize="7.5" fill={mut}>{m.label}</text>
@@ -155,14 +164,17 @@ function MonthLine({ data }: { data: DashboardData }) {
   )
 }
 
-/** Horizontal ranked tag bars. */
-function TagBars({ data }: { data: DashboardData }) {
+function TagBars({ data, onPick }: { data: DashboardData; onPick: Pick }) {
   const max = Math.max(1, ...data.topTags.map((t) => t.count))
   return (
     <div className="flex flex-col gap-1.5">
       {data.topTags.slice(0, 8).map((t) => (
-        <div key={t.tag} className="flex items-center gap-2 text-xs">
-          <span className="w-20 shrink-0 truncate" style={{ color: ink }}>#{t.tag}</span>
+        <button
+          key={t.tag}
+          onClick={() => onPick(`#${t.tag} — ${t.count} posts`, (p) => p.tags.includes(t.tag))}
+          className="flex items-center gap-2 text-xs w-full"
+        >
+          <span className="w-20 shrink-0 truncate text-left" style={{ color: ink }}>#{t.tag}</span>
           <div
             className="flex-1 h-3.5 rounded-full overflow-hidden cursor-pointer"
             style={{ background: 'rgba(255,255,255,0.06)' }}
@@ -177,19 +189,22 @@ function TagBars({ data }: { data: DashboardData }) {
             />
           </div>
           <span className="w-6 text-right tabular-nums" style={{ color: mut }}>{t.count}</span>
-        </div>
+        </button>
       ))}
     </div>
   )
 }
 
-/** Engagement-rate distribution histogram. */
-function Distribution({ data }: { data: DashboardData }) {
+function Distribution({ data, onPick }: { data: DashboardData; onPick: Pick }) {
   const max = Math.max(1, ...data.distribution.map((b) => b.count))
   return (
     <div className="flex items-end gap-1.5 h-28">
       {data.distribution.map((b) => (
-        <div key={b.label} className="flex-1 h-full flex flex-col items-center justify-end gap-1">
+        <button
+          key={b.label}
+          onClick={() => onPick(`${b.label} engagement — ${b.count} posts`, (p) => p.distBand === b.label)}
+          className="flex-1 h-full flex flex-col items-center justify-end gap-1"
+        >
           <span className="text-[0.58rem] tabular-nums" style={{ color: mut }}>{b.count}</span>
           <div
             className="w-full rounded-t cursor-pointer"
@@ -197,13 +212,12 @@ function Distribution({ data }: { data: DashboardData }) {
             data-tip={`${b.count} posts at ${b.label} engagement rate`}
           />
           <span className="text-[0.55rem]" style={{ color: mut }}>{b.label}</span>
-        </div>
+        </button>
       ))}
     </div>
   )
 }
 
-/** Follower growth line (fills in as daily snapshots accumulate). */
 function Growth({ data }: { data: DashboardData }) {
   if (data.growth.length < 2) {
     return (
@@ -240,13 +254,74 @@ function Growth({ data }: { data: DashboardData }) {
   )
 }
 
+/** Drill-down modal: the actual posts behind a clicked mark. */
+function PostsModal({
+  label,
+  posts,
+  onClose,
+}: {
+  label: string
+  posts: PostLite[]
+  onClose: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+      style={{ background: 'rgba(4,3,12,0.72)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full sm:max-w-lg max-h-[80vh] rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col"
+        style={{ background: 'rgba(14,11,30,0.98)', border: '1px solid rgba(178,148,255,0.28)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-3 p-4 border-b border-white/10">
+          <div>
+            <div className={labelClass}>{posts.length} posts</div>
+            <div className="text-sm font-medium" style={{ color: ink }}>{label}</div>
+          </div>
+          <button onClick={onClose} className="text-white/50 hover:text-white text-xl leading-none px-2" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <div className="overflow-y-auto p-3 flex flex-col gap-2">
+          {posts.map((p) => (
+            <Link
+              key={p.id}
+              href={`/videos/${p.id}`}
+              className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
+            >
+              {p.thumbnail ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.thumbnail} alt="" className="w-11 h-14 object-cover rounded-lg shrink-0" />
+              ) : (
+                <div className="w-11 h-14 rounded-lg shrink-0 bg-gradient-to-br from-violet-600/40 to-pink-500/30" />
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="text-sm truncate" style={{ color: ink }}>{p.title}</div>
+                <div className="text-[0.68rem]" style={{ color: mut }}>
+                  {p.category} · {p.likes.toLocaleString()} likes · {p.comments} comments · {p.er.toFixed(1)}%
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function InsightsDashboard({ data }: { data: DashboardData }) {
   const [metric, setMetric] = useState<Metric>('posts')
   const wrapRef = useRef<HTMLDivElement>(null)
   const [tip, setTip] = useState<{ x: number; y: number; w: number; text: string } | null>(null)
+  const [drill, setDrill] = useState<{ label: string; posts: PostLite[] } | null>(null)
 
-  // One delegated handler: any element carrying data-tip shows a cursor-following
-  // tooltip, so every chart mark gets the same behaviour without prop threading.
+  const pick: Pick = (label, predicate) => {
+    const subset = data.posts.filter(predicate).sort((a, b) => b.er - a.er)
+    if (subset.length) setDrill({ label, posts: subset })
+  }
+
   function onMove(e: React.MouseEvent) {
     const el = (e.target as Element).closest?.('[data-tip]')
     const wrap = wrapRef.current
@@ -265,6 +340,7 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
       label: d.label,
       value,
       note: `${d.label}: ${d.posts} posts · ${d.likes.toLocaleString()} likes · ${d.medER.toFixed(1)}% median ER`,
+      onClick: () => pick(`${d.label} — ${d.posts} posts`, (p) => p.weekday === d.label),
     }
   })
   const categoryRows = data.categories.map((c) => {
@@ -275,6 +351,7 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
       value,
       hue: c.hue,
       note: `${c.category}: ${c.posts} posts · ${c.avgLikes} avg likes · ${c.medER.toFixed(1)}% median ER`,
+      onClick: () => pick(`${c.category} — ${c.posts} posts`, (p) => p.category === c.category),
     }
   })
 
@@ -303,8 +380,9 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
           {tip.text}
         </div>
       )}
+
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h3 className={labelClass}>Insights dashboard</h3>
+        <h3 className={labelClass}>Insights dashboard · <span className="text-white/30 normal-case tracking-normal">click any bar to see the posts</span></h3>
         <div className="flex gap-1 p-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
           {METRICS.map((m) => (
             <button
@@ -331,31 +409,31 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
           <MetricBars rows={categoryRows} metric={metric} />
         </Card>
         <Card title="Category mix" sub={`${data.totalPosts} posts`}>
-          <Donut data={data} />
+          <Donut data={data} onPick={pick} />
         </Card>
         <Card title="Posting cadence" sub="last 12 months">
-          <MonthLine data={data} />
+          <MonthLine data={data} onPick={pick} />
         </Card>
         <Card title="Top tags" sub="by frequency">
-          <TagBars data={data} />
+          <TagBars data={data} onPick={pick} />
         </Card>
         <Card title="Engagement spread" sub="posts per rate band">
-          <Distribution data={data} />
+          <Distribution data={data} onPick={pick} />
         </Card>
         <Card title="Follower growth" sub="daily">
           <Growth data={data} />
         </Card>
         <Card title="Format mix" sub={`${data.reels + data.photoPosts} items`}>
           <div className="flex items-center gap-4 h-40 justify-center">
-            <div className="flex flex-col items-center gap-1">
+            <button onClick={() => pick(`Reels — ${data.reels}`, (p) => p.mediaType === 'reel')} className="flex flex-col items-center gap-1">
               <span className="font-display text-3xl text-white tabular-nums">{data.reels}</span>
               <span className={labelClass}>Reels</span>
-            </div>
+            </button>
             <div className="w-px h-14 bg-white/10" />
-            <div className="flex flex-col items-center gap-1">
+            <button onClick={() => pick(`Photo posts — ${data.photoPosts}`, (p) => p.mediaType === 'post')} className="flex flex-col items-center gap-1">
               <span className="font-display text-3xl text-white tabular-nums">{data.photoPosts}</span>
               <span className={labelClass}>Photo posts</span>
-            </div>
+            </button>
             <div className="w-px h-14 bg-white/10" />
             <div className="flex flex-col items-center gap-1">
               <span className="font-display text-3xl text-white tabular-nums">{data.medianER.toFixed(1)}%</span>
@@ -371,6 +449,8 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
           enriches per-post insights. Audience active-hours need your one screenshot.
         </p>
       )}
+
+      {drill && <PostsModal label={drill.label} posts={drill.posts} onClose={() => setDrill(null)} />}
     </div>
   )
 }

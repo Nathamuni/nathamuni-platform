@@ -34,8 +34,26 @@ export interface WeekdayDatum {
 
 export interface MonthDatum {
   label: string
+  monthKey: string
   posts: number
   medER: number
+}
+
+/** Lightweight per-post record for drill-down (click a mark → see these posts). */
+export interface PostLite {
+  id: string
+  title: string
+  category: string
+  weekday: string
+  monthKey: string
+  tags: string[]
+  likes: number
+  comments: number
+  er: number
+  mediaType: 'reel' | 'post'
+  distBand: string
+  instagramUrl: string
+  thumbnail: string | null
 }
 
 export interface TagDatum {
@@ -69,8 +87,17 @@ export interface DashboardData {
   topTags: TagDatum[]
   distribution: DistBucket[]
   growth: GrowthPoint[]
+  /** Every post as a lightweight record, for click-to-drill-down. */
+  posts: PostLite[]
   /** True once per-post reach/saves have been synced (unlocks richer charts). */
   hasReach: boolean
+}
+
+const DIST_EDGES = [0, 1, 2, 3, 5, 10, Infinity]
+const DIST_LABELS = ['<1%', '1–2%', '2–3%', '3–5%', '5–10%', '10%+']
+const distBandFor = (e: number): string => {
+  for (let i = 0; i < DIST_LABELS.length; i++) if (e >= DIST_EDGES[i] && e < DIST_EDGES[i + 1]) return DIST_LABELS[i]
+  return DIST_LABELS[DIST_LABELS.length - 1]
 }
 
 const median = (a: number[]): number => {
@@ -144,6 +171,7 @@ export function buildDashboard(
     const vs = mBuckets.get(k) ?? []
     months.push({
       label: d.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }),
+      monthKey: k,
       posts: vs.length,
       medER: median(vs.map(er)),
     })
@@ -162,15 +190,33 @@ export function buildDashboard(
     .slice(0, 10)
 
   // Engagement-rate distribution
-  const edges = [0, 1, 2, 3, 5, 10, Infinity]
-  const labels = ['<1%', '1–2%', '2–3%', '3–5%', '5–10%', '10%+']
-  const distribution: DistBucket[] = labels.map((label, i) => ({
+  const distribution: DistBucket[] = DIST_LABELS.map((label, i) => ({
     label,
     count: videos.filter((v) => {
       const e = er(v)
-      return e >= edges[i] && e < edges[i + 1]
+      return e >= DIST_EDGES[i] && e < DIST_EDGES[i + 1]
     }).length,
   }))
+
+  // Per-post drill-down records.
+  const posts: PostLite[] = videos.map((v) => {
+    const e = er(v)
+    return {
+      id: v.id,
+      title: v.title,
+      category: v.category,
+      weekday: WD[new Date(`${v.publishedDate}T00:00:00Z`).getUTCDay()],
+      monthKey: v.publishedDate.slice(0, 7),
+      tags: v.tags,
+      likes: v.likeCount ?? 0,
+      comments: v.commentsCount ?? 0,
+      er: e,
+      mediaType: v.mediaType === 'post' ? 'post' : 'reel',
+      distBand: distBandFor(e),
+      instagramUrl: v.instagramUrl,
+      thumbnail: v.thumbnail,
+    }
+  })
 
   const growth: GrowthPoint[] = (Array.isArray(history) ? history : [])
     .filter((h) => typeof h.followers === 'number')
@@ -190,6 +236,7 @@ export function buildDashboard(
     topTags,
     distribution,
     growth,
+    posts,
     hasReach: videos.some((v) => typeof v.reach === 'number'),
   }
 }
