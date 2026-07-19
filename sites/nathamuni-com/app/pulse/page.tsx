@@ -31,6 +31,7 @@ export default function PulsePage() {
   // Active-hours strip (0-23). Present only once the insights fetch supplies it.
   const hours = stats.onlineFollowersByHour
   const maxHour = hours ? Math.max(1, ...Object.values(hours)) : 1
+  const maxPosts = Math.max(1, ...stats.weekdayActivity.map((d) => d.posts))
 
   return (
     <section className="section">
@@ -68,42 +69,78 @@ export default function PulsePage() {
 
       <PulseGraph data={{ nodes, edges, stats }} />
 
-      {/* Active-hours strip — the real driver of posting-time advice. */}
-      <div className="mt-8" data-reveal>
-        <div className="flex items-baseline justify-between mb-3">
-          <h3 className={labelClass}>When followers are online</h3>
-          <span className="text-[0.6rem] text-white/35">
-            {hours ? 'live from Instagram insights' : 'unlocks when insights sync runs'}
-          </span>
+      {/* Timing panel. Prefer real audience active-hours; until Instagram supplies
+          them, show the real posting rhythm by weekday — never a dead placeholder. */}
+      {hours ? (
+        <div className="mt-8" data-reveal>
+          <div className="flex items-baseline justify-between mb-3">
+            <h3 className={labelClass}>When followers are online</h3>
+            <span className="text-[0.6rem] text-white/35">live from Instagram insights</span>
+          </div>
+          <div className="flex items-end gap-[3px] h-16">
+            {Array.from({ length: 24 }, (_, h) => {
+              const v = hours[String(h)] ?? 0
+              const pct = Math.max(4, (v / maxHour) * 100)
+              const peak = v === maxHour
+              return (
+                <div
+                  key={h}
+                  title={`${h}:00 — ${v} online`}
+                  className="flex-1 rounded-t"
+                  style={{
+                    height: `${pct}%`,
+                    background: peak ? 'rgba(74,222,128,0.9)' : 'rgba(178,148,255,0.5)',
+                  }}
+                />
+              )
+            })}
+          </div>
+          <div className="flex justify-between text-[0.55rem] text-white/30 mt-1">
+            <span>00:00</span>
+            <span>12:00</span>
+            <span>23:00</span>
+          </div>
         </div>
-        <div className="flex items-end gap-[3px] h-16">
-          {Array.from({ length: 24 }, (_, h) => {
-            const v = hours ? hours[String(h)] ?? 0 : 0
-            const pct = hours ? Math.max(4, (v / maxHour) * 100) : 8
-            const peak = hours && v === maxHour
-            return (
-              <div
-                key={h}
-                title={hours ? `${h}:00 — ${v} online` : `${h}:00`}
-                className="flex-1 rounded-t"
-                style={{
-                  height: `${pct}%`,
-                  background: hours
-                    ? peak
-                      ? 'rgba(74,222,128,0.9)'
-                      : 'rgba(178,148,255,0.5)'
-                    : 'rgba(255,255,255,0.06)',
-                }}
-              />
-            )
-          })}
+      ) : (
+        <div className="mt-8" data-reveal>
+          <div className="flex items-baseline justify-between mb-3">
+            <h3 className={labelClass}>Your posting rhythm</h3>
+            <span className="text-[0.6rem] text-white/35">
+              real, by weekday — audience active-hours unlock here once added
+            </span>
+          </div>
+          <div className="grid grid-cols-7 gap-2 sm:gap-3 items-end h-28">
+            {stats.weekdayActivity.map((d) => {
+              const pct = Math.max(6, (d.posts / maxPosts) * 100)
+              const heat = Math.min(1, d.medER / 4) // tint toward green for stronger engagement
+              return (
+                <div key={d.label} className="flex flex-col items-center gap-1.5 h-full justify-end">
+                  <span className="text-[0.6rem] text-white/45" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {d.posts}
+                  </span>
+                  <div
+                    title={`${d.label}: ${d.posts} posts · ${d.medER.toFixed(1)}% median engagement`}
+                    className="w-full rounded-t-lg"
+                    style={{
+                      height: `${pct}%`,
+                      background: `linear-gradient(180deg, hsl(${150 * heat + 262 * (1 - heat)} 80% 68%), hsl(${150 * heat + 262 * (1 - heat)} 80% 50%))`,
+                    }}
+                  />
+                  <span className={labelClass}>{d.label}</span>
+                </div>
+              )
+            })}
+          </div>
+          <p className="text-xs text-white/40 leading-relaxed mt-4">
+            Bar height = posts published that weekday; greener = higher median engagement. Reach over
+            the last 30 days: <span className="text-white/70">{stats.reachLast30Days?.toLocaleString() ?? '—'}</span>
+            {stats.profileViews != null && (
+              <> · profile views: <span className="text-white/70">{stats.profileViews.toLocaleString()}</span></>
+            )}
+            . For true best-time-to-post, add your Instagram active-hours screenshot and it replaces this panel.
+          </p>
         </div>
-        <div className="flex justify-between text-[0.55rem] text-white/30 mt-1">
-          <span>00:00</span>
-          <span>12:00</span>
-          <span>23:00</span>
-        </div>
-      </div>
+      )}
 
       <p className="text-xs text-white/35 border-t border-white/10 pt-4 mt-8">
         Node size = real likes + comments. Connections = shared categories and tags. Follower and
