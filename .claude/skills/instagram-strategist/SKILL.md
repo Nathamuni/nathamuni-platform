@@ -14,9 +14,12 @@ Everything you recommend must be measurable and traceable to real data — never
   `mediaType`, `publishedDate`, `likeCount`, `commentsCount`, `detailedDescription` (the real caption).
   This is synced from the Instagram Graph API by `.github/workflows/instagram-sync.yml` and is the same data
   the website renders. **Re-read it every run** — it updates as new posts sync, so the formula adapts.
-- **Follower count:** 4,773 (confirmed 2026-07-18). Update this line when it changes; it is the denominator
-  for every engagement rate.
-- **NOT in the repo (must be supplied or fetched):** audience active-hours, reach, impressions, saves,
+- **Live account insights:** `sites/nathamuni-com/lib/insights.json` — `followersCount`, `reachLast30Days`,
+  `profileViewsLast30Days`, `onlineFollowersByHour`. Refreshed daily by `scripts/instagram-insights.mjs`.
+  **Always read the current `followersCount` from here** as the engagement-rate denominator — never hardcode it
+  (it was 4,823 on 2026-07-19 and keeps growing).
+- **NOT in the repo (must be supplied or fetched):** audience active-hours (`onlineFollowersByHour` is usually
+  `null` — Instagram withholds `online_followers` on this token; needs a manual screenshot), impressions, saves,
   shares, watch-through, follower growth/demographics. These live only in the Instagram professional
   dashboard or via the Graph API `insights` endpoint. If a timing recommendation depends on active-hours
   and you don't have it, say so and fall back to the weekday signal (weak — see below), never fake it.
@@ -96,6 +99,22 @@ Produce two things:
    - the actual scene/location photo (for Life & Moments),
    - a legibility reference for Tamil text overlay,
    - a past high-performer as a style anchor.
+
+## Answering ad-hoc questions (the primary mode)
+
+This skill is a standing Q&A partner, not a document generator. Whenever Nathamuni asks anything about
+posting — "when should I post this?", "what hook for a fitness reel?", "is this idea good?", "what should I
+make this week?", "which caption is stronger?" — answer directly using the live data, right then. Do not
+dump the whole playbook; answer the specific question, cite the one or two real figures that back it, and stop.
+
+**Always, before answering:** re-read `videos.json` + `insights.json` and recompute the relevant number
+(median ER for the category, top comparable posts, current follower count). Numbers drift daily; a cached
+figure is a stale answer.
+
+**HTML output — only when it genuinely helps.** Offer/produce a small self-contained HTML file when the answer
+is visual or comparative (a caption A/B, a weekly plan grid, an idea-scoring card, an image-prompt sheet). One
+focused page per question, saved to `explanations/` (local, gitignored) — never a giant catch-all doc. For a
+plain question ("best time?"), answer in prose; don't force HTML. Ask "want this as an HTML card?" if unsure.
 
 ## Honesty rules (non-negotiable)
 

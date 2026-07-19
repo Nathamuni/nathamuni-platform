@@ -31,9 +31,17 @@ export interface PulseEdge {
   strength: number
 }
 
+export interface WeekdayActivity {
+  label: string
+  posts: number
+  /** Median engagement rate (%) for posts published on this weekday. */
+  medER: number
+}
+
 export interface PulseStats {
   followers: number | null
   posts: number
+  profileViews: number | null
   categories: number
   /** Median engagement rate across all posts, %. */
   medianER: number
@@ -42,6 +50,8 @@ export interface PulseStats {
   reachLast30Days: number | null
   /** Hourly followers-online map (0-23 -> count), or null if not yet fetched. */
   onlineFollowersByHour: Record<string, number> | null
+  /** Posting rhythm by weekday (real, from publish dates) — shown when active-hours are absent. */
+  weekdayActivity: WeekdayActivity[]
   /** True once real account insights (beyond seed) are present. */
   live: boolean
   updatedAt: string
@@ -72,6 +82,7 @@ function normalize(value: number, min: number, max: number): number {
 interface RawInsights {
   followersCount?: number | null
   reachLast30Days?: number | null
+  profileViewsLast30Days?: number | null
   onlineFollowersByHour?: Record<string, number> | null
   fetchedAt?: string
   [key: string]: unknown
@@ -167,14 +178,30 @@ export function buildPulseGraph(
 
   const onlineHours = insights.onlineFollowersByHour ?? null
 
+  // Posting rhythm by weekday (Mon-first), from real publish dates.
+  const wdOrder = [1, 2, 3, 4, 5, 6, 0]
+  const wdNames: Record<number, string> = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat' }
+  const wdBuckets = new Map<number, number[]>(wdOrder.map((d) => [d, []]))
+  for (const v of videos) {
+    const d = new Date(`${v.publishedDate}T00:00:00Z`).getUTCDay()
+    wdBuckets.get(d)?.push(er(v))
+  }
+  const weekdayActivity: WeekdayActivity[] = wdOrder.map((d) => ({
+    label: wdNames[d],
+    posts: wdBuckets.get(d)!.length,
+    medER: median(wdBuckets.get(d)!),
+  }))
+
   const stats: PulseStats = {
     followers,
     posts: videos.length,
+    profileViews: (insights as RawInsights).profileViewsLast30Days ?? null,
     categories: catMap.size,
     medianER: median(allER),
     topCategory,
     reachLast30Days: insights.reachLast30Days ?? null,
     onlineFollowersByHour: onlineHours,
+    weekdayActivity,
     live: Boolean(insights.reachLast30Days || onlineHours),
     updatedAt: insights.fetchedAt ?? '',
   }
