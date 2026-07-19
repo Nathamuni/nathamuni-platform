@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { DashboardData, Metric } from '@/lib/insights-dashboard'
 
 /**
@@ -62,9 +62,9 @@ function Donut({ data }: { data: DashboardData }) {
             strokeWidth="16"
             strokeDasharray={`${frac * C} ${C - frac * C}`}
             strokeDashoffset={-offset * C}
-          >
-            <title>{`${c.category}: ${c.posts} posts (${c.share.toFixed(0)}%)`}</title>
-          </circle>
+            className="cursor-pointer"
+            data-tip={`${c.category}: ${c.posts} posts (${c.share.toFixed(0)}%) · ${c.medER.toFixed(1)}% median engagement`}
+          />
         ))}
         <circle cx="65" cy="65" r="34" fill="rgba(10,8,24,0.85)" />
       </svg>
@@ -99,16 +99,15 @@ function MetricBars({
           <div key={r.label} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5">
             <span className="text-[0.6rem] tabular-nums" style={{ color: mut }}>{fmt(r.value)}</span>
             <div
-              className="w-full rounded-t-md transition-all"
+              data-tip={r.note}
+              className="w-full rounded-t-md transition-all cursor-pointer"
               style={{
                 height: `${pct}%`,
                 background: r.hue != null
                   ? `linear-gradient(180deg, ${catColor(r.hue, 66)}, ${catColor(r.hue, 46)})`
                   : 'linear-gradient(180deg, hsl(276 80% 68%), hsl(276 80% 46%))',
               }}
-            >
-              <title>{r.note}</title>
-            </div>
+            />
             <span className="text-[0.58rem] text-center leading-tight" style={{ color: mut }}>{r.label}</span>
           </div>
         )
@@ -139,9 +138,16 @@ function MonthLine({ data }: { data: DashboardData }) {
       <polyline points={pts} fill="none" stroke="hsl(286 85% 72%)" strokeWidth="2" strokeLinejoin="round" />
       {data.months.map((m, i) => (
         <g key={i}>
-          <circle cx={x(i)} cy={y(m.posts)} r="2.6" fill="hsl(286 90% 80%)">
-            <title>{`${m.label}: ${m.posts} posts · ${m.medER.toFixed(1)}% median engagement`}</title>
-          </circle>
+          <circle
+            cx={x(i)}
+            cy={y(m.posts)}
+            r="6"
+            fill="hsl(286 90% 80%)"
+            fillOpacity="0.001"
+            className="cursor-pointer"
+            data-tip={`${m.label}: ${m.posts} posts · ${m.medER.toFixed(1)}% median engagement`}
+          />
+          <circle cx={x(i)} cy={y(m.posts)} r="2.6" fill="hsl(286 90% 80%)" style={{ pointerEvents: 'none' }} />
           <text x={x(i)} y={H - 5} textAnchor="middle" fontSize="7.5" fill={mut}>{m.label}</text>
         </g>
       ))}
@@ -157,14 +163,17 @@ function TagBars({ data }: { data: DashboardData }) {
       {data.topTags.slice(0, 8).map((t) => (
         <div key={t.tag} className="flex items-center gap-2 text-xs">
           <span className="w-20 shrink-0 truncate" style={{ color: ink }}>#{t.tag}</span>
-          <div className="flex-1 h-3.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <div
+            className="flex-1 h-3.5 rounded-full overflow-hidden cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.06)' }}
+            data-tip={`#${t.tag}: ${t.count} posts · ${t.medER.toFixed(1)}% median engagement`}
+          >
             <div
               className="h-full rounded-full"
               style={{
                 width: `${(t.count / max) * 100}%`,
                 background: `linear-gradient(90deg, hsl(210 80% 60%), hsl(280 80% 66%))`,
               }}
-              title={`#${t.tag}: ${t.count} posts · ${t.medER.toFixed(1)}% median engagement`}
             />
           </div>
           <span className="w-6 text-right tabular-nums" style={{ color: mut }}>{t.count}</span>
@@ -183,9 +192,9 @@ function Distribution({ data }: { data: DashboardData }) {
         <div key={b.label} className="flex-1 h-full flex flex-col items-center justify-end gap-1">
           <span className="text-[0.58rem] tabular-nums" style={{ color: mut }}>{b.count}</span>
           <div
-            className="w-full rounded-t"
+            className="w-full rounded-t cursor-pointer"
             style={{ height: `${Math.max(3, (b.count / max) * 100)}%`, background: 'linear-gradient(180deg, hsl(200 80% 60%), hsl(250 80% 52%))' }}
-            title={`${b.count} posts at ${b.label} engagement`}
+            data-tip={`${b.count} posts at ${b.label} engagement rate`}
           />
           <span className="text-[0.55rem]" style={{ color: mut }}>{b.label}</span>
         </div>
@@ -217,9 +226,15 @@ function Growth({ data }: { data: DashboardData }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 120 }}>
       <polyline points={pts} fill="none" stroke="hsl(150 75% 55%)" strokeWidth="2" strokeLinejoin="round" />
       {data.growth.map((g, i) => (
-        <circle key={i} cx={x(i)} cy={y(g.followers)} r="2.6" fill="hsl(150 80% 68%)">
-          <title>{`${g.date}: ${g.followers.toLocaleString()} followers`}</title>
-        </circle>
+        <circle
+          key={i}
+          cx={x(i)}
+          cy={y(g.followers)}
+          r="6"
+          fill="hsl(150 80% 68%)"
+          className="cursor-pointer"
+          data-tip={`${g.date}: ${g.followers.toLocaleString()} followers${g.reach30 ? ` · ${g.reach30.toLocaleString()} reach` : ''}`}
+        />
       ))}
     </svg>
   )
@@ -227,6 +242,21 @@ function Growth({ data }: { data: DashboardData }) {
 
 export function InsightsDashboard({ data }: { data: DashboardData }) {
   const [metric, setMetric] = useState<Metric>('posts')
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [tip, setTip] = useState<{ x: number; y: number; w: number; text: string } | null>(null)
+
+  // One delegated handler: any element carrying data-tip shows a cursor-following
+  // tooltip, so every chart mark gets the same behaviour without prop threading.
+  function onMove(e: React.MouseEvent) {
+    const el = (e.target as Element).closest?.('[data-tip]')
+    const wrap = wrapRef.current
+    if (!el || !wrap) {
+      setTip(null)
+      return
+    }
+    const rect = wrap.getBoundingClientRect()
+    setTip({ x: e.clientX - rect.left, y: e.clientY - rect.top, w: rect.width, text: el.getAttribute('data-tip') || '' })
+  }
 
   const weekdayRows = data.weekday.map((d) => {
     const value =
@@ -249,7 +279,30 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
   })
 
   return (
-    <div className="mt-8" data-reveal>
+    <div
+      className="mt-8 relative"
+      data-reveal
+      ref={wrapRef}
+      onMouseMove={onMove}
+      onMouseLeave={() => setTip(null)}
+    >
+      {tip && (
+        <div
+          className="pointer-events-none absolute z-20 px-3 py-1.5 rounded-lg text-[0.72rem] leading-snug max-w-[240px]"
+          style={{
+            left: tip.x + 14,
+            top: tip.y + 14,
+            transform: tip.x > tip.w - 200 ? 'translateX(calc(-100% - 28px))' : undefined,
+            background: 'rgba(13,10,31,0.96)',
+            border: '1px solid rgba(178,148,255,0.4)',
+            color: 'rgba(236,233,255,0.92)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 6px 24px rgba(0,0,0,0.45)',
+          }}
+        >
+          {tip.text}
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <h3 className={labelClass}>Insights dashboard</h3>
         <div className="flex gap-1 p-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
