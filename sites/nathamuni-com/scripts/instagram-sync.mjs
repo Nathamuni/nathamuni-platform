@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from '
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildVideoMetadata, getYoutubeAccessToken, uploadToYoutube } from './youtube-upload.mjs'
+import { igGet } from './ig-fetch.mjs'
 
 const SITE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const VIDEOS_JSON = join(SITE_ROOT, 'lib', 'videos.json')
@@ -148,25 +149,38 @@ async function fetchAllMedia() {
   let fields = `${BASE_FIELDS},${ENGAGEMENT_FIELDS}`
   let engagementSupported = true
 
-  let res = await fetch(mediaUrl(fields))
-  let data = await res.json()
-  if (data.error) {
-    console.warn(`Engagement fields rejected (${data.error.message}) — retrying without like/comment counts.`)
+  // igGet retries transient/throttle errors with backoff; it only throws when a
+  // failure is genuinely non-retryable (e.g. a bad field) or retries are spent.
+  let data
+  try {
+    data = await igGet(mediaUrl(fields))
+  } catch (err) {
+    // A non-retryable error here usually means the engagement fields aren't
+    // allowed — drop them and try the base fields (which the site can't do
+    // without). If THAT fails after its own retries, it's fatal.
+    console.warn(`Engagement fields rejected (${err.message}) — retrying without like/comment counts.`)
     engagementSupported = false
     fields = BASE_FIELDS
-    res = await fetch(mediaUrl(fields))
-    data = await res.json()
+    try {
+      data = await igGet(mediaUrl(fields))
+    } catch (err2) {
+      fatal(err2)
+    }
   }
-  if (data.error) fatal(data.error)
 
   const items = [...data.data]
   let next = data.paging?.next ?? null
   while (next) {
-    const pageRes = await fetch(next)
-    const page = await pageRes.json()
-    if (page.error) fatal(page.error)
-    items.push(...page.data)
-    next = page.paging?.next ?? null
+    try {
+      const page = await igGet(next)
+      items.push(...page.data)
+      next = page.paging?.next ?? null
+    } catch (err) {
+      // Pagination failed after retries: keep what we have rather than aborting
+      // the whole sync — the next daily run picks up any missed pages.
+      console.warn(`Pagination stopped early (${err.message}) — proceeding with ${items.length} items.`)
+      next = null
+    }
   }
   return { items, engagementSupported }
 }

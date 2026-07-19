@@ -19,6 +19,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { igGet, currentUsagePct, sleep, USAGE_SOFT_LIMIT } from './ig-fetch.mjs'
 
 const SITE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const INSIGHTS_JSON = join(SITE_ROOT, 'lib', 'insights.json')
@@ -36,15 +37,10 @@ if (!TOKEN) {
   process.exit(1)
 }
 
-/** GET a Graph API path, returning parsed JSON or throwing with the API error. */
+/** GET a Graph API path (rate-limit-aware, with backoff/retry via igGet). */
 async function api(path) {
   const url = `${API}/${path}${path.includes('?') ? '&' : '?'}access_token=${TOKEN}`
-  const res = await fetch(url)
-  const json = await res.json()
-  if (!res.ok || json.error) {
-    throw new Error(`${path.split('?')[0]} -> ${json.error?.message || res.status}`)
-  }
-  return json
+  return igGet(url)
 }
 
 /** Best-effort single metric fetch; returns fallback (null) instead of throwing. */
@@ -95,8 +91,17 @@ async function enrichMediaInsights() {
 
   let enriched = 0
   for (const m of recent) {
+    // Threshold validation: stop enriching (optional work) once we're near the
+    // BUC ceiling, so the daily job never trips a hard throttle. Remaining posts
+    // roll into tomorrow's window. The essential account metrics already ran.
+    if (currentUsagePct() >= USAGE_SOFT_LIMIT) {
+      console.log(`  media enrichment: paused at ${currentUsagePct()}% usage (soft limit) — ${enriched} done, rest deferred to next run`)
+      break
+    }
     const v = byCode.get(shortcode(m.permalink))
     if (!v) continue
+    // Gentle pacing so a burst of insight calls doesn't spike usage.
+    if (enriched > 0) await sleep(350)
     const isReel = m.media_type === 'VIDEO'
     // Request the widest safe metric set; retry with fewer if the account/media
     // type rejects one (metric availability varies by media type + API version).
