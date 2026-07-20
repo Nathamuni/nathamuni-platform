@@ -12,6 +12,7 @@ import { SaveNudgeHost } from '@/components/account/SaveNudge'
 import { SOCIAL_LINKS } from '@/lib/social'
 import { SITE_URL } from '@/lib/site'
 import { PROFILE } from '@/lib/profile'
+import { BOOK } from '@/lib/book'
 import './globals.css'
 
 const outfit = Outfit({
@@ -55,15 +56,50 @@ export const viewport: Viewport = {
   themeColor: '#07070c',
 }
 
+// Rich Person entity. The extra attributes (full name, education, location,
+// expertise, authored book) exist to disambiguate this living creator from the
+// historical Sri Vaishnava saint "Nathamuni" — the decisive factor for Google
+// treating him as his own entity in branded search. @id makes the node
+// referenceable so other pages' schema can point at the same person.
 const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': `${SITE_URL}/#person`,
   name: PROFILE.name,
+  alternateName: PROFILE.alternateNames,
   url: SITE_URL,
+  mainEntityOfPage: SITE_URL,
   image: `${SITE_URL}/images/generated/about-portrait.jpg`,
   jobTitle: PROFILE.jobTitle,
   description: PROFILE.metaDescription,
-  sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube],
+  nationality: PROFILE.nationality,
+  birthPlace: { '@type': 'Place', name: PROFILE.birthPlace },
+  homeLocation: { '@type': 'Place', name: PROFILE.homeLocation },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: PROFILE.alumniOf },
+  knowsAbout: PROFILE.knowsAbout,
+  author: {
+    '@type': 'Book',
+    name: BOOK.title,
+    author: { '@id': `${SITE_URL}/#person` },
+  },
+  sameAs: [SOCIAL_LINKS.instagram, SOCIAL_LINKS.youtube, PROFILE.githubUrl],
+}
+
+// A distinct WebSite node enables the sitelinks search box and names the site
+// entity, so a branded query can surface the site's own search.
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  url: SITE_URL,
+  name: PROFILE.name,
+  description: PROFILE.metaDescription,
+  publisher: { '@id': `${SITE_URL}/#person` },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/videos?q={search_term_string}` },
+    'query-input': 'required name=search_term_string',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -73,6 +109,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <AuthProvider>
           <Nav />

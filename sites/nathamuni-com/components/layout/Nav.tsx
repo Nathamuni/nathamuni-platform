@@ -47,14 +47,17 @@ const TAB_ICONS: Record<string, React.ReactNode> = {
   home: <TabSvg d="M3 10.5 12 3l9 7.5" extra={<path d="M5 9.5V21h5v-6h4v6h5V9.5" />} />,
   videos: <TabSvg d="M2.5 6.5A2.5 2.5 0 0 1 5 4h14a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 19 20H5a2.5 2.5 0 0 1-2.5-2.5Z" extra={<path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none" />} />,
   moments: <TabSvg d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" extra={<circle cx="12" cy="12" r="3.2" />} />,
+  // Neural-network glyph for Pulse: connected nodes.
+  pulse: <TabSvg d="M6 5.5 12 9m0 0 6-3.5M12 9v6m0 0-5 3m5-3 5 3" extra={<><circle cx="6" cy="5.5" r="2" /><circle cx="18" cy="5.5" r="2" /><circle cx="12" cy="9" r="2" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></>} />,
   about: <TabSvg d="M20 21a8 8 0 0 0-16 0" extra={<circle cx="12" cy="8" r="4.2" />} />,
 }
 
-/** The app-style bottom tab bar on mobile shows the four primary sections. */
+/** The app-style bottom tab bar on mobile shows the primary sections. */
 const TAB_LINKS = [
   { href: '/', label: 'Home', icon: TAB_ICONS.home },
   { href: '/videos', label: 'Videos', icon: TAB_ICONS.videos },
   { href: '/moments', label: 'Moments', icon: TAB_ICONS.moments },
+  { href: '/pulse', label: 'Pulse', icon: TAB_ICONS.pulse },
   { href: '/about', label: 'About', icon: TAB_ICONS.about },
 ]
 

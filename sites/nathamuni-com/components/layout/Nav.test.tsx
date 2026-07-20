@@ -37,10 +37,12 @@ describe('Nav', () => {
     expect(homeLinks.every((l) => !l.hasAttribute('aria-current'))).toBe(true)
   })
 
-  it('renders the mobile tab bar with the four primary sections', () => {
+  it('renders the mobile tab bar with the five primary sections', () => {
     render(<Nav />)
     const tabBar = screen.getByTestId('tab-bar')
     expect(tabBar).toBeInTheDocument()
-    expect(tabBar.querySelectorAll('a')).toHaveLength(4)
+    const links = tabBar.querySelectorAll('a')
+    expect(links).toHaveLength(5)
+    expect([...links].map((a) => a.getAttribute('href'))).toContain('/pulse')
   })
 })
