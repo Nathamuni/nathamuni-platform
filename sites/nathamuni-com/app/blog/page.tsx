@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllPosts, getReadingMinutes } from '@/lib/blog'
 import { getCategoryMeta } from '@/lib/categoryMeta'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -20,12 +21,19 @@ function formatDate(iso: string): string {
 
 export default function BlogPage() {
   const posts = getAllPosts()
+  const totalMinutes = posts.reduce((sum, p) => sum + getReadingMinutes(p), 0)
   return (
     <section className="section">
-      <h1 className="section-title">Blog</h1>
-      <p className="section-sub">
-        The long-form versions — every idea tested on myself before it&apos;s written down.
-      </p>
+      <PageHeader
+        eyebrow="Long form"
+        title="The ideas, written out."
+        lede="Where a reel runs sixty seconds, these run as long as the idea needs — every one tested on myself before it was written down."
+        accentHue={262}
+        stats={[
+          { value: posts.length, label: 'Essays' },
+          { value: totalMinutes, label: 'Min to read' },
+        ]}
+      />
       <div className="post-list">
         {posts.map((post) => {
           const meta = getCategoryMeta(post.category)

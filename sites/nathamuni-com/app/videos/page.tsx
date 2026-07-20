@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { getAllVideos } from '@/lib/videos'
+import { getAllVideos, getAllCategories } from '@/lib/videos'
 import { VideoExplorer } from '@/components/video/VideoExplorer'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Video Library',
@@ -11,10 +12,22 @@ export const metadata: Metadata = {
 
 export default function VideosPage() {
   const videos = getAllVideos()
+  const categories = getAllCategories()
+  const reels = videos.filter((v) => v.mediaType !== 'post').length
+
   return (
     <section className="section">
-      <h1 className="section-title">Video Library</h1>
-      <p className="section-sub">{videos.length} videos — search anything, or filter by pillar.</p>
+      <PageHeader
+        eyebrow="The library"
+        title="Everything, searchable."
+        lede="No endless scrolling. Search the whole library by topic, tag, or pillar — every video tested on myself before it went up."
+        accentHue={192}
+        stats={[
+          { value: videos.length, label: 'Videos' },
+          { value: reels, label: 'Reels' },
+          { value: categories.length, label: 'Pillars' },
+        ]}
+      />
       <VideoExplorer videos={videos} />
     </section>
   )

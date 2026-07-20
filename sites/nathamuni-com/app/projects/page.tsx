@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getProjects, type ProjectStatus } from '@/lib/projects'
 import github from '@/lib/github.json'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -21,11 +22,16 @@ export default function ProjectsPage() {
 
   return (
     <section className="section" data-testid="projects-page">
-      <h1 className="section-title">Projects</h1>
-      <p className="section-sub">
-        What I&apos;ve actually shipped — the problem each one solved, what I built, and where it
-        stands today.
-      </p>
+      <PageHeader
+        eyebrow="Shipped, not pitched"
+        title="What I actually built."
+        lede="The problem each one solved, what got built, and where it honestly stands today — including the ones that never left internal use."
+        accentHue={192}
+        stats={[
+          { value: projects.length, label: 'Projects' },
+          { value: github.publicRepos, label: 'Public repos' },
+        ]}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5" data-reveal>
         {projects.map((project) => (

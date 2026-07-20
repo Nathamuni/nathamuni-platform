@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getAllSessions } from '@/lib/sessions'
 import { SessionCard } from '@/components/sessions/SessionCard'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Sessions',
@@ -11,12 +12,19 @@ export const metadata: Metadata = {
 
 export default function SessionsPage() {
   const sessions = getAllSessions()
+  const totalSteps = sessions.reduce((sum, s) => sum + s.steps.length, 0)
   return (
     <section className="section">
-      <h1 className="section-title">Sessions</h1>
-      <p className="section-sub">
-        A session is something you RUN, not read. Pick one, follow the steps, track the numbers.
-      </p>
+      <PageHeader
+        eyebrow="Run, don't read"
+        title="Protocols you actually execute."
+        lede="A session isn't an article. Pick one, enter focus mode, follow the steps, track the numbers — it holds your place until it's done."
+        accentHue={152}
+        stats={[
+          { value: sessions.length, label: 'Sessions' },
+          { value: totalSteps, label: 'Steps' },
+        ]}
+      />
       <div className="ssn-index-grid">
         {sessions.map((session) => (
           <SessionCard key={session.slug} session={session} />

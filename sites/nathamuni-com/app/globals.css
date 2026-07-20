@@ -600,6 +600,68 @@
     @apply flex items-end justify-between;
   }
 
+  /* ---------- rich page header (interior pages) ----------
+     Gives library/content pages the same weight as /pulse and /stats:
+     eyebrow, display-scale title, lede, and real-data stat chips. */
+  .pg-head {
+    @apply relative mb-8 sm:mb-11;
+  }
+  /* Soft accent glow behind the title, tinted per page via --pg-hue. */
+  .pg-head::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: -3rem;
+    width: 22rem;
+    height: 12rem;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(
+      closest-side,
+      hsl(var(--pg-hue, 262) 85% 60% / 0.16),
+      transparent 70%
+    );
+  }
+  .pg-head-eyebrow {
+    @apply block text-[0.65rem] uppercase tracking-[0.22em] mb-2.5;
+    color: hsl(var(--pg-hue, 262) 80% 78% / 0.85);
+  }
+  .pg-head-title {
+    @apply font-display text-3xl sm:text-5xl leading-[1.05] tracking-tight mb-3;
+    background: linear-gradient(
+      100deg,
+      #fff 10%,
+      hsl(var(--pg-hue, 262) 85% 82%) 55%,
+      hsl(var(--pg-hue, 262) 90% 72%)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pg-head-lede {
+    @apply text-sm sm:text-base text-white/55 leading-relaxed max-w-2xl;
+  }
+  .pg-head-stats {
+    @apply flex flex-wrap gap-2.5 mt-6;
+  }
+  .pg-head-stat {
+    @apply glass-card flex flex-col gap-0.5 px-4 py-2.5;
+    min-width: 5.5rem;
+  }
+  .pg-head-stat.is-link {
+    @apply transition-colors;
+  }
+  .pg-head-stat.is-link:hover {
+    border-color: hsl(var(--pg-hue, 262) 85% 70% / 0.45);
+  }
+  .pg-head-stat-value {
+    @apply font-display text-xl sm:text-2xl leading-none text-white;
+    font-variant-numeric: tabular-nums;
+  }
+  .pg-head-stat-label {
+    @apply text-[0.6rem] uppercase tracking-widest text-white/40;
+  }
+
   /* ---------- category tiles ---------- */
   .category-tiles {
     @apply grid grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6;
