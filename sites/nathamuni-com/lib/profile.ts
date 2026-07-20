@@ -36,6 +36,30 @@ export const PROFILE = {
   jobTitle: 'Software Developer & AI Architect',
   metaDescription:
     'Nathamuni: software developer and AI architect, self-taught since childhood, tested on himself first — offline-first AI, calisthenics, and a book built from three years of failure.',
+
+  /**
+   * Entity attributes for structured data. These disambiguate Nathamuni the
+   * living creator/engineer from the historical Sri Vaishnava saint of the same
+   * name — the single biggest lever for branded search. Every value is real.
+   */
+  fullName: 'Nathamuni S R',
+  alternateNames: ['Nathamuni S R', 'Nathamuni SR', 'Nathamuni Nathamuni'],
+  homeLocation: 'Chennai, Tamil Nadu, India',
+  birthPlace: 'Tiruchirappalli, Tamil Nadu, India',
+  nationality: 'Indian',
+  alumniOf: 'Saranathan College of Engineering',
+  knowsAbout: [
+    'Artificial Intelligence',
+    'Offline-first AI',
+    'On-device machine learning',
+    'Calisthenics',
+    'Discipline systems',
+    'Meditation',
+    'Software Engineering',
+    'Local-first software',
+  ],
+  /** External profiles that reinforce the entity (sameAs in JSON-LD). */
+  githubUrl: 'https://github.com/Nathamuni',
 } as const
 
 export function rolesLine(): string {
