@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getAllStories } from '@/lib/stories'
 import { MomentsWall } from '@/components/moments/MomentsWall'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Moments',
@@ -13,11 +14,13 @@ export default function MomentsPage() {
   const stories = getAllStories()
   return (
     <section className="section">
-      <h1 className="section-title">Moments</h1>
-      <p className="section-sub">
-        {stories.length} stories — Instagram deletes these after 24 hours. This archive
-        doesn&apos;t.
-      </p>
+      <PageHeader
+        eyebrow="The 24-hour archive"
+        title="Stories that didn't disappear."
+        lede="Instagram deletes these after a day. Every one is captured and self-hosted here instead — the moments behind the content, kept."
+        accentHue={340}
+        stats={[{ value: stories.length, label: 'Moments' }]}
+      />
       <MomentsWall stories={stories} />
     </section>
   )

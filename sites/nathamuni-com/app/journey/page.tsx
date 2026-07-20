@@ -3,6 +3,7 @@ import { getPrinciples, getDecisions, getGoals } from '@/lib/journey'
 import { PrinciplesGrid } from '@/components/journey/PrinciplesGrid'
 import { DecisionMap } from '@/components/journey/DecisionMap'
 import { GoalsTracker } from '@/components/journey/GoalsTracker'
+import { PageHeader } from '@/components/layout/PageHeader'
 
 export const metadata: Metadata = {
   title: 'Journey',
@@ -22,11 +23,17 @@ export default function JourneyPage() {
     <>
       <section className="section" data-testid="journey-page">
         <div className="mb-10 sm:mb-14 max-w-2xl" data-reveal>
-          <h1 className="section-title">Journey</h1>
-          <p className="section-sub">
-            Not a highlight reel — the rules I run on, the decisions that shaped them, and an
-            honest tally of what&apos;s done, in progress, and still just a dream.
-          </p>
+          <PageHeader
+            eyebrow="Not a highlight reel"
+            title="The rules, and what they cost."
+            lede="The principles I run on, the decisions that shaped them, and an honest tally of what's done, in progress, and still just a dream."
+            accentHue={38}
+            stats={[
+              { value: principles.length, label: 'Principles' },
+              { value: decisions.length, label: 'Decisions' },
+              { value: goals.length, label: 'Goals' },
+            ]}
+          />
         </div>
 
         <div>
