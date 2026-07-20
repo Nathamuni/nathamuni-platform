@@ -16,9 +16,18 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Root-level guard: the home MomentsStrip uses a -mx-4 full-bleed marquee
+       that can sit a few px past the viewport on narrow screens. `clip` kills
+       the stray horizontal scroll without breaking the sticky nav. */
+    overflow-x: clip;
   }
   body {
     @apply bg-ground text-white font-body min-h-screen;
+    /* Guard against transient horizontal overflow — e.g. [data-reveal-3d]
+       sections project their edge outward while still rotated below the fold.
+       `clip` (not `hidden`) contains it without breaking the sticky nav or
+       creating a scroll container. */
+    overflow-x: clip;
     background-image:
       radial-gradient(1300px 700px at 85% -10%, rgba(139, 92, 246, 0.32), transparent 62%),
       radial-gradient(1000px 600px at -15% 25%, rgba(34, 211, 238, 0.18), transparent 58%),
@@ -773,6 +782,12 @@
   /* ---------- video grid & cards ---------- */
   .video-grid {
     @apply grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6;
+  }
+  /* Grid items default to min-width:auto, so a card whose content won't shrink
+     (long title, non-wrapping row) forces its track wider than its share and
+     overflows the row. min-width:0 lets tracks hold their allotted width. */
+  .video-grid > * {
+    min-width: 0;
   }
   .video-grid-empty {
     @apply text-white/55 text-center py-14;
