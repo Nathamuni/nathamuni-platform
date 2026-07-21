@@ -24,6 +24,9 @@ const EMBED_BATCH = 90
 // tier, cheaper per token (5,500 / 36,400 neurons per M in/out tokens), and
 // multilingual — useful for the occasional Tamil phrase in the twin's voice.
 const ASK_MODEL = '@cf/zai-org/glm-4.7-flash'
+// Non-reasoning last resort: it has no thinking pass to get lost in, so it
+// always returns visible text as long as Workers AI is up at all.
+const ASK_FALLBACK_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast'
 const ASK_MAX_QUESTION_LEN = 300
 // Reasoning model: thinking tokens count against the budget, so leave enough
 // headroom that the visible answer never comes back empty.
@@ -320,29 +323,48 @@ async function handleAsk(request, env) {
       { role: 'user', content: question },
     ]
 
-    // Reasoning models can spend the whole budget "thinking" on unusual
-    // questions and return no visible text — retry once, bigger budget,
-    // with an explicit nudge to answer directly.
+    // Reasoning models can spend the whole token budget "thinking" on long or
+    // unusual questions and return no visible text. Escalate through three
+    // attempts: normal, then GLM's own /nothink switch which suppresses the
+    // reasoning pass entirely, then a non-reasoning model that cannot fail
+    // this way at all. A thrown attempt (model timeout, capacity) falls
+    // through to the next rather than aborting the chain.
     let answer = ''
-    let lastResult
+    let lastError = 'no attempt produced text'
     for (const attempt of [
-      { messages, max_tokens: ASK_MAX_TOKENS },
+      { model: ASK_MODEL, messages, max_tokens: ASK_MAX_TOKENS },
       {
+        model: ASK_MODEL,
         messages: [
           messages[0],
           {
             role: 'user',
-            content: `${question}\n\n(Answer directly in 2-5 sentences. Do not overthink.)`,
+            content: `${question}\n\n/nothink\n(Answer directly in 2-5 sentences. Do not overthink.)`,
           },
         ],
         max_tokens: ASK_MAX_TOKENS + 800,
       },
+      {
+        model: ASK_FALLBACK_MODEL,
+        messages: [
+          messages[0],
+          { role: 'user', content: `${question}\n\n(Answer directly in 2-5 sentences.)` },
+        ],
+        max_tokens: 600,
+      },
     ]) {
-      lastResult = await env.AI.run(ASK_MODEL, attempt)
-      answer = extractAnswer(lastResult)
-      if (answer) break
+      const { model, ...input } = attempt
+      try {
+        const result = await env.AI.run(model, input)
+        answer = extractAnswer(result)
+        if (answer) break
+        lastError = `${model} returned no visible text: ${JSON.stringify(result).slice(0, 160)}`
+      } catch (err) {
+        lastError = `${model} threw: ${err.message}`
+      }
+      console.warn('ask attempt failed:', lastError)
     }
-    if (!answer) throw new Error(`empty model response: ${JSON.stringify(lastResult).slice(0, 200)}`)
+    if (!answer) throw new Error(lastError)
 
     await logQuestion(env, question, 'answered')
     return Response.json({ answer })
