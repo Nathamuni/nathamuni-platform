@@ -45,6 +45,10 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState<{ node: Sim; x: number; y: number } | null>(null)
   const [hint, setHint] = useState(true)
+  // Whether the user has panned/zoomed away from the auto-fit view — drives the
+  // "recenter" button so they can never permanently lose the graph.
+  const [adjusted, setAdjusted] = useState(false)
+  const resetViewRef = useRef<() => void>(() => {})
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -110,6 +114,17 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     const ro = new ResizeObserver(resize)
     ro.observe(wrap)
 
+    // Recenter escape hatch — hand it to React so the button can call it.
+    resetViewRef.current = () => {
+      view.userControlled = false // autoFit resumes and lerps back to a centred fit
+      setAdjusted(false)
+    }
+    // Any deliberate pan/zoom flags the view as user-controlled (shows recenter).
+    const markAdjusted = () => {
+      view.userControlled = true
+      setAdjusted(true)
+    }
+
     function autoFit(lerp: number) {
       if (view.userControlled || W === 0) return
       let minX = Infinity
@@ -122,10 +137,13 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
         maxX = Math.max(maxX, n.x + n.r)
         maxY = Math.max(maxY, n.y + n.r)
       }
-      const P = 46
+      // Tighter padding + higher zoom ceiling on small screens so the graph
+      // fills the canvas instead of sitting tiny in the middle.
+      const P = W < 480 ? 22 : 44
+      const maxK = W < 480 ? 2.8 : 1.8
       const gw = Math.max(1, maxX - minX)
       const gh = Math.max(1, maxY - minY)
-      const k = Math.min((W - 2 * P) / gw, (H - 2 * P) / gh, 1.6)
+      const k = Math.min((W - 2 * P) / gw, (H - 2 * P) / gh, maxK)
       const cx = (minX + maxX) / 2
       const cy = (minY + maxY) / 2
       const tx = W / 2 - cx * k
@@ -403,28 +421,67 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     let panning = false
     let lastX = 0
     let lastY = 0
+    // Active touch/mouse pointers, for two-finger pinch-zoom.
+    const pointers = new Map<number, { x: number; y: number }>()
+    let pinchDist = 0 // finger separation at the start of the current pinch
 
     function relPos(e: PointerEvent) {
       const rect = canvas!.getBoundingClientRect()
       return { px: e.clientX - rect.left, py: e.clientY - rect.top }
     }
+    const pinchMidpoint = () => {
+      const pts = [...pointers.values()]
+      return { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+    }
+    const pinchSeparation = () => {
+      const pts = [...pointers.values()]
+      return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)
+    }
     function onDown(e: PointerEvent) {
       const { px, py } = relPos(e)
-      const n = nodeAt(px, py)
+      pointers.set(e.pointerId, { x: px, y: py })
       canvas!.setPointerCapture(e.pointerId)
       setHint(false)
+
+      if (pointers.size === 2) {
+        // Second finger down → enter pinch; cancel any drag/pan in progress.
+        dragNode = null
+        panning = false
+        pinchDist = pinchSeparation()
+        markAdjusted()
+        return
+      }
+
+      const n = nodeAt(px, py)
       if (n) {
         dragNode = n
         n.flash = Math.max(n.flash, 0.6)
       } else {
         panning = true
-        view.userControlled = true
+        markAdjusted()
       }
       lastX = px
       lastY = py
     }
     function onMove(e: PointerEvent) {
       const { px, py } = relPos(e)
+      if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: px, y: py })
+
+      // Two-finger pinch: scale about the midpoint between the fingers.
+      if (pointers.size >= 2) {
+        const dist = pinchSeparation()
+        if (pinchDist > 0 && dist > 0) {
+          const mid = pinchMidpoint()
+          const g = toGraph(mid.x, mid.y)
+          view.k = Math.max(0.3, Math.min(5, view.k * (dist / pinchDist)))
+          view.tx = mid.x - g.x * view.k
+          view.ty = mid.y - g.y * view.k
+        }
+        pinchDist = dist
+        setHovered(null)
+        return
+      }
+
       if (dragNode) {
         const g = toGraph(px, py)
         dragNode.x = g.x
@@ -449,6 +506,8 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       } else setHovered(null)
     }
     function onUp(e: PointerEvent) {
+      pointers.delete(e.pointerId)
+      if (pointers.size < 2) pinchDist = 0
       dragNode = null
       panning = false
       try {
@@ -458,6 +517,12 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     function onLeave() {
       if (!dragNode && !panning) setHovered(null)
     }
+    function onCancel(e: PointerEvent) {
+      pointers.delete(e.pointerId)
+      if (pointers.size < 2) pinchDist = 0
+      dragNode = null
+      panning = false
+    }
     function onWheel(e: WheelEvent) {
       e.preventDefault()
       const { px, py } = { px: e.offsetX, py: e.offsetY }
@@ -466,12 +531,13 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       view.k = Math.max(0.3, Math.min(4, view.k * factor))
       view.tx = px - g.x * view.k
       view.ty = py - g.y * view.k
-      view.userControlled = true
+      markAdjusted()
       setHint(false)
     }
     canvas.addEventListener('pointerdown', onDown)
     canvas.addEventListener('pointermove', onMove)
     canvas.addEventListener('pointerup', onUp)
+    canvas.addEventListener('pointercancel', onCancel)
     canvas.addEventListener('pointerleave', onLeave)
     canvas.addEventListener('wheel', onWheel, { passive: false })
 
@@ -481,6 +547,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       canvas.removeEventListener('pointerdown', onDown)
       canvas.removeEventListener('pointermove', onMove)
       canvas.removeEventListener('pointerup', onUp)
+      canvas.removeEventListener('pointercancel', onCancel)
       canvas.removeEventListener('pointerleave', onLeave)
       canvas.removeEventListener('wheel', onWheel)
     }
@@ -489,9 +556,8 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
   return (
     <div
       ref={wrapRef}
-      className="relative w-full rounded-3xl overflow-hidden touch-none select-none"
+      className="relative w-full rounded-3xl overflow-hidden touch-none select-none aspect-square max-h-[70vh] sm:aspect-auto sm:h-[min(76vh,660px)] sm:max-h-none"
       style={{
-        height: 'min(76vh, 660px)',
         background:
           'radial-gradient(circle at 50% 40%, rgba(26,14,50,0.7), rgba(6,5,16,0.97))',
         border: '1px solid rgba(178,148,255,0.18)',
@@ -500,9 +566,28 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     >
       <canvas ref={canvasRef} className="absolute inset-0" />
       {hint && (
-        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] text-white/40 tracking-wide">
-          drag a node · drag background to pan · scroll to zoom
+        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] text-white/40 tracking-wide text-center px-4">
+          drag a node · drag to pan · pinch or scroll to zoom
         </div>
+      )}
+      {adjusted && (
+        <button
+          type="button"
+          onClick={() => resetViewRef.current()}
+          className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.7rem] text-white/80 transition-colors hover:text-white"
+          style={{
+            background: 'rgba(13,10,31,0.9)',
+            border: '1px solid rgba(178,148,255,0.4)',
+            backdropFilter: 'blur(8px)',
+          }}
+          aria-label="Recenter the graph"
+        >
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+          </svg>
+          Recenter
+        </button>
       )}
       {hovered && (
         <div
