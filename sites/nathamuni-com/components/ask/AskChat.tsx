@@ -11,6 +11,9 @@ const STARTERS = [
   'What is your book about?',
 ]
 
+/** Must match ASK_MAX_QUESTION_LEN in worker/index.mjs. */
+const MAX_QUESTION_LEN = 300
+
 interface Message {
   id: string
   role: 'user' | 'twin'
@@ -153,6 +156,12 @@ export function AskChat() {
         </div>
       )}
 
+      {input.length > MAX_QUESTION_LEN - 60 && (
+        <p className="text-xs text-white/45 text-right -mb-3" data-testid="ask-counter">
+          {input.length}/{MAX_QUESTION_LEN} characters
+        </p>
+      )}
+
       <form onSubmit={handleSubmit} className="flex gap-2 items-center">
         <input
           type="text"
@@ -160,7 +169,7 @@ export function AskChat() {
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask about discipline, AI, calisthenics..."
           className="search-bar flex-1"
-          maxLength={300}
+          maxLength={MAX_QUESTION_LEN}
           disabled={pending}
           aria-label="Ask a question"
           data-testid="ask-input"
