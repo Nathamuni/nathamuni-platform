@@ -401,6 +401,20 @@ function extractAnswer(result) {
     .trim()
 }
 
+async function handleVideos(request, env) {
+  try {
+    const videosRes = await env.ASSETS.fetch(new URL('/videos.json', request.url))
+    if (!videosRes.ok) {
+      return Response.json({ error: 'videos data not found' }, { status: 404 })
+    }
+    const videos = await videosRes.json()
+    return Response.json(videos, { headers: { 'cache-control': 'public, max-age=300' } })
+  } catch (err) {
+    console.error('videos error:', err.message)
+    return Response.json({ error: 'videos unavailable' }, { status: 500 })
+  }
+}
+
 async function handleSearch(request, env) {
   const q = new URL(request.url).searchParams.get('q')?.trim() ?? ''
   if (q.length < 3 || q.length > 200) {
@@ -424,6 +438,9 @@ async function handleSearch(request, env) {
 const worker = {
   async fetch(request, env) {
     const { pathname } = new URL(request.url)
+    if (pathname === '/api/videos') {
+      return handleVideos(request, env)
+    }
     if (pathname === '/api/search') {
       try {
         return await handleSearch(request, env)

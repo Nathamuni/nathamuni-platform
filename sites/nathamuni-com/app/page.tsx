@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getAllVideos, getFeaturedVideos } from '@/lib/videos'
+import { getAllVideos } from '@/lib/videos'
 import { getAllStories } from '@/lib/stories'
 import { PROFILE, rolesLine } from '@/lib/profile'
 import { HeroPortrait } from '@/components/hero/HeroPortrait'
@@ -9,7 +9,7 @@ import { ScrollCue } from '@/components/fx/ScrollCue'
 import { CountUp } from '@/components/fx/CountUp'
 import { SocialButtons } from '@/components/layout/SocialButtons'
 import { CategoryTiles } from '@/components/home/CategoryTiles'
-import { VideoCard } from '@/components/video/VideoCard'
+import { VideoSections } from '@/components/home/VideoSections'
 import { MomentsStrip } from '@/components/home/MomentsStrip'
 import { AboutPreview } from '@/components/about/AboutPreview'
 import { JoinBlock } from '@/components/join/JoinBlock'
@@ -17,8 +17,6 @@ import { PlaceholdersRow } from '@/components/layout/PlaceholdersRow'
 
 export default function HomePage() {
   const videos = getAllVideos()
-  const featured = getFeaturedVideos()
-  const latest = videos.filter((v) => (v.mediaType ?? 'reel') === 'reel').slice(0, 4)
   const momentsCount = getAllStories().length
 
   return (
@@ -90,38 +88,7 @@ export default function HomePage() {
         <CategoryTiles />
       </section>
 
-      <section className="section" aria-labelledby="featured-heading" data-reveal data-reveal-3d>
-        <h2 id="featured-heading" className="section-title">
-          Start here
-        </h2>
-        <p className="section-sub">Hand-picked — the videos that best explain how I think.</p>
-        <div className="video-grid" data-testid="featured-grid">
-          {featured.map((video, i) => (
-            <div key={video.id} className={`anim-fade-up anim-delay-${Math.min(i, 4)} h-full`}>
-              <VideoCard video={video} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section" aria-labelledby="latest-heading" data-reveal data-reveal-3d>
-        <div className="section-head-row">
-          <div>
-            <h2 id="latest-heading" className="section-title">
-              Latest drops
-            </h2>
-            <p className="section-sub">Fresh from the feed.</p>
-          </div>
-        </div>
-        <div className="video-grid" data-testid="latest-grid">
-          {latest.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
-        <Link href="/videos" className="link-more" data-testid="browse-all-link">
-          Browse all {videos.length} videos →
-        </Link>
-      </section>
+      <VideoSections />
 
       <MomentsStrip />
       <AboutPreview />
