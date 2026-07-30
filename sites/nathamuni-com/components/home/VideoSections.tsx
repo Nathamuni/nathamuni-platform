@@ -59,7 +59,16 @@ export function VideoSections() {
     return <div className="video-grid"><div>Loading...</div></div>
   }
 
-  const featured = videos.filter((video) => video.featured)
+  // One card per category, always the newest in that category — replaces a
+  // hand-picked "featured" flag that went stale the moment new videos landed.
+  const latestByCategory: Video[] = []
+  const seenCategories = new Set<string>()
+  for (const video of videos) {
+    if (seenCategories.has(video.category)) continue
+    seenCategories.add(video.category)
+    latestByCategory.push(video)
+  }
+
   const latest = videos.filter((v) => (v.mediaType ?? 'reel') === 'reel').slice(0, 4)
   const totalCount = videos.length
 
@@ -69,9 +78,9 @@ export function VideoSections() {
         <h2 id="featured-heading" className="section-title">
           Start here
         </h2>
-        <p className="section-sub">Hand-picked — the videos that best explain how I think.</p>
+        <p className="section-sub">The newest video from every pillar — always up to date.</p>
         <div className="video-grid" data-testid="featured-grid">
-          {featured.map((video, i) => (
+          {latestByCategory.map((video, i) => (
             <div key={video.id} className={`anim-fade-up anim-delay-${Math.min(i, 4)} h-full`}>
               <VideoCard video={video} />
             </div>

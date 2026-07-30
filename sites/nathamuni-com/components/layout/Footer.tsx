@@ -27,6 +27,7 @@ const MORE_LINKS: FooterLink[] = [
   { href: '/projects', label: 'Projects' },
   { href: '/stats', label: 'Stats' },
   { href: '/ask', label: 'Ask' },
+  { href: '/privacy', label: 'Privacy' },
 ]
 
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {

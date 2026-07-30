@@ -212,6 +212,13 @@ const syncable = media.filter(
 console.log(`API media: ${media.length} total, ${syncable.length} syncable; site library: ${videos.length}`)
 if (!engagementSupported) console.log('Engagement counts (likes/comments) unavailable this run.')
 
+// Set when the YouTube refresh token itself is dead (expired/revoked) rather
+// than a one-off upload problem — every subsequent upload this run will fail
+// the same way, and next run's will too, silently, until someone re-auths.
+// Surfaced as a GitHub Actions output so the workflow can fail loudly on it
+// without blocking the Instagram data commit (see bottom of this file).
+let ytAuthBroken = false
+
 /**
  * Best-effort cross-post to YouTube for one video entry. Never throws —
  * failures are recorded on the entry itself so the Instagram sync (the part
@@ -251,6 +258,7 @@ async function crossPostToYoutube(entry, media) {
   } catch (err) {
     console.warn(`  youtube: upload failed for ${entry.id}: ${err.message}`)
     entry.youtubeStatus = 'failed'
+    if (/token refresh failed/i.test(err.message)) ytAuthBroken = true
   }
 }
 
@@ -470,3 +478,12 @@ async function syncStories() {
 }
 
 await syncStories()
+
+if (ytAuthBroken) {
+  console.error(
+    '::error::YouTube refresh token is dead (expired or revoked) — re-run scripts/youtube-get-refresh-token.mjs and update the YOUTUBE_REFRESH_TOKEN GitHub secret. Reels are still syncing to the site; only the YouTube cross-post is affected.'
+  )
+}
+if (process.env.GITHUB_OUTPUT) {
+  writeFileSync(process.env.GITHUB_OUTPUT, `yt_auth_broken=${ytAuthBroken}\n`, { flag: 'a' })
+}
