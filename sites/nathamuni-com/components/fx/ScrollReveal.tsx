@@ -8,6 +8,14 @@ import { usePathname } from 'next/navigation'
  * up as it enters the viewport. Re-scans on every route change — without
  * that, client-side navigation would leave new pages' sections unobserved
  * and therefore stuck invisible at opacity 0 (P0 found on /books).
+ *
+ * Also watches the DOM for [data-reveal] elements that mount *after* the
+ * initial scan — e.g. a client component whose content arrives from an
+ * async fetch (VideoSections rendering post-videos.json). Without this,
+ * those sections' data-reveal never gets observed and they stay stuck at
+ * opacity 0 forever, since the one-time querySelectorAll ran before they
+ * existed.
+ *
  * No-ops for prefers-reduced-motion (CSS keeps those elements visible).
  */
 export function ScrollReveal() {
@@ -15,12 +23,19 @@ export function ScrollReveal() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const els = document.querySelectorAll('[data-reveal]:not(.is-visible)')
+
     if (!('IntersectionObserver' in window)) {
-      // Ancient browser: never leave content hidden.
-      els.forEach((el) => el.classList.add('is-visible'))
-      return
+      // Ancient browser: never leave content hidden, present or future.
+      const revealAll = () =>
+        document
+          .querySelectorAll('[data-reveal]:not(.is-visible)')
+          .forEach((el) => el.classList.add('is-visible'))
+      revealAll()
+      const fallbackMo = new MutationObserver(revealAll)
+      fallbackMo.observe(document.body, { childList: true, subtree: true })
+      return () => fallbackMo.disconnect()
     }
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -32,8 +47,19 @@ export function ScrollReveal() {
       },
       { rootMargin: '0px 0px -8% 0px', threshold: 0.05 }
     )
-    els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
+
+    const observeNew = () => {
+      document.querySelectorAll('[data-reveal]:not(.is-visible)').forEach((el) => io.observe(el))
+    }
+    observeNew()
+
+    const mo = new MutationObserver(observeNew)
+    mo.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      io.disconnect()
+      mo.disconnect()
+    }
   }, [pathname])
 
   return null
