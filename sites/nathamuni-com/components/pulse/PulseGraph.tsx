@@ -602,7 +602,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     >
       <canvas ref={canvasRef} className="absolute inset-0" />
       {hint && (
-        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] text-white/40 tracking-wide text-center px-4">
+        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] text-white/55 tracking-wide text-center px-4">
           drag a node · drag to pan · pinch or scroll to zoom
         </div>
       )}

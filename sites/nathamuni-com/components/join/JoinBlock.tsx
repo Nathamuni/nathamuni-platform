@@ -98,7 +98,7 @@ export function JoinBlock() {
                 {message}
               </p>
             )}
-            <p className="text-white/35 text-xs">
+            <p className="text-white/55 text-xs">
               Stored for one purpose: sending you one tested idea a week. No trackers, nothing else.
             </p>
           </form>

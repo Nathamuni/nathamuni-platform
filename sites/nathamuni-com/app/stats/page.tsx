@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const tabularNums: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' }
 
-const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/40'
+const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/55'
 
 function StatTile({
   value,
@@ -168,7 +168,7 @@ export default function StatsPage() {
               className="detail-tag"
               style={{ minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
             >
-              #{t.tag} <span className="text-white/35 ml-1" style={tabularNums}>{t.count}</span>
+              #{t.tag} <span className="text-white/55 ml-1" style={tabularNums}>{t.count}</span>
             </Link>
           ))}
         </div>
@@ -235,7 +235,7 @@ export default function StatsPage() {
         </div>
       )}
 
-      <p className="text-xs text-white/35 border-t border-white/10 pt-4">
+      <p className="text-xs text-white/55 border-t border-white/10 pt-4">
         Data updates automatically from Instagram, daily.
       </p>
     </section>

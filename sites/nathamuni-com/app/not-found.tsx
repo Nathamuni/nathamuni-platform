@@ -46,7 +46,7 @@ export default function NotFound() {
         ))}
       </div>
 
-      <p className="text-xs text-white/35 mt-8">
+      <p className="text-xs text-white/55 mt-8">
         Landed here from a link on this site?{' '}
         <Link href="/ask" className="text-white/60 underline underline-offset-2 hover:text-white">
           Tell me

@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from './AuthProvider'
+import { useFocusTrap } from '@/components/ui/useFocusTrap'
 
 /** Only these sections have progress worth saving — the pill stays out of the way everywhere else. */
 function isProgressPage(pathname: string | null): boolean {
@@ -194,6 +195,7 @@ export function AccountWidget() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const cardRef = useRef<HTMLDivElement | null>(null)
+  useFocusTrap(cardRef, open)
 
   // A SaveNudge anywhere on the page can pop this dialog open.
   useEffect(() => {

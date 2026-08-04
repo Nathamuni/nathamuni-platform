@@ -23,7 +23,7 @@ export function PrinciplesGrid({ principles }: { principles: Principle[] }) {
           </h3>
           <p className="text-sm text-white/65 leading-relaxed">{principle.meaning}</p>
           {principle.origin && (
-            <p className="text-xs text-white/40 italic mt-1">{principle.origin}</p>
+            <p className="text-xs text-white/55 italic mt-1">{principle.origin}</p>
           )}
         </div>
       ))}

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Step } from '@/lib/sessions'
 import { loadItem, saveItem } from '@/lib/progress'
 import { CredibilityBadge } from './CredibilityBadge'
+import { useFocusTrap } from '@/components/ui/useFocusTrap'
 
 const ENTRY_MS = 3000
 
@@ -60,6 +61,9 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
     if (fadeTimer.current) window.clearTimeout(fadeTimer.current)
   }, [])
   const overlayRef = useRef<HTMLDivElement>(null)
+  // Traps Tab inside the focus-mode overlay and restores focus on exit. Escape was
+  // already handled; focus was not, so keyboard users tabbed into the page behind.
+  useFocusTrap(overlayRef, open)
   const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null)
 
   const acquireWakeLock = useCallback(async () => {

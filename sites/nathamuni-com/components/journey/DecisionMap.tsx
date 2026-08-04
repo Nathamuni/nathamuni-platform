@@ -125,7 +125,7 @@ export function DecisionMap({ nodes }: { nodes: DecisionNode[] }) {
                 className={`glass-card border p-5 sm:p-6 anim-fade-up ${CARD_BORDER[node.hue]}`}
                 data-reveal
               >
-                <p className="text-[0.65rem] uppercase tracking-widest text-white/40 mb-2">
+                <p className="text-[0.65rem] uppercase tracking-widest text-white/55 mb-2">
                   {node.period}
                 </p>
                 <p className="text-sm text-white/65 italic mb-1.5 leading-relaxed">

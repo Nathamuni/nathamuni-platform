@@ -49,7 +49,7 @@ export default function BlogPage() {
                 <span className="video-card-category">
                   {meta.icon} {post.category}
                 </span>
-                <span className="text-[0.65rem] uppercase tracking-widest text-white/35 flex-shrink-0">
+                <span className="text-[0.65rem] uppercase tracking-widest text-white/55 flex-shrink-0">
                   {getReadingMinutes(post)} min read
                 </span>
               </div>

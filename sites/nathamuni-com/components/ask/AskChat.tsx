@@ -185,7 +185,7 @@ export function AskChat() {
         </button>
       </form>
 
-      <p className="text-xs text-white/35 text-center">
+      <p className="text-xs text-white/55 text-center">
         Answers come from published content only — for anything else,{' '}
         <a
           href={SOCIAL_LINKS.instagram}

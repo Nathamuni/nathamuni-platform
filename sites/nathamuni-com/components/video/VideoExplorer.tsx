@@ -95,6 +95,7 @@ export function VideoExplorer({
             <button
               key={t}
               type="button"
+              aria-pressed={mediaType === t}
               className={mediaType === t ? 'category-filter-btn is-active' : 'category-filter-btn'}
               onClick={() => setMediaType(t)}
             >
@@ -102,11 +103,18 @@ export function VideoExplorer({
             </button>
           ))}
         </div>
-        {isBrowsing && (
-          <span className="explorer-count" data-testid="explorer-count">
-            {results.length} result{results.length === 1 ? '' : 's'} found
-          </span>
-        )}
+        {/* Always mounted so the live region exists before the count changes —
+            results arrive asynchronously from /api/search and were announced to
+            nobody. Empty until the visitor actually starts browsing. */}
+        <span
+          className="explorer-count"
+          data-testid="explorer-count"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {isBrowsing ? `${results.length} result${results.length === 1 ? '' : 's'} found` : ''}
+        </span>
       </div>
       <VideoGrid videos={results} />
     </div>

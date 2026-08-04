@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/pulse' },
 }
 
-const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/40'
+const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/55'
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
@@ -46,11 +46,15 @@ export default function PulsePage() {
               boxShadow: stats.live ? '0 0 8px #4ade80' : '0 0 8px #facc15',
             }}
           />
-          <h1 className={labelClass}>{stats.live ? 'Live signal' : 'Warming up'}</h1>
+          {/* Status badge, not the page title — it used to be the h1, which left the
+              real heading as an h2 and gave the page no meaningful top-level heading. */}
+          <span className={labelClass} role="status">
+            {stats.live ? 'Live signal' : 'Warming up'}
+          </span>
         </div>
-        <h2 className="font-display text-white text-2xl sm:text-4xl leading-tight mb-2">
+        <h1 className="font-display text-white text-2xl sm:text-4xl leading-tight mb-2">
           The content network, alive.
-        </h2>
+        </h1>
         <p className="text-sm text-white/55 leading-relaxed">
           Every glowing node is a real post, category, or theme. Bigger nodes earned more
           engagement; the lines are themes they genuinely share. Pulses trace the strongest
@@ -77,7 +81,7 @@ export default function PulsePage() {
         <div className="mt-8" data-reveal>
           <div className="flex items-baseline justify-between mb-3">
             <h3 className={labelClass}>When followers are online</h3>
-            <span className="text-[0.6rem] text-white/35">live from Instagram insights</span>
+            <span className="text-[0.6rem] text-white/55">live from Instagram insights</span>
           </div>
           <div className="flex items-end gap-[3px] h-16">
             {Array.from({ length: 24 }, (_, h) => {
@@ -107,7 +111,7 @@ export default function PulsePage() {
 
       <InsightsDashboard data={dashboard} />
 
-      <p className="text-xs text-white/35 border-t border-white/10 pt-4 mt-8">
+      <p className="text-xs text-white/55 border-t border-white/10 pt-4 mt-8">
         Node size = real likes + comments. Connections = shared categories and tags. Follower and
         reach figures update daily from Instagram insights
         {stats.updatedAt ? ` (last synced ${stats.updatedAt})` : ''}. This is a visualization of

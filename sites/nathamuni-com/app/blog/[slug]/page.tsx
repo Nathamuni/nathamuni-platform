@@ -78,8 +78,8 @@ export default async function BlogPostPage({
       <h1 className="post-title">{post.title}</h1>
       <div className="flex items-center gap-3">
         <span className="video-detail-date">{formatDate(post.publishedDate)}</span>
-        <span className="text-xs text-white/35">·</span>
-        <span className="text-xs text-white/40">{readingMinutes} min read</span>
+        <span className="text-xs text-white/55">·</span>
+        <span className="text-xs text-white/55">{readingMinutes} min read</span>
       </div>
       <div className="post-body" data-testid="post-body">
         {post.body.split('\n\n').map((block) => {
@@ -119,7 +119,7 @@ export default async function BlogPostPage({
               </li>
             ))}
           </ul>
-          <p className="text-xs text-white/40 italic">
+          <p className="text-xs text-white/55 italic">
             Tested on myself first — external research linked where I lean on it.
           </p>
         </aside>
