@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getStats } from '@/lib/stats'
 import { getCategoryMeta } from '@/lib/categoryMeta'
 import { CountUp } from '@/components/fx/CountUp'
+import { Thumbnail } from '@/components/ui/Thumbnail'
 
 export const metadata: Metadata = {
   title: 'The library in numbers',
@@ -187,10 +188,11 @@ export default function StatsPage() {
                   className="glass-card flex items-center gap-3 p-2.5 hover:border-white/30 transition-all"
                 >
                   {v.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Thumbnail
                       src={v.thumbnail}
                       alt=""
+                      width={48}
+                      height={64}
                       className="w-12 h-16 object-cover rounded-lg flex-shrink-0"
                     />
                   ) : (
@@ -212,10 +214,11 @@ export default function StatsPage() {
                   className="glass-card flex items-center gap-3 p-2.5 hover:border-white/30 transition-all"
                 >
                   {v.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Thumbnail
                       src={v.thumbnail}
                       alt=""
+                      width={48}
+                      height={64}
                       className="w-12 h-16 object-cover rounded-lg flex-shrink-0"
                     />
                   ) : (

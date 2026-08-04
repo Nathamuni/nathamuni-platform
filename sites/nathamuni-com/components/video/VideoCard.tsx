@@ -4,6 +4,7 @@ import { getCategoryMeta } from '@/lib/categoryMeta'
 import { TiltCard } from '@/components/fx/TiltCard'
 import { ThumbPeek } from '@/components/fx/ThumbPeek'
 import { PlaceholderArt } from './PlaceholderArt'
+import { Thumbnail } from '@/components/ui/Thumbnail'
 
 function formatDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
@@ -25,8 +26,7 @@ export function VideoCard({ video }: { video: Video }) {
         )}
         {video.thumbnail ? (
           <ThumbPeek src={video.thumbnail} hue={meta.hue} longPress className="thumb-peek-region">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Thumbnail
               src={video.thumbnail}
               alt={video.title}
               loading="lazy"

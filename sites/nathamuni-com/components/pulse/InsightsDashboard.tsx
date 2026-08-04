@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import type { DashboardData, Metric, PostLite } from '@/lib/insights-dashboard'
+import { Thumbnail } from '@/components/ui/Thumbnail'
 
 /**
  * Interactive insights dashboard for /pulse. Multiple real-data charts with a
@@ -292,8 +293,13 @@ function PostsModal({
               className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
             >
               {p.thumbnail ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.thumbnail} alt="" className="w-11 h-14 object-cover rounded-lg shrink-0" />
+                <Thumbnail
+                  src={p.thumbnail}
+                  alt=""
+                  width={44}
+                  height={56}
+                  className="w-11 h-14 object-cover rounded-lg shrink-0"
+                />
               ) : (
                 <div className="w-11 h-14 rounded-lg shrink-0 bg-gradient-to-br from-violet-600/40 to-pink-500/30" />
               )}

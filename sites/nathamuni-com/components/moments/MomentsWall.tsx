@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { Story } from "@/lib/stories";
 import { SOCIAL_LINKS } from "@/lib/social";
 import { ThoughtCard } from "./ThoughtCard";
+import { Thumbnail } from "@/components/ui/Thumbnail";
 
 function formatDate(iso: string): string {
   return new Date(iso + "T00:00:00").toLocaleDateString("en-GB", {
@@ -110,13 +111,7 @@ function MomentCardMedia({ story }: { story: Story }) {
       onPointerLeave={() => setPreview(false)}
     >
       {story.poster ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={story.poster}
-          alt=""
-          loading="lazy"
-          className="moment-poster"
-        />
+        <Thumbnail src={story.poster} alt="" loading="lazy" className="moment-poster" />
       ) : (
         <span className="moment-poster bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">
           <span aria-hidden className="text-2xl text-white/70">
