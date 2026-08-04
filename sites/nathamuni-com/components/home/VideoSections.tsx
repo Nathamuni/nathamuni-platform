@@ -1,64 +1,19 @@
-'use client'
-
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import type { Video } from '@/lib/videos'
 import { VideoCard } from '@/components/video/VideoCard'
 
-interface Video {
-  id: string
-  title: string
-  instagramUrl: string
-  youtubeUrl?: string
-  youtubeId?: string
-  youtubeStatus?: 'private' | 'public' | 'unlisted' | 'failed' | 'skipped-too-large'
-  thumbnail: string | null
-  mediaType?: 'reel' | 'post'
-  category: string
-  tags: string[]
-  problemSolved?: string
-  shortDescription: string
-  detailedDescription: string
-  keyLessons?: string[]
-  featured: boolean
-  publishedDate: string
-  likeCount?: number
-  commentsCount?: number
-  reach?: number
-  saved?: number
-  shares?: number
-  views?: number
-  avgWatchTimeMs?: number
-}
-
-export function VideoSections() {
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        const res = await fetch('/videos.json')
-        if (res.ok) {
-          const data = await res.json()
-          const sorted = (data as Video[])
-            .slice()
-            .sort((a, b) => b.publishedDate.localeCompare(a.publishedDate))
-          setVideos(sorted)
-        }
-      } catch (err) {
-        console.error('Failed to fetch videos:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchVideos()
-  }, [])
-
-  if (loading) {
-    return <div className="video-grid"><div>Loading...</div></div>
-  }
-
+/**
+ * The "Start here" and "Latest drops" grids.
+ *
+ * Server-rendered from the `videos` the home page already loaded. This used to be a
+ * client component that fetched /videos.json (120KB) in an effect and rendered
+ * "Loading..." in the meantime — for the largest above-the-fold section on the site,
+ * while app/page.tsx had the very same data available synchronously.
+ *
+ * Ordering matches the previous behaviour exactly: getAllVideos() applies the same
+ * publishedDate-descending sort the effect used to redo on the client.
+ */
+export function VideoSections({ videos }: { videos: Video[] }) {
   // One card per category, always the newest in that category — replaces a
   // hand-picked "featured" flag that went stale the moment new videos landed.
   const latestByCategory: Video[] = []

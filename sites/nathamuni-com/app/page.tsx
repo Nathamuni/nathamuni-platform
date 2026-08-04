@@ -88,7 +88,7 @@ export default function HomePage() {
         <CategoryTiles />
       </section>
 
-      <VideoSections />
+      <VideoSections videos={videos} />
 
       <MomentsStrip />
       <AboutPreview />

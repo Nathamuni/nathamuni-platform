@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { getAllCategories, searchAndFilterVideos, type Video } from '@/lib/videos'
+// From lib/video-search, not lib/videos — the latter imports videos.json and would
+// bundle the whole catalog into this client component.
+import { searchAndFilterVideos, type Video } from '@/lib/video-search'
 import { SearchBar } from './SearchBar'
 import { CategoryFilter } from './CategoryFilter'
 import { VideoGrid } from './VideoGrid'
@@ -17,7 +19,12 @@ export function VideoExplorer({
   const [category, setCategory] = useState<string | null>(null)
   const [mediaType, setMediaType] = useState<'all' | 'reel' | 'post'>('all')
   const [semanticIds, setSemanticIds] = useState<string[]>([])
-  const categories = useMemo(() => getAllCategories(), [])
+  // Derived from the videos already passed in, rather than re-reading the catalog.
+  // Same result as getAllCategories(): unique categories, sorted.
+  const categories = useMemo(
+    () => Array.from(new Set(videos.map((v) => v.category))).sort(),
+    [videos]
+  )
 
   // Deep-link support on a static export: category tiles and tag pills link
   // to /videos?category=... / ?tag=... / ?q=..., read client-side on mount.
