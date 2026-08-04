@@ -20,9 +20,24 @@ export function TiltCard({ children }: { children: React.ReactNode }) {
     if (!fine || reduced) return
 
     let raf = 0
+    // Cached on enter instead of read per pointermove. Two reasons: a rect read per
+    // move forces layout on every event, and getBoundingClientRect() reflects the
+    // transform this handler applies — so reading it live feeds the tilt back into
+    // itself. Position only changes on scroll/resize, so refresh it there.
+    let rect: DOMRect | null = null
+    const refreshRect = () => {
+      rect = el.getBoundingClientRect()
+    }
+
+    const onEnter = () => {
+      refreshRect()
+      window.addEventListener('scroll', refreshRect, { passive: true })
+      window.addEventListener('resize', refreshRect, { passive: true })
+    }
 
     const onMove = (e: PointerEvent) => {
-      const rect = el.getBoundingClientRect()
+      if (!rect) refreshRect()
+      if (!rect) return
       const px = (e.clientX - rect.left) / rect.width // 0..1
       const py = (e.clientY - rect.top) / rect.height
       cancelAnimationFrame(raf)
@@ -37,6 +52,9 @@ export function TiltCard({ children }: { children: React.ReactNode }) {
     }
 
     const onLeave = () => {
+      rect = null
+      window.removeEventListener('scroll', refreshRect)
+      window.removeEventListener('resize', refreshRect)
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
         el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)'
@@ -44,10 +62,14 @@ export function TiltCard({ children }: { children: React.ReactNode }) {
       })
     }
 
+    el.addEventListener('pointerenter', onEnter)
     el.addEventListener('pointermove', onMove)
     el.addEventListener('pointerleave', onLeave)
     return () => {
       cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', refreshRect)
+      window.removeEventListener('resize', refreshRect)
+      el.removeEventListener('pointerenter', onEnter)
       el.removeEventListener('pointermove', onMove)
       el.removeEventListener('pointerleave', onLeave)
     }

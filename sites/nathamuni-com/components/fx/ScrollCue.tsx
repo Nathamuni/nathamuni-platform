@@ -38,8 +38,13 @@ export function ScrollCue() {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
+    // Dismissal is one-way, so detach as soon as it fires rather than keeping a
+    // scroll listener alive for the life of the page.
     const onScroll = () => {
-      if (window.scrollY > 80) setDismissed(true)
+      if (window.scrollY > 80) {
+        setDismissed(true)
+        window.removeEventListener('scroll', onScroll)
+      }
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })

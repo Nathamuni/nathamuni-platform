@@ -443,11 +443,15 @@ export function Companion() {
     window.addEventListener('scroll', onScroll, { passive: true })
 
     const loop = (now: number) => {
-      raf = requestAnimationFrame(loop)
+      // Scheduled only while visible. Re-arming before the hidden check (as this
+      // did previously) keeps a callback queued every frame for the life of a
+      // backgrounded tab; onVisibility restarts it instead.
       if (document.hidden) {
+        raf = 0
         last = now
         return
       }
+      raf = requestAnimationFrame(loop)
       const dt = Math.min(now - last, 48) / 16.67
       last = now
 
@@ -583,8 +587,19 @@ export function Companion() {
 
     raf = requestAnimationFrame(loop)
 
+    // Restart the loop when the tab comes back. `last` is reset so the first frame
+    // after a long background period doesn't integrate a huge dt.
+    const onVisibility = () => {
+      if (document.hidden || raf !== 0) return
+      last = performance.now()
+      raf = requestAnimationFrame(loop)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
     return () => {
       cancelAnimationFrame(raf)
+      raf = 0
+      document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('click', onDocClick)
       window.removeEventListener('scroll', onScroll)

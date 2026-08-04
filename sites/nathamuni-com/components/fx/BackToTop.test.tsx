@@ -39,12 +39,15 @@ describe('BackToTop', () => {
     expect(btn.className).not.toContain('btt-visible')
   })
 
-  it('becomes visible after scrolling past two viewport heights', () => {
+  it('becomes visible after scrolling past two viewport heights', async () => {
     render(<BackToTop />)
     const btn = screen.getByTestId('back-to-top')
     setScroll(window.innerHeight * 2 + 1)
-    act(() => {
+    // The scroll handler is rAF-coalesced, so the state lands on the next frame
+    // rather than synchronously inside the event dispatch.
+    await act(async () => {
       window.dispatchEvent(new Event('scroll'))
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
     })
     expect(btn).toHaveAttribute('aria-hidden', 'false')
     expect(btn.className).toContain('btt-visible')

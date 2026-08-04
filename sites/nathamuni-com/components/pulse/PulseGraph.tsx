@@ -228,6 +228,15 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     const t0 = last
     let nextCascade = t0 + 1400
 
+    // The simulation used to redraw ~60 nodes every frame forever — including under
+    // prefers-reduced-motion, where the physics is skipped but the canvas was still
+    // repainted. It now parks itself once the layout settles and nobody is
+    // interacting, and wake() restarts it on input or resize.
+    const REST_ALPHA = 0.06
+    const IDLE_MS = 1200
+    let lastInteractionAt = t0
+    let sleeping = false
+
     function draw(now: number) {
       const dt = Math.min(50, now - last)
       last = now
@@ -393,9 +402,25 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
         }
       }
 
+      const settled = reduce ? elapsed > INTRO_MS : alpha <= REST_ALPHA
+      const idle = now - lastInteractionAt > IDLE_MS
+      if (settled && idle && elapsed > INTRO_MS) {
+        sleeping = true
+        raf = 0
+        return
+      }
+
       raf = requestAnimationFrame(draw)
     }
     raf = requestAnimationFrame(draw)
+
+    const wake = () => {
+      lastInteractionAt = performance.now()
+      if (!sleeping && raf !== 0) return
+      sleeping = false
+      last = performance.now()
+      raf = requestAnimationFrame(draw)
+    }
 
     // ---- Interaction: hover, drag node, pan, zoom ----
     const toGraph = (px: number, py: number) => ({
@@ -541,6 +566,13 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     canvas.addEventListener('pointerleave', onLeave)
     canvas.addEventListener('wheel', onWheel, { passive: false })
 
+    // Every input path must revive a parked loop, or hover/drag/zoom would render
+    // nothing. Registered after the handlers above so wake() runs on the same events.
+    for (const evt of ['pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'wheel']) {
+      canvas.addEventListener(evt, wake, { passive: true })
+    }
+    window.addEventListener('resize', wake, { passive: true })
+
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
@@ -550,6 +582,10 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       canvas.removeEventListener('pointercancel', onCancel)
       canvas.removeEventListener('pointerleave', onLeave)
       canvas.removeEventListener('wheel', onWheel)
+      for (const evt of ['pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'wheel']) {
+        canvas.removeEventListener(evt, wake)
+      }
+      window.removeEventListener('resize', wake)
     }
   }, [data])
 
