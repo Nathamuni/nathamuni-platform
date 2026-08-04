@@ -17,7 +17,9 @@ import './globals.css'
 
 const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['300', '400', '600', '800'],
+  // 300 dropped — nothing requests it (no font-light, no font-weight:300 anywhere).
+  // 800 IS used, by four session components, so it stays.
+  weight: ['400', '600', '800'],
   variable: '--font-outfit',
 })
 const inter = Inter({
