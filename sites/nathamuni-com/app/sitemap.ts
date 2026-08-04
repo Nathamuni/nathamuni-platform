@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/books`, priority: 0.3 },
     { url: `${SITE_URL}/projects`, priority: 0.3 },
     { url: `${SITE_URL}/journey`, priority: 0.5 },
+    { url: `${SITE_URL}/pulse`, priority: 0.5 },
     { url: `${SITE_URL}/ask`, priority: 0.6 },
     { url: `${SITE_URL}/courses`, priority: 0.8 },
     { url: `${SITE_URL}/sessions`, priority: 0.8 },

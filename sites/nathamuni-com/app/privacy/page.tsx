@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SOCIAL_LINKS } from '@/lib/social'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -25,11 +26,42 @@ export default function PrivacyPage() {
 
           <h2 className="text-white text-base font-medium mt-6">What this site collects</h2>
           <p>
-            No accounts, no trackers, no analytics cookies. The site is a static export with
-            two visitor-facing features that store data: the &ldquo;Join&rdquo; email signup
-            (email + optional text, used only to send occasional updates) and an anonymous
-            question log for the AI &ldquo;Ask&rdquo; feature (question text only, no IP or
-            identity stored).
+            No trackers and no analytics cookies. The pages are a static export, but a
+            Cloudflare Worker handles a few features that do store data:
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5">
+            <li>
+              <strong className="text-white/90">Optional accounts.</strong> If you choose to
+              create one, your email address and a hashed password (PBKDF2-SHA256) are stored,
+              along with your course and session progress, so it follows you between devices.
+              Sign-in uses a signed, HttpOnly cookie — not a tracking cookie. Accounts are
+              entirely optional: signed out, everything still works and progress stays in your
+              own browser.
+            </li>
+            <li>
+              <strong className="text-white/90">Join signup.</strong> Email plus optional text,
+              used only to send occasional updates.
+            </li>
+            <li>
+              <strong className="text-white/90">Ask questions.</strong> An anonymous log of the
+              question text for the AI feature — no IP address, no identity.
+            </li>
+          </ul>
+
+          <h2 className="text-white text-base font-medium mt-6">Deleting your data</h2>
+          <p>
+            Message{' '}
+            <a
+              className="text-white/90 underline"
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @nathamuni_ on Instagram
+            </a>{' '}
+            and your account, stored progress, and any join-list entry will be deleted. No
+            account is required to use the site, and nothing here is shared with or sold to
+            anyone.
           </p>
 
           <h2 className="text-white text-base font-medium mt-6">

@@ -35,8 +35,11 @@ npm test           # vitest
 - Static export (`output: 'export'`) + a thin Worker (`worker/index.mjs`) that serves
   assets and `/api/search` (semantic search via Workers AI bge-m3, vectors cached by
   index hash from the prebuild `search-index.json`)
-- No database, no auth; the Instagram Graph API is touched only by the daily sync job,
-  never by visitor traffic
+- No database, but there *is* optional auth: `worker/auth.mjs` stores email +
+  PBKDF2-SHA256 password hashes and a per-user progress blob in the `INBOX` KV
+  namespace, behind HMAC-signed HttpOnly cookies. Accounts are opt-in; signed out,
+  progress stays in localStorage. Keep `app/privacy/page.tsx` honest about this.
+- The Instagram Graph API is touched only by the daily sync job, never by visitor traffic
 - Social links live in `lib/social.ts`; category colors in `lib/categoryMeta.ts`
 - Instagram is the primary social CTA; YouTube is secondary until that channel is prioritized
 - Mobile-first is mandatory; 3D/tilt effects are desktop-only and reduced-motion-safe

@@ -35,7 +35,9 @@ describe('Footer', () => {
   it('shows the privacy line and copyright', () => {
     render(<Footer />)
     const footer = screen.getByTestId('site-footer')
-    expect(footer).toHaveTextContent('No servers. No trackers. Built to be searched.')
+    // Was "No servers. No trackers." — untrue, since the site runs a Cloudflare
+    // Worker with KV and Workers AI behind /api/*.
+    expect(footer).toHaveTextContent('No trackers. No ads. Built to be searched.')
     expect(footer).toHaveTextContent(`${PROFILE.name}. All rights reserved.`)
   })
 })

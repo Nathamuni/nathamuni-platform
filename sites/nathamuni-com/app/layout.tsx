@@ -49,6 +49,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/',
+    // Makes /feed.xml discoverable to readers and crawlers via <link rel="alternate">.
+    types: {
+      'application/rss+xml': [{ url: '/feed.xml', title: `${PROFILE.name} — posts and videos` }],
+    },
   },
 }
 

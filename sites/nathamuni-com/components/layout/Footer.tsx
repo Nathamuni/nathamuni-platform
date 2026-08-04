@@ -65,7 +65,10 @@ export function Footer() {
 
       <div className="site-footer-bottom">
         <SocialButtons />
-        <p className="site-footer-note">No servers. No trackers. Built to be searched.</p>
+        {/* "No servers" was untrue: the site runs a Cloudflare Worker with KV and
+            Workers AI behind /api/*. No-trackers still holds — nothing analytics-like
+            is loaded. */}
+        <p className="site-footer-note">No trackers. No ads. Built to be searched.</p>
         <p className="site-footer-copy">&copy; {PROFILE.name}. All rights reserved.</p>
       </div>
     </footer>
