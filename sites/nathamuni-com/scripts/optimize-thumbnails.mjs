@@ -43,16 +43,22 @@ function isStale(src, out) {
 }
 
 async function main() {
+  // public/images/thumbnails/ is generated, so if this script cannot do its job the
+  // build MUST fail rather than emit a site with no thumbnails. A failed build is
+  // safe — Cloudflare keeps serving the previous successful deploy.
   if (!fs.existsSync(SRC_DIR)) {
-    console.error(`optimize-thumbnails: source dir missing: ${SRC_DIR}`)
+    console.error(
+      `optimize-thumbnails: source dir missing: ${SRC_DIR}\n` +
+        'Originals are git-tracked; restore with: git checkout -- assets/thumbnails'
+    )
     process.exit(1)
   }
   fs.mkdirSync(OUT_DIR, { recursive: true })
 
   const sources = fs.readdirSync(SRC_DIR).filter((f) => /\.jpe?g$/i.test(f))
   if (sources.length === 0) {
-    console.warn('optimize-thumbnails: no source thumbnails found')
-    return
+    console.error('optimize-thumbnails: no source thumbnails found in assets/thumbnails/')
+    process.exit(1)
   }
 
   let built = 0
@@ -95,7 +101,19 @@ async function main() {
       `${mb(bytesIn)}MB source -> ${mb(bytesOut)}MB emitted`
   )
 
-  if (failed > 0 && built === 0 && skipped === 0) {
+  // Any failure means at least one card would render a broken image. Fail the build.
+  if (failed > 0) {
+    console.error(`optimize-thumbnails: ${failed} thumbnail(s) failed — refusing to build.`)
+    process.exit(1)
+  }
+
+  // Every source must have produced both outputs, or the deploy is incomplete.
+  const emitted = fs.readdirSync(OUT_DIR)
+  const webpCount = emitted.filter((f) => f.endsWith('.webp')).length
+  if (webpCount < sources.length) {
+    console.error(
+      `optimize-thumbnails: expected ${sources.length} .webp, found ${webpCount} — refusing to build.`
+    )
     process.exit(1)
   }
 
