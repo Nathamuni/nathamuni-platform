@@ -403,8 +403,11 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       }
 
       const settled = reduce ? elapsed > INTRO_MS : alpha <= REST_ALPHA
+      // Holding a node still fires no pointermove, so idle alone would let the loop
+      // park mid-drag and freeze the other nodes until the pointer moved again.
+      const interacting = dragNode !== null || panning
       const idle = now - lastInteractionAt > IDLE_MS
-      if (settled && idle && elapsed > INTRO_MS) {
+      if (settled && idle && !interacting && elapsed > INTRO_MS) {
         sleeping = true
         raf = 0
         return
