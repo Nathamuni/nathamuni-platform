@@ -102,6 +102,14 @@ Post-fix browser sweep, six pages, 0 below AA on every one:
 4. Privacy page routes deletion requests to Instagram DMs — no contact email exists in
    the repo and one was not invented.
 
+## Browser QA
+
+A full rendered QA pass was run after the review fixes — see `QA.md` (rev `39122eb`).
+It found and cleared **1 serious + 4 moderate axe violations** that the phases had
+already been called done, including a step-timeline cluster with no accessible name and
+h1→h3 heading jumps on four routes. Viewports, keyboard focus, reduced motion, console
+and network are all clean. Performance is still NOT MEASURED.
+
 ## Test state
 
 `npm run lint` clean · `npm run type-check` clean · `npm run build` exit 0 ·
