@@ -154,7 +154,7 @@ export default async function SessionDetailPage({
         .ssn-session-forwhom {
           margin: 0;
           font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-session-reading-list {
           list-style: none;

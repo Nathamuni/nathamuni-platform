@@ -191,7 +191,7 @@ export function SaveNudgeHost() {
         .nudge-toast-dismiss {
           border: none;
           background: none;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
           font-size: 1.1rem;
           line-height: 1;
           cursor: pointer;

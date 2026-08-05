@@ -195,7 +195,10 @@ export function AccountWidget() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const cardRef = useRef<HTMLDivElement | null>(null)
-  useFocusTrap(cardRef, open)
+  // Must track whether the dialog is actually rendered, not just `open`: this widget
+  // returns null off the course/session routes, and a stale-active trap held a
+  // listener against the detached card that swallowed Shift+Tab site-wide.
+  useFocusTrap(cardRef, open && isProgressPage(pathname))
 
   // A SaveNudge anywhere on the page can pop this dialog open.
   useEffect(() => {

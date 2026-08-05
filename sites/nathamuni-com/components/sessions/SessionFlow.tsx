@@ -62,7 +62,7 @@ export function SessionFlow({
           font-size: 0.65rem;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-flow-diagram {
           position: relative;

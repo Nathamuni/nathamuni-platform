@@ -297,7 +297,7 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
         }
         .ssn-tracker-clear {
           font-size: 0.72rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
           background: none;
           border: none;
           padding: 0.4rem 0.1rem;
@@ -367,7 +367,7 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           font-size: 0.6rem;
           text-transform: uppercase;
           letter-spacing: 0.06em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-tracker-streak {
           display: inline-flex;
@@ -399,12 +399,12 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           color: var(--color-rose);
         }
         .ssn-tracker-trend-flat {
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-tracker-privacy {
           margin: 0;
           font-size: 0.7rem;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(255, 255, 255, 0.55);
         }
         @media (max-width: 640px) {
           .ssn-tracker-stats {

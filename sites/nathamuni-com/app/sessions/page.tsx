@@ -74,7 +74,7 @@ export default function SessionsPage() {
         .ssn-card-phase-count,
         .ssn-card-metric-count {
           font-size: 0.65rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
           white-space: nowrap;
         }
         .ssn-card-phase-count {
@@ -97,7 +97,7 @@ export default function SessionsPage() {
           margin: 0;
           font-size: 0.75rem;
           line-height: 1.5;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-card-cta {
           margin-top: auto;

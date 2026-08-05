@@ -64,7 +64,7 @@ export function SessionTimeline({
           font-size: 0.65rem;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-timeline-rail {
           list-style: none;
@@ -95,7 +95,7 @@ export function SessionTimeline({
           font-size: 0.62rem;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-timeline-name {
           font-size: 0.95rem;

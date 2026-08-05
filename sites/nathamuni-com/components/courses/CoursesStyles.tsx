@@ -93,7 +93,7 @@ const CSS = `
   margin-top: auto;
   padding-top: 0.5rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -113,7 +113,7 @@ const CSS = `
 .crs-meta-row {
   font-size: 0.72rem;
   letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.55);
   white-space: normal;
 }
 
@@ -166,7 +166,7 @@ const CSS = `
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.55);
   font-weight: 600;
   margin-bottom: 0.4rem;
 }
@@ -317,7 +317,7 @@ const CSS = `
 }
 .crs-module-summary-count {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
 }
 .crs-module-chevron {
   flex-shrink: 0;
@@ -436,7 +436,7 @@ const CSS = `
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
 }
 .crs-blog-card-title {
   font-size: 0.92rem;
@@ -481,7 +481,7 @@ const CSS = `
   background: rgba(255, 255, 255, 0.06);
 }
 .crs-action-label[data-checked='true'] {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: line-through;
 }
 .crs-action-checkbox {

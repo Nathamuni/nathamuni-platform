@@ -178,7 +178,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           font-size: 0.68rem;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-protocol-almost {
           color: var(--color-cyan);
@@ -246,7 +246,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
         }
         .ssn-step-number {
           font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(255, 255, 255, 0.55);
           font-weight: 600;
         }
         .ssn-step-title {

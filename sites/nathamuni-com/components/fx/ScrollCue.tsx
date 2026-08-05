@@ -10,7 +10,7 @@ const CSS = `
   transition: opacity 0.4s ease;
 }
 .scue-chevron {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.55);
   animation: scue-float 2s ease-in-out infinite;
 }
 @keyframes scue-float {

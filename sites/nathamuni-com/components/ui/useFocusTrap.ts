@@ -8,6 +8,10 @@ const FOCUSABLE = [
   'input:not([disabled]):not([type="hidden"])',
   'select:not([disabled])',
   'textarea:not([disabled])',
+  // The Moments lightbox puts a <video controls> before its buttons; without this
+  // the player itself was unreachable by keyboard inside the trap.
+  'video[controls]',
+  'audio[controls]',
   '[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
@@ -64,6 +68,10 @@ export function useFocusTrap<T extends HTMLElement>(
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return
+      // If the dialog was removed without `active` flipping (e.g. a route change
+      // unmounting its host), never preventDefault — that would trap Tab against a
+      // detached node and freeze keyboard navigation for the whole page.
+      if (!container.isConnected) return
       const items = focusables()
       if (items.length === 0) {
         e.preventDefault()

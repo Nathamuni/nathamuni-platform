@@ -111,13 +111,21 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
     resize()
-    const ro = new ResizeObserver(resize)
+    // Resizing the canvas clears it. If the loop is parked nothing would repaint,
+    // leaving a blank graph until the next pointer event — so wake it.
+    const ro = new ResizeObserver(() => {
+      resize()
+      wake()
+    })
     ro.observe(wrap)
 
     // Recenter escape hatch — hand it to React so the button can call it.
     resetViewRef.current = () => {
       view.userControlled = false // autoFit resumes and lerps back to a centred fit
       setAdjusted(false)
+      // autoFit only runs inside the loop, so without this the button would clear
+      // itself while the graph stayed exactly where it was.
+      wake()
     }
     // Any deliberate pan/zoom flags the view as user-controlled (shows recenter).
     const markAdjusted = () => {

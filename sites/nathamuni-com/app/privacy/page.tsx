@@ -32,19 +32,36 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-5 space-y-1.5">
             <li>
               <strong className="text-white/90">Optional accounts.</strong> If you choose to
-              create one, your email address and a hashed password (PBKDF2-SHA256) are stored,
-              along with your course and session progress, so it follows you between devices.
+              create one, your email address and a hashed password (PBKDF2-SHA256) are stored.
               Sign-in uses a signed, HttpOnly cookie — not a tracking cookie. Accounts are
-              entirely optional: signed out, everything still works and progress stays in your
-              own browser.
+              entirely optional: signed out, everything still works and stays in your own
+              browser only.
+            </li>
+            <li>
+              <strong className="text-white/90">
+                Progress, including health details you enter.
+              </strong>{' '}
+              While you are signed in, the progress saved on this device is copied to the
+              server so it follows you to another one. That includes course and session
+              checkmarks <em>and</em> anything you type into the session tools — body weight,
+              height and whether you train (used for the BMI and protein calculators), plus
+              any mood or metric entries you log. If you would rather this never leaves your
+              device, simply do not create an account: signed out, none of it is ever sent.
             </li>
             <li>
               <strong className="text-white/90">Join signup.</strong> Email plus optional text,
               used only to send occasional updates.
             </li>
             <li>
-              <strong className="text-white/90">Ask questions.</strong> An anonymous log of the
-              question text for the AI feature — no IP address, no identity.
+              <strong className="text-white/90">Ask questions.</strong> Your question text is
+              sent to Cloudflare Workers AI to generate an answer, and an anonymous log of the
+              question text is kept. No name or account is attached to it.
+            </li>
+            <li>
+              <strong className="text-white/90">Abuse protection.</strong> The Ask, sign-in and
+              Join endpoints are rate-limited. That involves briefly keying a counter derived
+              from your IP address; it is not stored as a record of your visit and is not used
+              to profile you.
             </li>
           </ul>
 

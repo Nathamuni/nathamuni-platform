@@ -55,6 +55,47 @@ describe('useFocusTrap', () => {
     expect(screen.getByRole('button', { name: 'last' })).toHaveFocus()
   })
 
+  it('does not swallow Tab once its container is unmounted while still active', () => {
+    // Regression: AccountWidget kept open=true while a route change made it render
+    // null, so `active` never flipped and this listener stayed bound to a detached
+    // node — calling preventDefault and blocking Tab across the whole site.
+    function StaleHarness() {
+      const [mounted, setMounted] = useState(true)
+      const ref = useRef<HTMLDivElement>(null)
+      useFocusTrap(ref, true) // deliberately stays active after the dialog goes away
+      return (
+        <>
+          <button data-testid="outside">outside</button>
+          <button data-testid="unmount" onClick={() => setMounted(false)}>
+            unmount
+          </button>
+          {mounted && (
+            <div ref={ref} role="dialog" aria-modal="true" aria-label="Stale">
+              <button>inner</button>
+            </div>
+          )}
+        </>
+      )
+    }
+    render(<StaleHarness />)
+    fireEvent.click(screen.getByTestId('unmount'))
+
+    const outside = screen.getByTestId('outside')
+    outside.focus()
+    // Shift+Tab is the path that actually breaks: the handler's back-wrap branch
+    // fires whenever focus is outside the container, which is true of the entire
+    // page once that container is detached.
+    const evt = new KeyboardEvent('keydown', {
+      key: 'Tab',
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    document.dispatchEvent(evt)
+    expect(evt.defaultPrevented).toBe(false)
+    expect(outside).toHaveFocus()
+  })
+
   it('restores focus to the trigger when the dialog unmounts', async () => {
     const user = userEvent.setup()
     render(<Harness />)

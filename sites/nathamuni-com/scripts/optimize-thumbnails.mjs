@@ -132,6 +132,7 @@ async function optimiseStoryPosters() {
   const posters = fs.readdirSync(STORIES_DIR).filter((f) => /\.jpe?g$/i.test(f))
   let built = 0
   let skipped = 0
+  let failed = 0
   let bytesIn = 0
   let bytesOut = 0
 
@@ -154,14 +155,22 @@ async function optimiseStoryPosters() {
       built++
     } catch (err) {
       console.error(`optimize-thumbnails: FAILED poster ${file}: ${err.message}`)
+      failed++
     }
   }
 
   const mb = (n) => (n / 1048576).toFixed(1)
   console.log(
-    `optimize-thumbnails: story posters — ${built} built, ${skipped} cached — ` +
+    `optimize-thumbnails: story posters — ${built} built, ${skipped} cached, ${failed} failed — ` +
       `${mb(bytesIn)}MB source -> ${mb(bytesOut)}MB emitted`
   )
+
+  // Thumbnail advertises the derived .webp unconditionally, so a silently skipped
+  // poster would ship a <source> pointing at a file that does not exist.
+  if (failed > 0) {
+    console.error(`optimize-thumbnails: ${failed} story poster(s) failed — refusing to build.`)
+    process.exit(1)
+  }
 }
 
 await main()

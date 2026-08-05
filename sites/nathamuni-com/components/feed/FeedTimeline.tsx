@@ -164,7 +164,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           text-transform: uppercase;
           letter-spacing: 0.18em;
           font-variant: small-caps;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
           margin-bottom: 0.85rem;
         }
         .feed-rows {
@@ -238,7 +238,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
         .feed-kind-story { color: #fda4af; background: rgba(244, 63, 94, 0.16); }
         .feed-row-date {
           font-size: 0.65rem;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(255, 255, 255, 0.55);
           flex-shrink: 0;
         }
         .feed-row-title {
@@ -292,7 +292,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
         }
         .feed-filter-count {
           font-size: 0.65rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
           font-variant-numeric: tabular-nums;
         }
         .feed-filter-chip:hover { border-color: rgba(178, 148, 255, 0.45); color: #fff; }
