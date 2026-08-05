@@ -18,7 +18,7 @@ const CSS = `
   width: 100%;
   transform-origin: left center;
   transform: scaleX(0);
-  background: linear-gradient(90deg, #8b5cf6, #ec4899, #22d3ee);
+  background: linear-gradient(90deg, var(--color-accent), var(--color-pink), var(--color-cyan));
 }
 @media (prefers-reduced-motion: reduce) {
   .sprg-track {

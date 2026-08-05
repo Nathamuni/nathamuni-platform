@@ -197,17 +197,17 @@ const CSS = `
   white-space: nowrap;
 }
 .crs-badge-tested {
-  color: #d8ccff;
+  color: var(--color-lavender-tint);
   background: rgba(139, 92, 246, 0.18);
   border: 1px solid rgba(178, 148, 255, 0.4);
 }
 .crs-badge-research {
-  color: #a5f3fc;
+  color: var(--color-cyan-tint);
   background: rgba(34, 211, 238, 0.14);
   border: 1px solid rgba(34, 211, 238, 0.4);
 }
 .crs-badge-standard {
-  color: #fde68a;
+  color: var(--color-amber-tint);
   background: rgba(245, 158, 11, 0.14);
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
@@ -225,17 +225,17 @@ const CSS = `
   flex-shrink: 0;
 }
 .crs-badge-dot-tested {
-  color: #d8ccff;
+  color: var(--color-lavender-tint);
   background: rgba(139, 92, 246, 0.22);
   border: 1px solid rgba(178, 148, 255, 0.45);
 }
 .crs-badge-dot-research {
-  color: #a5f3fc;
+  color: var(--color-cyan-tint);
   background: rgba(34, 211, 238, 0.18);
   border: 1px solid rgba(34, 211, 238, 0.45);
 }
 .crs-badge-dot-standard {
-  color: #fde68a;
+  color: var(--color-amber-tint);
   background: rgba(245, 158, 11, 0.18);
   border: 1px solid rgba(245, 158, 11, 0.45);
 }
@@ -488,7 +488,7 @@ const CSS = `
   flex-shrink: 0;
   width: 20px;
   height: 20px;
-  accent-color: #8b5cf6;
+  accent-color: var(--color-accent);
   cursor: pointer;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -514,7 +514,7 @@ const CSS = `
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), var(--color-cyan));
   transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -554,7 +554,7 @@ const CSS = `
   box-shadow: 0 0 24px -4px rgba(251, 191, 36, 0.5);
 }
 .crs-ring-done .crs-ring-value {
-  color: #fbbf24;
+  color: var(--color-amber);
 }
 .crs-ring-label {
   font-size: 0.8rem;
@@ -578,7 +578,7 @@ const CSS = `
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), var(--color-cyan));
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .crs-card-progress-pct {

@@ -75,7 +75,7 @@ export function SessionFlow({
           left: 1.05rem;
           width: 3px;
           border-radius: 9999px;
-          background: linear-gradient(180deg, #8b5cf6, #ec4899 55%, #22d3ee);
+          background: linear-gradient(180deg, var(--color-accent), var(--color-pink) 55%, var(--color-cyan));
         }
         .ssn-flow-spine::after {
           content: '';
@@ -87,7 +87,7 @@ export function SessionFlow({
           height: 0;
           border-left: 5px solid transparent;
           border-right: 5px solid transparent;
-          border-top: 7px solid #22d3ee;
+          border-top: 7px solid var(--color-cyan);
         }
         .ssn-flow-list {
           position: relative;
@@ -135,21 +135,21 @@ export function SessionFlow({
           z-index: 1;
         }
         .ssn-flow-ring-tested {
-          color: #c4b5fd;
-          border-color: #8b5cf6;
+          color: var(--color-accent-tint);
+          border-color: var(--color-accent);
         }
         .ssn-flow-ring-research {
-          color: #67e8f9;
-          border-color: #22d3ee;
+          color: var(--color-cyan-soft);
+          border-color: var(--color-cyan);
         }
         .ssn-flow-ring-standard {
-          color: #fcd34d;
-          border-color: #f59e0b;
+          color: var(--color-amber-soft);
+          border-color: var(--color-amber-deep);
         }
         .ssn-flow-ring-done {
-          color: #0d0a1f;
-          background: #22d3ee;
-          border-color: #22d3ee;
+          color: var(--color-ground);
+          background: var(--color-cyan);
+          border-color: var(--color-cyan);
         }
         .ssn-flow-title {
           font-size: 0.9rem;

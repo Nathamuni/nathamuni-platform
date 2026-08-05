@@ -260,7 +260,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               align-items: center;
               justify-content: center;
               padding: 1.5rem;
-              background: #0d0a1f;
+              background: var(--color-ground);
             }
             /* Breathing dark gradient: two hued glows slowly swelling and
                relaxing on an ~8s cycle — calm, not weather. Sits behind the
@@ -353,7 +353,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
               border-radius: 0.85rem;
               border: none;
               background: hsl(var(--cat) 80% 62%);
-              color: #0d0a1f;
+              color: var(--color-ground);
               font-size: 0.95rem;
               font-weight: 700;
               cursor: pointer;
@@ -413,7 +413,7 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
           padding: 0.6rem 1.15rem;
           border-radius: 9999px;
           border: none;
-          background: linear-gradient(135deg, #f59e0b, #ec4899 55%, #8b5cf6);
+          background: linear-gradient(135deg, var(--color-amber-deep), var(--color-pink) 55%, var(--color-accent));
           color: #fff;
           font-size: 0.85rem;
           font-weight: 700;

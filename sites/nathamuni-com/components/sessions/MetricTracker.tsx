@@ -337,7 +337,7 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           border-radius: 0.6rem;
           background: rgba(34, 211, 238, 0.16);
           border: 1px solid rgba(34, 211, 238, 0.45);
-          color: #67e8f9;
+          color: var(--color-cyan-soft);
           font-size: 0.85rem;
           font-weight: 600;
           cursor: pointer;
@@ -377,7 +377,7 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           border-radius: 999px;
           font-size: 0.72rem;
           font-weight: 600;
-          color: #fbbf24;
+          color: var(--color-amber);
           background: rgba(251, 191, 36, 0.12);
           border: 1px solid rgba(251, 191, 36, 0.3);
         }
@@ -393,10 +393,10 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           line-height: 1;
         }
         .ssn-tracker-trend-up {
-          color: #4ade80;
+          color: var(--color-success);
         }
         .ssn-tracker-trend-down {
-          color: #fb7185;
+          color: var(--color-rose);
         }
         .ssn-tracker-trend-flat {
           color: rgba(255, 255, 255, 0.4);

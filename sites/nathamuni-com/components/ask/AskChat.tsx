@@ -157,7 +157,7 @@ export function AskChat() {
       )}
 
       {input.length > MAX_QUESTION_LEN - 60 && (
-        <p className="text-xs text-white/45 text-right -mb-3" data-testid="ask-counter">
+        <p className="text-xs text-white/55 text-right -mb-3" data-testid="ask-counter">
           {input.length}/{MAX_QUESTION_LEN} characters
         </p>
       )}

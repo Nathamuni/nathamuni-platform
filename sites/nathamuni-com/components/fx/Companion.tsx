@@ -258,7 +258,7 @@ const CSS = `
   border-radius: 999px;
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.06);
-  color: #f5f3ff;
+  color: var(--text-on-glass);
   font-size: 13px;
   white-space: nowrap;
   cursor: pointer;
@@ -268,7 +268,7 @@ const CSS = `
   background: rgba(139, 92, 246, 0.25);
 }
 .cmp-menu-item[aria-checked='true'] {
-  border-color: #22d3ee;
+  border-color: var(--color-cyan);
   background: rgba(34, 211, 238, 0.18);
 }
 `

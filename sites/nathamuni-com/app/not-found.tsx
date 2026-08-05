@@ -41,7 +41,7 @@ export default function NotFound() {
             className="glass-card p-4 sm:p-5 flex flex-col gap-1 transition-colors hover:border-white/30"
           >
             <span className="text-white text-sm font-medium">{exit.label} →</span>
-            <span className="text-xs text-white/45">{exit.note}</span>
+            <span className="text-xs text-white/55">{exit.note}</span>
           </Link>
         ))}
       </div>

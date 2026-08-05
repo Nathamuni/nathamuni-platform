@@ -140,7 +140,7 @@ export function SessionTimeline({
           letter-spacing: 0.1em;
           padding: 0.15rem 0.5rem;
           border-radius: 9999px;
-          color: #0d0a1f;
+          color: var(--color-ground);
           background: hsl(var(--cat) 85% 65%);
         }
 

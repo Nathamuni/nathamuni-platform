@@ -133,7 +133,7 @@ export default function StatsPage() {
           })}
         </div>
         {firstMonth && lastMonth && (
-          <div className="flex justify-between text-[0.6rem] text-white/30 mt-2">
+          <div className="flex justify-between text-[0.6rem] text-white/55 mt-2">
             <span>{firstMonth.label}</span>
             <span>{lastMonth.label}</span>
           </div>

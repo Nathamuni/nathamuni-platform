@@ -181,7 +181,7 @@ export function SaveNudgeHost() {
           border: none;
           background: none;
           padding: 0;
-          color: #22d3ee;
+          color: var(--color-cyan);
           font-size: 0.82rem;
           font-weight: 600;
           cursor: pointer;

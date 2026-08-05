@@ -57,7 +57,7 @@ export default function BlogPage() {
               <p className="post-card-excerpt">{post.excerpt}</p>
               <div className="flex items-center justify-between gap-3 mt-1">
                 <span className="video-card-date">{formatDate(post.publishedDate)}</span>
-                <span className="text-xs text-white/30 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
+                <span className="text-xs text-white/55 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
                   Read →
                 </span>
               </div>

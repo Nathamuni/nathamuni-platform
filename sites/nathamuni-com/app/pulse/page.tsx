@@ -42,8 +42,8 @@ export default function PulsePage() {
           <span
             className="inline-block w-2 h-2 rounded-full"
             style={{
-              background: stats.live ? '#4ade80' : '#facc15',
-              boxShadow: stats.live ? '0 0 8px #4ade80' : '0 0 8px #facc15',
+              background: stats.live ? 'var(--color-success)' : 'var(--color-warning)',
+              boxShadow: stats.live ? '0 0 8px var(--color-success)' : '0 0 8px var(--color-warning)',
             }}
           />
           {/* Status badge, not the page title — it used to be the h1, which left the
@@ -101,7 +101,7 @@ export default function PulsePage() {
               )
             })}
           </div>
-          <div className="flex justify-between text-[0.55rem] text-white/30 mt-1">
+          <div className="flex justify-between text-[0.55rem] text-white/55 mt-1">
             <span>00:00</span>
             <span>12:00</span>
             <span>23:00</span>

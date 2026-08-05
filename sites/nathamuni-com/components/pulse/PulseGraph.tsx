@@ -642,7 +642,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
           <div className="text-white/90 font-medium leading-snug line-clamp-2">
             {hovered.node.label}
           </div>
-          <div className="text-white/45 mt-0.5 capitalize">
+          <div className="text-white/55 mt-0.5 capitalize">
             {hovered.node.kind}
             {hovered.node.er != null && (
               <span className="text-white/70"> · {hovered.node.er.toFixed(1)}% engagement</span>

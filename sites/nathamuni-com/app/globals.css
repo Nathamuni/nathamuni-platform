@@ -38,6 +38,23 @@
   --color-pink: #ec4899;
   --color-lavender: #b294ff;
   --color-amber: #fbbf24;
+  --color-amber-deep: #f59e0b;
+
+  /* ---- status ---- */
+  --color-success: #4ade80;
+  --color-warning: #facc15;
+  --color-danger: #fca5b0;
+  --color-caution: #fcd9a8;
+  --color-rose: #fb7185;
+
+  /* ---- tints. Only values used in 2+ places are tokenised; genuine one-offs
+         stay literal, since indirection there buys nothing. ---- */
+  --text-on-glass: #f5f3ff;
+  --color-cyan-tint: #a5f3fc;
+  --color-amber-tint: #fde68a;
+  --color-amber-soft: #fcd34d;
+  --color-lavender-tint: #d8ccff;
+  --color-accent-tint: #c4b5fd;
 
   /* ---- surfaces & borders ---- */
   --surface-glass: rgb(148 112 255 / 0.08);

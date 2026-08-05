@@ -154,7 +154,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           top: 0.3rem;
           bottom: 0.3rem;
           width: 2px;
-          background: linear-gradient(180deg, #8b5cf6, #ec4899, #22d3ee);
+          background: linear-gradient(180deg, var(--color-accent), var(--color-pink), var(--color-cyan));
           opacity: 0.5;
           border-radius: 999px;
         }

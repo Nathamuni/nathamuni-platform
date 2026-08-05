@@ -71,10 +71,10 @@ export function GoalsTracker({ goals }: { goals: Goal[] }) {
           flex-shrink: 0;
         }
         .jny-marker-achieved {
-          background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+          background: linear-gradient(135deg, var(--color-accent), var(--color-cyan));
         }
         .jny-marker-progress {
-          background: conic-gradient(from 0deg, #8b5cf6, #ec4899, #22d3ee, #8b5cf6);
+          background: conic-gradient(from 0deg, var(--color-accent), var(--color-pink), var(--color-cyan), var(--color-accent));
           animation: jny-spin 3s linear infinite;
         }
         .jny-marker-dream {

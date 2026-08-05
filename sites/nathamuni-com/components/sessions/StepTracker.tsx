@@ -181,7 +181,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           color: rgba(255, 255, 255, 0.45);
         }
         .ssn-protocol-almost {
-          color: #22d3ee;
+          color: var(--color-cyan);
         }
         .ssn-protocol-bar {
           height: 4px;
@@ -193,7 +193,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           display: block;
           height: 100%;
           border-radius: 999px;
-          background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+          background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), var(--color-cyan));
           transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .ssn-complete {
@@ -212,7 +212,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           width: 26px;
           height: 26px;
           flex-shrink: 0;
-          color: #fbbf24;
+          color: var(--color-amber);
         }
         .ssn-protocol-list {
           display: flex;
@@ -267,17 +267,17 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           border: 1px solid transparent;
         }
         .ssn-badge-tested {
-          color: #c4b5fd;
+          color: var(--color-accent-tint);
           background: rgba(139, 92, 246, 0.15);
           border-color: rgba(139, 92, 246, 0.4);
         }
         .ssn-badge-research {
-          color: #67e8f9;
+          color: var(--color-cyan-soft);
           background: rgba(34, 211, 238, 0.13);
           border-color: rgba(34, 211, 238, 0.4);
         }
         .ssn-badge-standard {
-          color: #fcd34d;
+          color: var(--color-amber-soft);
           background: rgba(245, 158, 11, 0.13);
           border-color: rgba(245, 158, 11, 0.4);
         }
@@ -315,9 +315,9 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           transition: all 0.2s ease;
         }
         .ssn-step-checkpoint input:checked + .ssn-check-mark {
-          color: #0d0a1f;
-          background: #22d3ee;
-          border-color: #22d3ee;
+          color: var(--color-ground);
+          background: var(--color-cyan);
+          border-color: var(--color-cyan);
         }
         .ssn-step-checkpoint input:focus-visible + .ssn-check-mark {
           outline: 2px solid rgba(34, 211, 238, 0.6);
@@ -326,13 +326,13 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
         .ssn-step-reference {
           align-self: flex-start;
           font-size: 0.75rem;
-          color: #67e8f9;
+          color: var(--color-cyan-soft);
           text-decoration: underline;
           text-underline-offset: 2px;
           word-break: break-word;
         }
         .ssn-step-reference:hover {
-          color: #a5f3fc;
+          color: var(--color-cyan-tint);
         }
         @media (max-width: 640px) {
           .ssn-step {

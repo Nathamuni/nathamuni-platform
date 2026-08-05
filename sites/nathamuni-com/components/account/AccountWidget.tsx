@@ -41,7 +41,7 @@ const ACCT_CSS = `
   border: 1px solid rgba(178, 148, 255, 0.22);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  color: #f5f3ff;
+  color: var(--text-on-glass);
   font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
@@ -70,7 +70,7 @@ const ACCT_CSS = `
   border-radius: 9999px;
   border: 1px solid rgba(178, 148, 255, 0.22);
   background: rgba(255, 255, 255, 0.06);
-  color: #f5f3ff;
+  color: var(--text-on-glass);
   font-size: 0.72rem;
   cursor: pointer;
 }
@@ -153,7 +153,7 @@ const ACCT_CSS = `
   border-radius: 0.7rem;
   border: 1px solid rgba(34, 211, 238, 0.45);
   background: rgba(34, 211, 238, 0.18);
-  color: #67e8f9;
+  color: var(--color-cyan-soft);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
