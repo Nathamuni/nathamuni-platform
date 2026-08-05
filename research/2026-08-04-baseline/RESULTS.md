@@ -61,17 +61,44 @@ every one of these dialogs is. The trap would have silently done nothing.
 - **Analytics** — Cloudflare Web Analytics needs a beacon token from the owner.
 - **GSAP / full shadcn** — see the plan's "explicitly not doing" section.
 
+## Independent review (codex, gpt-5.6-sol, read-only) — and what it overturned
+
+It ran to completion on the second attempt and found **no blocker**, but judged several
+of my own commit claims false or overstated. All confirmed and fixed:
+
+| My claim | Its verdict | Reality |
+|---|---|---|
+| "No normal text below AA remains" | **FALSE** | 27 raw `rgba(255,255,255,.35–.45)` text colours survived. My sweep only covered `text-white/NN` utilities and only verified 4 pages — the sessions/courses/feed area was never looked at. |
+| "All four dialogs correctly trap/restore focus" | **FALSE** | `AccountWidget` renders null off course/session routes while `open` stayed true, so the trap held a listener on a detached card and **hijacked Shift+Tab site-wide**. |
+| "Privacy copy is factually accurate" | **FALSE** | `PROGRESS_PREFIXES` syncs `metrics-*`, i.e. body weight, height, training status and mood entries — described only as "course and session progress". |
+| "Idle loops stop and reliably wake" | OVERSTATED | `ResizeObserver` cleared a parked canvas without waking; Recenter cleared its button without moving the graph. |
+| "Pipeline cannot emit a missing WebP" | OVERSTATED | Story-poster conversion failures were swallowed while `Thumbnail` advertises the `.webp` unconditionally. |
+| Catalog gone from client JS | TRUE | Confirmed absent from all 22 chunks. It notes `videos.html` still serialises 172 ids as client props — accurate, and never claimed otherwise. |
+| Token replacements visually exact | TRUE | No undefined token, no invalid SVG `var()` use. |
+| RSS, workflow staging, OG images, footer wording | TRUE | — |
+
+**A test I wrote was also wrong.** The first regression test for the Shift+Tab trap used
+plain `Tab` and passed with the fix reverted. Rewritten to use Shift+Tab and verified to
+fail without the guard, pass with it. A regression test that passes without the fix is
+worse than none.
+
+Post-fix browser sweep, six pages, 0 below AA on every one:
+`/videos` 1139 · `/pulse` 109 · `/stats` 78 · `/blog` 88 ·
+`/sessions/diet-reset` 172 · `/courses/the-consistency-system` 155.
+
 ## Remaining work
 
-1. **122 inline hex values in `.tsx` are not yet tokenised.** The token layer exists and
-   `globals.css` consumes it; this is the second half, and the precondition for making a
-   bold redesign a token change rather than a 63-component edit.
+1. **Token migration is now done.** 122 inline hex values reduced to 45. The remainder are
+   deliberate: 23 SVG presentation attributes (`fill=`, `stroke=`, `stopColor=`, where
+   `var()` is not a legal attribute value), `themeColor` in metadata, and single-use
+   decorative tints. A bold redesign is now a token change, not a 63-component edit.
 2. **`lib/blog.test.ts` fails 2 tests on `main`, unrelated to this branch** —
    `real-confidence-is-not-a-posture` is 889 words (needs 900) and has no `references`.
    Left alone deliberately: it is content, and the test may be right.
-3. **Codex review did not complete.** Two runs hung (prompt fed via heredoc stdin; killing
-   the parent shell left the process blocked on a read) and the retry was cancelled.
-   Verification above is first-party.
+3. **Codex review completed on the third attempt.** The first two hung — the prompt was fed
+   via heredoc stdin, so killing the parent shell left the process blocked on a read that
+   never came. Fixed by passing the prompt as a file and running detached. Its findings are
+   in the section above.
 4. Privacy page routes deletion requests to Instagram DMs — no contact email exists in
    the repo and one was not invented.
 

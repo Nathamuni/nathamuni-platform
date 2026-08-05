@@ -143,7 +143,7 @@ export function HealthTools() {
         .ht-sub { margin: -0.35rem 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
         .ht-inputs { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; }
         .ht-field { display: flex; flex-direction: column; gap: 0.3rem; }
-        .ht-label { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+        .ht-label { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.55); }
         .ht-input {
           width: 6.5rem;
           padding: 0.5rem 0.65rem;
@@ -159,7 +159,7 @@ export function HealthTools() {
         .ht-result { display: flex; flex-direction: column; gap: 0.15rem; }
         .ht-result-value { font-size: 1.5rem; font-weight: 700; background: linear-gradient(90deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .ht-result-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
-        .ht-note { margin: 0; font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.4); }
+        .ht-note { margin: 0; font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.55); }
       `}</style>
     </section>
   )
