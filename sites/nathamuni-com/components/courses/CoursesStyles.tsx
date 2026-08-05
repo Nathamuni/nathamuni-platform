@@ -298,6 +298,10 @@ const CSS = `
   font-size: 1.05rem;
   line-height: 1.35;
   color: #fff;
+  /* This is an h2 (it was a span, which left the course page jumping h1 -> h3).
+     Reset the UA heading box so it lays out exactly as the span did. */
+  margin: 0;
+  font-weight: inherit;
 }
 @media (min-width: 640px) {
   .crs-module-title {

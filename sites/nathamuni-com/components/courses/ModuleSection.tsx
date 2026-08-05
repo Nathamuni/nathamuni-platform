@@ -50,7 +50,7 @@ export function ModuleSection({
           {String(index + 1).padStart(2, '0')}
         </span>
         <span className="crs-module-summary-text">
-          <span className="crs-module-title">{courseModule.title}</span>
+          <h2 className="crs-module-title">{courseModule.title}</h2>
           <span className="crs-module-summary-meta">
             <span className="crs-module-summary-chips" data-testid="module-label-chips">
               {presentLabels.map((label) => (

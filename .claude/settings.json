@@ -12,5 +12,18 @@
       "Bash(ls:*)",
       "Bash(find . *)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/ui-inventory.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }

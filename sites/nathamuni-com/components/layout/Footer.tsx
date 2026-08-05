@@ -33,7 +33,10 @@ const MORE_LINKS: FooterLink[] = [
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div className="site-footer-col">
-      <h3 className="site-footer-col-title">{title}</h3>
+      {/* h2, not h3: these are the top-level groupings inside the footer landmark.
+          As h3 they made any page whose content has no h2 (e.g. /moments) jump
+          h1 -> h3, which axe reports as a heading-order violation site-wide. */}
+      <h2 className="site-footer-col-title">{title}</h2>
       <ul className="site-footer-col-links">
         {links.map((link) => (
           <li key={link.href}>

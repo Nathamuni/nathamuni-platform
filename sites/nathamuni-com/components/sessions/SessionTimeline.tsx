@@ -39,8 +39,12 @@ export function SessionTimeline({
             )}
             <span className="ssn-timeline-name">{block.phase}</span>
             <p className="ssn-timeline-focus">{block.focus}</p>
+            {/* role="img" so the dot cluster can carry a name: aria-label is prohibited
+                on a bare span, whose implicit generic role cannot be labelled. The dots
+                themselves stay aria-hidden, so this reads as one "Steps 3, 4" unit. */}
             <span
               className="ssn-timeline-steps"
+              role="img"
               aria-label={`Steps ${block.stepIndexes.map((i) => i + 1).join(', ')}`}
             >
               {block.stepIndexes.map((i) => (

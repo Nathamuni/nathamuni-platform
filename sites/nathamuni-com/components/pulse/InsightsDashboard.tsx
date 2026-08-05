@@ -405,7 +405,9 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h3 className={labelClass}>Insights dashboard · <span className="text-white/55 normal-case tracking-normal">click any bar to see the posts</span></h3>
+        {/* h2, not h3: this is the page's top-level section under the h1, and the
+            cards below it are h3. As an h3 it made /pulse jump h1 -> h3. */}
+        <h2 className={labelClass}>Insights dashboard · <span className="text-white/55 normal-case tracking-normal">click any bar to see the posts</span></h2>
         <div className="flex gap-1 p-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
           {METRICS.map((m) => (
             <button
