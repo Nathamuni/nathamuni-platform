@@ -55,7 +55,17 @@ export default async function VideoDetailPage({
     thumbnailUrl: video.thumbnail ? `${SITE_URL}${video.thumbnail}` : undefined,
     uploadDate: video.publishedDate,
     url: `${SITE_URL}/videos/${video.id}`,
-    embedUrl: video.instagramUrl,
+    // embedUrl must be a player URL, not a page. It previously pointed at the Instagram
+    // post page, which is not embeddable — so search engines had nothing playable.
+    // Omitted entirely rather than falsified when there is no public YouTube copy.
+    embedUrl:
+      video.youtubeId && video.youtubeStatus === 'public'
+        ? `https://www.youtube-nocookie.com/embed/${video.youtubeId}`
+        : undefined,
+    contentUrl:
+      video.youtubeId && video.youtubeStatus === 'public'
+        ? `https://www.youtube.com/watch?v=${video.youtubeId}`
+        : undefined,
     genre: video.category,
     keywords: video.tags.join(', '),
     author: { '@type': 'Person', name: 'Nathamuni', url: SITE_URL },

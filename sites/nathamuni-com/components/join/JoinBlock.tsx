@@ -10,6 +10,7 @@ type JoinState = 'idle' | 'pending' | 'done' | 'error'
  */
 export function JoinBlock() {
   const [state, setState] = useState<JoinState>('idle')
+  const [mailed, setMailed] = useState(false)
   const [message, setMessage] = useState('')
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -30,6 +31,9 @@ export function JoinBlock() {
       })
       const body = await res.json().catch(() => ({}))
       if (res.ok && body.ok) {
+        // The worker reports whether a confirmation mail actually went out, so the
+        // success copy never promises an email that was not sent.
+        setMailed(Boolean(body.mailed))
         setState('done')
         form.reset()
       } else {
@@ -49,13 +53,14 @@ export function JoinBlock() {
           One tested idea, weekly
         </h2>
         <p className="section-sub">
-          When the newsletter opens, you&apos;ll get exactly one idea a week that survived testing
-          on me first. Tell me what you&apos;re chasing — the first issues will be built from your
-          answers.
+          One idea a week that survived testing on me first. Tell me what you&apos;re chasing —
+          the issues get built from your answers. Unsubscribe from any email, one click.
         </p>
         {state === 'done' ? (
           <p className="text-emerald-300 text-sm mt-4" data-testid="join-done">
-            You&apos;re in. When the first issue ships, it lands in your inbox — nothing else will.
+            {mailed
+              ? 'Check your inbox — confirm the link and you’re in. Nothing else will be sent.'
+              : 'You’re in. Nothing else will be sent to that address.'}
           </p>
         ) : (
           <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-3">

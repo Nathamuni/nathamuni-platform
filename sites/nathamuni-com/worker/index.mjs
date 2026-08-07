@@ -221,6 +221,85 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
  * Privacy-honest: stored solely for the weekly newsletter; honeypot-guarded;
  * per-IP rate limited; inert (friendly 503) until the INBOX KV is bound.
  */
+/**
+ * Sends the double opt-in confirmation via Resend's REST API.
+ *
+ * Plain fetch, no SDK — the Worker bundle stays dependency-free. Returns false rather
+ * than throwing so a mail outage never costs the visitor their signup; the address is
+ * already stored by the time this runs.
+ *
+ * Needs two secrets: RESEND_API_KEY, and JOIN_FROM_EMAIL (an address on a domain
+ * verified in Resend). Without them the caller stays on the no-mail path.
+ */
+async function sendJoinConfirmation(env, email, token, origin) {
+  const from = env.JOIN_FROM_EMAIL
+  if (!from) {
+    console.error('join: RESEND_API_KEY set but JOIN_FROM_EMAIL missing')
+    return false
+  }
+  const confirmUrl = `${origin}/api/join/confirm?token=${token}`
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: email,
+        subject: 'Confirm your spot',
+        text: [
+          'You asked to join the list on nathamuni.com.',
+          '',
+          'Confirm here (the link works for 7 days):',
+          confirmUrl,
+          '',
+          "If this wasn't you, ignore this email — nothing will be sent.",
+        ].join('\n'),
+      }),
+    })
+    if (!res.ok) {
+      console.error('join: resend responded', res.status)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('join: resend failed', err.message)
+    return false
+  }
+}
+
+/** Confirms or removes a subscription from an emailed link. */
+async function handleJoinToken(request, env, action) {
+  const token = new URL(request.url).searchParams.get('token') ?? ''
+  const html = (msg) =>
+    new Response(
+      `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">` +
+        `<title>${msg}</title>` +
+        `<body style="background:#0d0a1f;color:#f5f3ff;font:16px/1.6 system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center;padding:2rem">` +
+        `<main><p>${msg}</p><p><a style="color:#b294ff" href="/">← nathamuni.com</a></p></main>`,
+      { headers: { 'content-type': 'text/html; charset=utf-8' } }
+    )
+
+  if (!env.INBOX || !token) return html('That link is not valid.')
+  const email = await env.INBOX.get(`jointoken:${token}`)
+  if (!email) return html('That link has expired or was already used.')
+
+  const record = await env.INBOX.get(`join:${email}`, 'json')
+  if (action === 'unsubscribe') {
+    await env.INBOX.delete(`join:${email}`)
+    await env.INBOX.delete(`jointoken:${token}`)
+    return html('Unsubscribed. You will not hear from this list again.')
+  }
+  await env.INBOX.put(
+    `join:${email}`,
+    JSON.stringify({ ...(record ?? { email }), status: 'confirmed', confirmedAt: new Date().toISOString() })
+  )
+  await env.INBOX.delete(`jointoken:${token}`)
+  return html("You're in. Confirmed.")
+}
+
 async function handleJoin(request, env) {
   if (request.method !== 'POST') {
     return Response.json({ error: 'method not allowed' }, { status: 405 })
@@ -263,11 +342,37 @@ async function handleJoin(request, env) {
 
   try {
     // Idempotent per email: re-joining just refreshes the record.
+    // Double opt-in: an address is `pending` until the emailed link is followed, so the
+    // list only ever contains people who proved they own the inbox. Without RESEND_API_KEY
+    // no mail can be sent, so the record is stored confirmed and the UI says as much —
+    // better than silently collecting addresses that can never be mailed.
+    const canSend = Boolean(env.RESEND_API_KEY)
+    const token = crypto.randomUUID()
+    const existing = await env.INBOX.get(`join:${email}`, 'json')
+    const alreadyConfirmed = existing?.status === 'confirmed'
+
     await env.INBOX.put(
       `join:${email}`,
-      JSON.stringify({ email, ambition, at: new Date().toISOString() })
+      JSON.stringify({
+        email,
+        ambition,
+        at: new Date().toISOString(),
+        status: alreadyConfirmed || !canSend ? 'confirmed' : 'pending',
+        token,
+      })
     )
-    return Response.json({ ok: true })
+    if (canSend) await env.INBOX.put(`jointoken:${token}`, email, { expirationTtl: 60 * 60 * 24 * 7 })
+
+    if (canSend && !alreadyConfirmed) {
+      const origin = new URL(request.url).origin
+      const sent = await sendJoinConfirmation(env, email, token, origin)
+      if (!sent) {
+        // Mail failed: do not claim a confirmation email is on its way.
+        return Response.json({ ok: true, confirmed: true, mailed: false })
+      }
+      return Response.json({ ok: true, confirmed: false, mailed: true })
+    }
+    return Response.json({ ok: true, confirmed: true, mailed: false })
   } catch (err) {
     console.error('join error:', err.message)
     return Response.json({ error: 'Could not save that just now — try again.' }, { status: 500 })
@@ -458,6 +563,15 @@ const worker = {
       } catch (err) {
         console.error('join fatal:', err.message)
         return Response.json({ error: 'Could not save that just now — try again.' }, { status: 500 })
+      }
+    }
+    // Followed from a confirmation email, so these are GET links, not API calls.
+    if (pathname === '/api/join/confirm' || pathname === '/api/join/unsubscribe') {
+      try {
+        return await handleJoinToken(request, env, pathname.endsWith('unsubscribe') ? 'unsubscribe' : 'confirm')
+      } catch (err) {
+        console.error('join token fatal:', err.message)
+        return new Response('Something went wrong.', { status: 500 })
       }
     }
     if (pathname.startsWith('/api/auth/')) {

@@ -131,6 +131,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SaveNudgeHost />
           <BackToTop />
         </AuthProvider>
+        {/* Cloudflare Web Analytics: cookieless, no consent banner needed, free and
+            unlimited — so the footer's "no trackers" claim stays literally true.
+            Inert until NEXT_PUBLIC_CF_BEACON_TOKEN is set (Cloudflare dashboard →
+            Web Analytics → the token in its snippet), so nothing ships to visitors
+            and no request is made while it is unset. */}
+        {process.env.NEXT_PUBLIC_CF_BEACON_TOKEN && (
+          <script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({
+              token: process.env.NEXT_PUBLIC_CF_BEACON_TOKEN,
+            })}
+          />
+        )}
       </body>
     </html>
   )
