@@ -12,7 +12,7 @@ function isProgressPage(pathname: string | null): boolean {
 }
 
 const WHY_LINE =
-  'Email + password only, so your course and session progress follows you to any device. No newsletters, no tracking, nothing shared.'
+  'Email + password only. Your progress — including any health numbers you enter in the session tools — is uploaded so it follows you to any device. No newsletters, no tracking, never shared with anyone else.'
 
 type Tab = 'login' | 'signup'
 
@@ -325,7 +325,9 @@ export function AccountWidget() {
             </button>
           </div>
 
-          <p className="acct-why">{WHY_LINE}</p>
+          <p className="acct-why" data-testid="account-widget-why">
+            {WHY_LINE}
+          </p>
 
           <form className="acct-form" onSubmit={handleSubmit}>
             <label className="acct-field">

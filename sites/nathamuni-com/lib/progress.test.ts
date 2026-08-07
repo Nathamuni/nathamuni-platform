@@ -52,4 +52,30 @@ describe('progress', () => {
 
     window.removeEventListener('nm-progress-applied', handler)
   })
+
+  it('does not let a stale server blob overwrite work done before hydration', () => {
+    // Regression: /api/auth/me is deferred to idle, so there is a window where the
+    // visitor is signed in but `authed` is still false. A step checked in that window
+    // skipped syncUp, then applyProgress landed the server's older copy on top of it
+    // and the work vanished.
+    setAuthed(false)
+    saveItem('session-diet-reset', JSON.stringify([true, true, false]))
+
+    // Hydration arrives carrying an older server value for the same key.
+    applyProgress({
+      'session-diet-reset': JSON.stringify([false, false, false]),
+      'course-other-0': JSON.stringify([true]),
+    })
+
+    // The local edit survives...
+    expect(loadItem('session-diet-reset')).toBe(JSON.stringify([true, true, false]))
+    // ...while untouched keys still hydrate from the server.
+    expect(loadItem('course-other-0')).toBe(JSON.stringify([true]))
+  })
+
+  it('still applies server values for keys this tab never touched', () => {
+    setAuthed(false)
+    applyProgress({ 'session-a': JSON.stringify([true]) })
+    expect(loadItem('session-a')).toBe(JSON.stringify([true]))
+  })
 })

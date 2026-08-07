@@ -64,7 +64,9 @@ export function HealthTools() {
         <CredibilityBadge label="standard" />
       </div>
       <p className="ht-sub">
-        Two numbers worth knowing before week one. Saved with your progress, never shared.
+        Two numbers worth knowing before week one. Stored in this browser — and, if you
+        create an account, synced to the server with the rest of your progress so it
+        follows you between devices. Never shared with anyone else.
       </p>
 
       <div className="ht-inputs">

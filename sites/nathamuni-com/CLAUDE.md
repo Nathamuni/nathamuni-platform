@@ -26,7 +26,10 @@ npm test           # vitest
   (daily GitHub Action, IG_ACCESS_TOKEN secret); safe to hand-edit titles/categories/tags
 - **Story archive:** `lib/stories.json` + `public/stories/` — self-hosted clips
   (Instagram deletes stories after 24h; the sync captures active ones each run)
-- **Thumbnails:** `public/images/thumbnails/<shortcode>.jpg`
+- **Thumbnails:** originals live in `assets/thumbnails/<shortcode>.jpg` (git-tracked,
+  never deployed). `scripts/optimize-thumbnails.mjs` derives the served 540w
+  `.webp`/`.jpg` into `public/images/thumbnails/`, which is generated and gitignored —
+  do not put files there by hand, they will not be committed
 - **Profile/bio copy:** `lib/profile.ts` — single source of truth for hero/about/metadata
 - **Hero video assets:** `public/video/portrait-*.webm`; static fallbacks in `public/images/`
 
