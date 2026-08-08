@@ -345,10 +345,85 @@ async function handleJoinToken(request, env, action) {
   if (!record) return page('That link is no longer valid.')
   await env.INBOX.put(
     `join:${email}`,
-    JSON.stringify({ ...record, status: 'confirmed', confirmedAt: new Date().toISOString(), confirmToken: undefined })
+    JSON.stringify({
+      email,
+      ambition: record.ambition,
+      at: record.at,
+      status: 'confirmed',
+      confirmedAt: new Date().toISOString(),
+      unsubToken: record.unsubToken,
+      welcomedAt: new Date().toISOString(),
+    })
   )
   await env.INBOX.delete(`jointoken:${token}`)
-  return page("You're in. Confirmed.")
+
+  // Sent after the record is safely confirmed, and awaited so a failure is logged
+  // rather than lost. A welcome that does not arrive must never cost someone their
+  // confirmed place on the list, so the result is deliberately not checked here.
+  await sendWelcome(env, email, {
+    ambition: record.ambition,
+    unsubToken: record.unsubToken,
+    origin: new URL(request.url).origin,
+  })
+
+  return page("You're in. Confirmed.", '<p style="opacity:.7;font-size:.9rem">A welcome note is on its way.</p>')
+}
+
+/**
+ * The first real email: sent once, the moment someone confirms.
+ *
+ * Deliberately plain text and short. It states what they will get and how often, echoes
+ * the ambition they typed if they gave one, and carries the same permanent unsubscribe
+ * token as every later issue.
+ */
+async function sendWelcome(env, email, { ambition, unsubToken, origin }) {
+  if (!env.RESEND_API_KEY || !env.JOIN_FROM_EMAIL) return false
+  const unsubUrl = `${origin}/api/join/unsubscribe?token=${unsubToken}`
+  const lines = [
+    "You're confirmed — welcome.",
+    '',
+    'What you signed up for: one idea a week that survived testing on me first.',
+    'No daily mail, no launches, no forwarding your address to anyone.',
+  ]
+  if (ambition) {
+    lines.push(
+      '',
+      `You said you were chasing: "${ambition}"`,
+      'That goes into the pile the issues get built from.'
+    )
+  }
+  lines.push(
+    '',
+    'If an issue is ever not worth your inbox, leave in one click:',
+    unsubUrl,
+    '',
+    '— Nathamuni',
+    origin
+  )
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: env.JOIN_FROM_EMAIL,
+        to: email,
+        subject: "You're in",
+        text: lines.join('\n'),
+        headers: {
+          'List-Unsubscribe': `<${unsubUrl}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+      }),
+    })
+    if (!res.ok) console.error('welcome: resend responded', res.status)
+    return res.ok
+  } catch (err) {
+    console.error('welcome: resend failed', err.message)
+    return false
+  }
 }
 
 async function handleJoin(request, env) {
