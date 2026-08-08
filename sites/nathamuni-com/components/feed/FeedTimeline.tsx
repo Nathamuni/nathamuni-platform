@@ -1,5 +1,12 @@
 import Link from 'next/link'
 import type { FeedEntry, FeedKind } from '@/lib/feed'
+import { Thumbnail } from '@/components/ui/Thumbnail'
+
+/** First letter of the title, for the essay plate. Skips quotes and punctuation. */
+function initialOf(title: string): string {
+  const match = title.match(/\p{L}|\p{N}/u)
+  return (match?.[0] ?? '·').toUpperCase()
+}
 
 const KIND_LABEL: Record<FeedKind, string> = {
   blog: 'Blog',
@@ -57,9 +64,12 @@ function groupByMonth(entries: FeedEntry[]): MonthGroup[] {
 }
 
 /**
- * Vertical, reverse-chronological timeline of the whole feed: a gradient
- * spine on the left, month dividers, and compact glass rows. Rows use
- * content-visibility:auto since a full feed easily runs past 200 entries.
+ * Reverse-chronological gallery of the whole feed, grouped by month.
+ *
+ * A grid rather than a list because the feed is overwhelmingly visual — reels,
+ * posts and moments outnumber essays roughly thirty to one — so the image is the
+ * thing being scanned and the title annotates it. Cards use
+ * content-visibility:auto since a full feed runs past 200 entries.
  */
 const FILTERS: { id: string; kind: FeedKind | null; label: string }[] = [
   { id: 'fk-all', kind: null, label: 'All' },
@@ -98,7 +108,6 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
         ))}
       </fieldset>
     <div className="feed-timeline">
-      <div className="feed-spine" aria-hidden />
       {groups.map((group) => (
         <div key={group.key} className="feed-month" data-reveal>
           <h2 className="feed-month-label">{group.label}</h2>
@@ -116,23 +125,24 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
                 >
                   <span className="feed-row-thumb">
                     {entry.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={entry.image} alt="" loading="lazy" className="feed-row-thumb-img" />
+                      <Thumbnail src={entry.image} alt="" loading="lazy" className="feed-row-thumb-img" />
                     ) : (
-                      <span className="feed-row-thumb-placeholder" aria-hidden />
+                      // Essays have no image. Setting the initial in the display face
+                      // makes the cover belong to the piece; the flat gradient block it
+                      // replaces carried nothing at all.
+                      <span className="feed-row-plate" aria-hidden>
+                        <span className="feed-row-plate-initial">{initialOf(entry.title)}</span>
+                        <span className="feed-row-plate-rule" />
+                        <span className="feed-row-plate-kicker">Essay</span>
+                      </span>
                     )}
+                    <span className={`feed-kind-badge feed-kind-${entry.kind}`}>
+                      {KIND_LABEL[entry.kind]}
+                    </span>
                   </span>
                   <span className="feed-row-body">
-                    <span className="feed-row-top">
-                      <span className={`feed-kind-badge feed-kind-${entry.kind}`}>
-                        {KIND_LABEL[entry.kind]}
-                      </span>
-                      <span className="feed-row-date">{formatDate(entry.date)}</span>
-                    </span>
                     <span className="feed-row-title">{entry.title}</span>
-                    {entry.kind === 'blog' && entry.excerpt && (
-                      <span className="feed-row-excerpt">{entry.excerpt}</span>
-                    )}
+                    <span className="feed-row-date">{formatDate(entry.date)}</span>
                   </span>
                 </Link>
               )
@@ -145,18 +155,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           position: relative;
           display: flex;
           flex-direction: column;
-          gap: 2.5rem;
-          padding-left: 1.35rem;
-        }
-        .feed-spine {
-          position: absolute;
-          left: 0.3rem;
-          top: 0.3rem;
-          bottom: 0.3rem;
-          width: 2px;
-          background: linear-gradient(180deg, var(--color-accent), var(--color-pink), var(--color-cyan));
-          opacity: 0.5;
-          border-radius: 999px;
+          gap: 2.75rem;
         }
         .feed-month-label {
           font-size: 0.7rem;
@@ -165,98 +164,123 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           letter-spacing: 0.18em;
           font-variant: small-caps;
           color: rgba(255, 255, 255, 0.55);
-          margin-bottom: 0.85rem;
+          margin-bottom: 0.9rem;
+          padding-bottom: 0.6rem;
+          border-bottom: 1px solid rgba(178, 148, 255, 0.16);
         }
+        /* A gallery, not a reading column: 236 of the 244 entries are images or video,
+           so the artefact leads and the label follows it. The single wide row this
+           replaces gave one entry per 1100px band and left the frame mostly empty. */
         .feed-rows {
-          display: flex;
-          flex-direction: column;
-          gap: 0.6rem;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+          gap: 1.1rem 1rem;
         }
         .feed-row {
           display: flex;
-          align-items: center;
-          gap: 0.9rem;
-          padding: 0.55rem 0.9rem;
-          border-radius: 1rem;
-          background: rgba(148, 112, 255, 0.06);
-          border: 1px solid rgba(178, 148, 255, 0.14);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+          flex-direction: column;
+          gap: 0.55rem;
+          border-radius: 0.9rem;
+          transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
           content-visibility: auto;
-          contain-intrinsic-size: auto 88px;
+          contain-intrinsic-size: auto 300px;
         }
-        .feed-row:hover {
-          border-color: hsla(var(--cat, 262), 85%, 70%, 0.7);
-          box-shadow: 0 14px 36px -14px hsla(var(--cat, 262), 85%, 55%, 0.5);
-          transform: translateY(-2px);
-        }
+        .feed-row:hover { transform: translateY(-3px); }
         .feed-row-thumb {
-          flex-shrink: 0;
+          position: relative;
           display: block;
-          width: 72px;
-          height: 72px;
+          aspect-ratio: 3 / 4;
           border-radius: 0.85rem;
           overflow: hidden;
-          background: radial-gradient(120% 120% at 30% 15%, hsla(var(--cat, 262), 70%, 45%, 0.4), rgba(13, 10, 31, 0.7) 72%);
+          background: rgba(13, 10, 31, 0.55);
+          border: 1px solid rgba(178, 148, 255, 0.14);
+          transition: border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+        .feed-row:hover .feed-row-thumb {
+          border-color: hsla(var(--cat, 262), 85%, 70%, 0.6);
+          box-shadow: 0 18px 40px -18px hsla(var(--cat, 262), 85%, 55%, 0.55);
         }
         .feed-row-thumb-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-        }
-        .feed-row-thumb-placeholder {
           display: block;
-          width: 100%;
-          height: 100%;
         }
-        .feed-row-body {
+        .feed-row-plate {
           display: flex;
           flex-direction: column;
-          gap: 0.2rem;
-          min-width: 0;
-          flex: 1;
-        }
-        .feed-row-top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+          justify-content: flex-end;
           gap: 0.5rem;
+          width: 100%;
+          height: 100%;
+          padding: 0.9rem;
+          background: linear-gradient(
+            158deg,
+            hsla(var(--cat, 262), 58%, 24%, 0.95),
+            hsla(var(--cat, 262), 52%, 11%, 0.96)
+          );
+        }
+        .feed-row-plate-initial {
+          font-family: var(--font-display, inherit);
+          font-size: 3.4rem;
+          line-height: 0.85;
+          font-weight: 600;
+          color: hsla(var(--cat, 262), 92%, 88%, 0.95);
+        }
+        .feed-row-plate-rule {
+          display: block;
+          width: 1.75rem;
+          height: 1px;
+          background: hsla(var(--cat, 262), 85%, 78%, 0.5);
+        }
+        .feed-row-plate-kicker {
+          font-size: 0.6rem;
+          text-transform: uppercase;
+          letter-spacing: 0.18em;
+          color: hsla(var(--cat, 262), 70%, 84%, 0.75);
         }
         .feed-kind-badge {
-          font-size: 0.6rem;
+          position: absolute;
+          top: 0.5rem;
+          left: 0.5rem;
+          font-size: 0.58rem;
           text-transform: uppercase;
           letter-spacing: 0.1em;
           font-weight: 600;
-          padding: 0.15rem 0.5rem;
+          padding: 0.18rem 0.45rem;
           border-radius: 999px;
-          flex-shrink: 0;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
         }
-        .feed-kind-blog { color: #c4b5fd; background: rgba(139, 92, 246, 0.18); }
-        .feed-kind-reel { color: #67e8f9; background: rgba(34, 211, 238, 0.16); }
-        .feed-kind-post { color: #f5a8e0; background: rgba(236, 72, 153, 0.16); }
-        .feed-kind-story { color: #fda4af; background: rgba(244, 63, 94, 0.16); }
+        .feed-kind-blog { color: #ede9ff; background: rgba(139, 92, 246, 0.55); }
+        .feed-kind-reel { color: #ecfeff; background: rgba(14, 116, 144, 0.6); }
+        .feed-kind-post { color: #fdf2f8; background: rgba(157, 23, 106, 0.6); }
+        .feed-kind-story { color: #fff1f2; background: rgba(159, 18, 57, 0.6); }
+        .feed-row-body {
+          display: flex;
+          flex-direction: column;
+          gap: 0.15rem;
+          min-width: 0;
+          padding: 0 0.15rem;
+        }
+        .feed-row-title {
+          font-size: 0.83rem;
+          line-height: 1.4;
+          color: rgba(255, 255, 255, 0.92);
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
         .feed-row-date {
           font-size: 0.65rem;
           color: rgba(255, 255, 255, 0.55);
-          flex-shrink: 0;
-        }
-        .feed-row-title {
-          font-size: 0.9rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .feed-row-excerpt {
-          font-size: 0.75rem;
-          color: rgba(255, 255, 255, 0.55);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          font-variant-numeric: tabular-nums;
         }
         @media (max-width: 640px) {
-          .feed-row-thumb { width: 56px; height: 56px; }
-          .feed-row { padding: 0.5rem 0.65rem; gap: 0.65rem; }
+          .feed-rows { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.9rem 0.75rem; }
+          .feed-row-plate-initial { font-size: 2.6rem; }
+          .feed-row { contain-intrinsic-size: auto 250px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .feed-row { transition: none; }
