@@ -47,3 +47,6 @@ public/videos.json
 public/images/thumbnails/
 # WebP siblings generated beside the tracked story posters
 public/stories/*.webp
+
+# wrangler dev local state and bundle scratch (miniflare sqlite, temp bundles)
+.wrangler/
