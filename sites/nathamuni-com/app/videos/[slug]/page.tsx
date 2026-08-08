@@ -62,10 +62,8 @@ export default async function VideoDetailPage({
       video.youtubeId && video.youtubeStatus === 'public'
         ? `https://www.youtube-nocookie.com/embed/${video.youtubeId}`
         : undefined,
-    contentUrl:
-      video.youtubeId && video.youtubeStatus === 'public'
-        ? `https://www.youtube.com/watch?v=${video.youtubeId}`
-        : undefined,
+    // No contentUrl: it must point at the media file itself, not a watch page. There is
+    // no direct media URL here, so it is omitted rather than filled with a page URL.
     genre: video.category,
     keywords: video.tags.join(', '),
     author: { '@type': 'Person', name: 'Nathamuni', url: SITE_URL },

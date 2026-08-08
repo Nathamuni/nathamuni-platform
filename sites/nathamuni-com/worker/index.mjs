@@ -292,38 +292,63 @@ async function sendJoinConfirmation(env, email, { confirmToken, unsubToken, alre
 /** Confirms or removes a subscription from an emailed link. */
 async function handleJoinToken(request, env, action) {
   const token = new URL(request.url).searchParams.get('token') ?? ''
-  const html = (msg) =>
+  const page = (msg, extra = '') =>
     new Response(
       `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">` +
         `<title>${msg}</title>` +
         `<body style="background:#0d0a1f;color:#f5f3ff;font:16px/1.6 system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center;padding:2rem">` +
-        `<main><p>${msg}</p><p><a style="color:#b294ff" href="/">← nathamuni.com</a></p></main>`,
-      { headers: { 'content-type': 'text/html; charset=utf-8' } }
+        `<main><p>${msg}</p>${extra}<p><a style="color:#b294ff" href="/">\u2190 nathamuni.com</a></p></main>`,
+      {
+        headers: {
+          'content-type': 'text/html; charset=utf-8',
+          // Bearer token sits in the URL: keep it out of referrers and shared caches.
+          'referrer-policy': 'no-referrer',
+          'cache-control': 'no-store',
+        },
+      }
     )
 
-  if (!env.INBOX || !token) return html('That link is not valid.')
+  const confirmButton = (label) =>
+    `<form method="POST"><button style="margin:1rem 0;padding:.7rem 1.4rem;border-radius:9999px;border:1px solid #b294ff59;background:#8b5cf62e;color:#f5f3ff;font:inherit;cursor:pointer">${label}</button></form>`
 
-  // Two distinct tokens by design. The confirm token is single-use and expires; the
-  // unsubscribe token never expires and is never consumed, because it has to keep
-  // working from every newsletter sent months later. Consuming one must not break
-  // the other.
+  if (!env.INBOX || !token) return page('That link is not valid.')
+
+  // GET is inert on purpose. Mail-security scanners follow every link in an email, so a
+  // state-changing GET would let them confirm or unsubscribe people automatically.
+  // RFC 8058 also requires one-click unsubscribe to be a POST.
+  if (request.method === 'GET') {
+    return action === 'unsubscribe'
+      ? page('Unsubscribe from the list?', confirmButton('Yes, unsubscribe me'))
+      : page('Confirm your subscription?', confirmButton('Yes, confirm'))
+  }
+  if (request.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 })
+  }
+
   if (action === 'unsubscribe') {
     const email = await env.INBOX.get(`unsub:${token}`)
-    if (!email) return html('That link is not valid.')
+    if (!email) return page('That link is not valid.')
+    const record = await env.INBOX.get(`join:${email}`, 'json')
+    // Also drop any live confirmation token, or a pending confirm link from an older
+    // email could resurrect the record after the person opted out.
+    if (record?.confirmToken) await env.INBOX.delete(`jointoken:${record.confirmToken}`)
     await env.INBOX.delete(`join:${email}`)
     await env.INBOX.delete(`unsub:${token}`)
-    return html('Unsubscribed. You will not hear from this list again.')
+    return page('Unsubscribed. You will not hear from this list again.')
   }
 
   const email = await env.INBOX.get(`jointoken:${token}`)
-  if (!email) return html('That link has expired or was already used.')
+  if (!email) return page('That link has expired or was already used.')
   const record = await env.INBOX.get(`join:${email}`, 'json')
+  // Only a still-pending record may be confirmed. If it is gone the person unsubscribed
+  // (or it expired), and confirming would silently re-add them.
+  if (!record) return page('That link is no longer valid.')
   await env.INBOX.put(
     `join:${email}`,
-    JSON.stringify({ ...(record ?? { email }), status: 'confirmed', confirmedAt: new Date().toISOString() })
+    JSON.stringify({ ...record, status: 'confirmed', confirmedAt: new Date().toISOString(), confirmToken: undefined })
   )
   await env.INBOX.delete(`jointoken:${token}`)
-  return html("You're in. Confirmed.")
+  return page("You're in. Confirmed.")
 }
 
 async function handleJoin(request, env) {
@@ -372,12 +397,23 @@ async function handleJoin(request, env) {
     // list only ever contains people who proved they own the inbox. Without RESEND_API_KEY
     // no mail can be sent, so the record is stored confirmed and the UI says as much —
     // better than silently collecting addresses that can never be mailed.
-    const canSend = Boolean(env.RESEND_API_KEY)
+    // Both secrets, or the list is closed. Storing an address we cannot mail means
+    // holding an unverified address that anyone could have typed — including someone
+    // signing up a third party — with no way for them to confirm or opt out.
+    const canSend = Boolean(env.RESEND_API_KEY && env.JOIN_FROM_EMAIL)
+    if (!canSend) {
+      return Response.json(
+        { error: 'The list is not open yet — DM me on Instagram and I will add you.' },
+        { status: 503 }
+      )
+    }
     const token = crypto.randomUUID()
     const existing = await env.INBOX.get(`join:${email}`, 'json')
     const alreadyConfirmed = existing?.status === 'confirmed'
     // Stable across re-submits so previously sent newsletters keep unsubscribing.
     const unsubToken = existing?.unsubToken ?? crypto.randomUUID()
+
+    const PENDING_TTL = 60 * 60 * 24 * 7 // 7 days — matches what the email promises
 
     await env.INBOX.put(
       `join:${email}`,
@@ -385,29 +421,47 @@ async function handleJoin(request, env) {
         email,
         ambition,
         at: new Date().toISOString(),
-        status: alreadyConfirmed || !canSend ? 'confirmed' : 'pending',
+        status: alreadyConfirmed ? 'confirmed' : 'pending',
         unsubToken,
-      })
+        confirmToken: alreadyConfirmed ? undefined : token,
+      }),
+      // An unconfirmed address disappears on its own, so an abandoned signup does not
+      // leave someone's email sitting here forever — which is what the email says.
+      alreadyConfirmed ? undefined : { expirationTtl: PENDING_TTL }
     )
-    await env.INBOX.put(`unsub:${unsubToken}`, email)
-    if (canSend) await env.INBOX.put(`jointoken:${token}`, email, { expirationTtl: 60 * 60 * 24 * 7 })
-
-    if (canSend) {
-      const origin = new URL(request.url).origin
-      // Mail is sent whether or not the address was already confirmed, and the response
-      // is identical either way. Branching here would turn this endpoint into a
-      // membership oracle: submit an address, read the reply, learn whether that person
-      // is on the list.
-      const sent = await sendJoinConfirmation(env, email, {
-        confirmToken: token,
-        unsubToken,
-        alreadyConfirmed,
-        origin,
-      })
-      // Same shape on mail failure, for the same reason.
-      return Response.json({ ok: true, mailed: sent })
+    await env.INBOX.put(
+      `unsub:${unsubToken}`,
+      email,
+      alreadyConfirmed ? undefined : { expirationTtl: PENDING_TTL }
+    )
+    if (!alreadyConfirmed) {
+      await env.INBOX.put(`jointoken:${token}`, email, { expirationTtl: PENDING_TTL })
     }
-    return Response.json({ ok: true, mailed: false })
+
+    // Per-address cooldown on top of the per-IP limit. Without it a distributed
+    // attacker rotating IPs could mail the same victim repeatedly, burning quota and
+    // sender reputation. Silent: replying differently here would rebuild the
+    // membership oracle the identical response shape exists to prevent.
+    const mailKey = `https://rate.nathamuni.internal/joinmail/${encodeURIComponent(email)}`
+    const mailedRecently = await readCounter(cache, mailKey)
+    if (mailedRecently >= 1) {
+      return Response.json({ ok: true, mailed: true })
+    }
+    await writeCounter(cache, mailKey, 1, 900) // one confirmation mail per address / 15 min
+
+    const origin = new URL(request.url).origin
+    // Mail goes out whether or not the address was already confirmed, and the response
+    // is identical either way. Branching here would turn this endpoint into a
+    // membership oracle: submit an address, read the reply, learn whether that person
+    // is on the list.
+    const sent = await sendJoinConfirmation(env, email, {
+      confirmToken: token,
+      unsubToken,
+      alreadyConfirmed,
+      origin,
+    })
+    // Same shape on mail failure, for the same reason.
+    return Response.json({ ok: true, mailed: sent })
   } catch (err) {
     console.error('join error:', err.message)
     return Response.json({ error: 'Could not save that just now — try again.' }, { status: 500 })

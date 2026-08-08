@@ -96,10 +96,27 @@ export default function PrivacyPage() {
 
           <h2 className="text-white text-base font-medium mt-6">Data sharing</h2>
           <p>
-            Data collected through this site or its automation is never sold or shared with
-            third parties, except the platforms required to operate the feature itself
-            (Google/YouTube for video hosting, Cloudflare for site infrastructure).
+            Data collected through this site or its automation is never sold, and never
+            shared except with the platforms required to operate the feature you used:
           </p>
+          <ul className="list-disc pl-5 space-y-1.5">
+            <li>
+              <strong className="text-white/90">Cloudflare</strong> — hosting, the APIs
+              above, and the AI models behind Ask and search. Page-view counts come from
+              Cloudflare Web Analytics, which is cookieless and does not fingerprint or
+              follow you between sites.
+            </li>
+            <li>
+              <strong className="text-white/90">Resend</strong> — only if you sign up to the
+              list: your email address is passed to them to deliver the confirmation and any
+              later issues.
+            </li>
+            <li>
+              <strong className="text-white/90">Google/YouTube</strong> — video hosting.
+              Nothing is requested from them until you press play on a video; the player is
+              not loaded before that.
+            </li>
+          </ul>
 
           <h2 className="text-white text-base font-medium mt-6">Contact</h2>
           <p>

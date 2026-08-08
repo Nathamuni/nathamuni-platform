@@ -59,8 +59,8 @@ export function JoinBlock() {
         {state === 'done' ? (
           <p className="text-emerald-300 text-sm mt-4" data-testid="join-done">
             {mailed
-              ? 'Check your inbox — confirm the link and you’re in. Nothing else will be sent.'
-              : 'You’re in. Nothing else will be sent to that address.'}
+              ? 'Check your inbox and follow the link to confirm — that is the only way you get added. Nothing else will be sent.'
+              : 'Saved, but the confirmation email did not go out. Try again in a few minutes, or DM me on Instagram.'}
           </p>
         ) : (
           <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-3">

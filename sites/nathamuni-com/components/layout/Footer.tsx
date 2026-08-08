@@ -71,7 +71,10 @@ export function Footer() {
         {/* "No servers" was untrue: the site runs a Cloudflare Worker with KV and
             Workers AI behind /api/*. No-trackers still holds — nothing analytics-like
             is loaded. */}
-        <p className="site-footer-note">No trackers. No ads. Built to be searched.</p>
+        {/* Page views are counted with Cloudflare Web Analytics, which is cookieless and
+            does not follow visitors between sites — but it is still measurement, so this
+            no longer claims a blanket "no trackers". */}
+        <p className="site-footer-note">No ads. No cookies. Built to be searched.</p>
         <p className="site-footer-copy">&copy; {PROFILE.name}. All rights reserved.</p>
       </div>
     </footer>
