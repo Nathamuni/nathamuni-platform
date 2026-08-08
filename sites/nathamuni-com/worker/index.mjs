@@ -367,17 +367,22 @@ async function handleJoin(request, env) {
     return Response.json({ ok: true })
   }
 
-  const email = (body?.email ?? '').toString().trim().toLowerCase()
-  const ambition = (body?.ambition ?? '').toString().trim().slice(0, JOIN_MAX_AMBITION_LEN)
-  if (!EMAIL_RE.test(email) || email.length > 254) {
-    return Response.json({ error: 'That email does not look right.' }, { status: 400 })
-  }
-
-  if (!env.INBOX) {
+  // Answered before the input is even looked at. A closed list is a property of the
+  // site, not of what the visitor typed: complaining that their address is malformed
+  // when nothing could be accepted either way is just misleading. Storage needs KV; a
+  // confirmable signup additionally needs both mail secrets, because without them the
+  // address could never be verified or unsubscribed.
+  if (!env.INBOX || !env.RESEND_API_KEY || !env.JOIN_FROM_EMAIL) {
     return Response.json(
       { error: 'The lab list opens very soon — until then, DM me on Instagram.' },
       { status: 503 }
     )
+  }
+
+  const email = (body?.email ?? '').toString().trim().toLowerCase()
+  const ambition = (body?.ambition ?? '').toString().trim().slice(0, JOIN_MAX_AMBITION_LEN)
+  if (!EMAIL_RE.test(email) || email.length > 254) {
+    return Response.json({ error: 'That email does not look right.' }, { status: 400 })
   }
 
   // Reuse the cache-counter mechanism: max 5 join attempts per IP per hour.
@@ -392,21 +397,9 @@ async function handleJoin(request, env) {
   await writeCounter(cache, joinKey, prev + 1, 3600)
 
   try {
-    // Idempotent per email: re-joining just refreshes the record.
-    // Double opt-in: an address is `pending` until the emailed link is followed, so the
-    // list only ever contains people who proved they own the inbox. Without RESEND_API_KEY
-    // no mail can be sent, so the record is stored confirmed and the UI says as much —
-    // better than silently collecting addresses that can never be mailed.
-    // Both secrets, or the list is closed. Storing an address we cannot mail means
-    // holding an unverified address that anyone could have typed — including someone
-    // signing up a third party — with no way for them to confirm or opt out.
-    const canSend = Boolean(env.RESEND_API_KEY && env.JOIN_FROM_EMAIL)
-    if (!canSend) {
-      return Response.json(
-        { error: 'The list is not open yet — DM me on Instagram and I will add you.' },
-        { status: 503 }
-      )
-    }
+    // Double opt-in: an address stays `pending` until the emailed link is followed, so
+    // the list only ever contains people who proved they own the inbox. The guard that
+    // the mail secrets exist at all is above, before anything is validated or stored.
     const token = crypto.randomUUID()
     const existing = await env.INBOX.get(`join:${email}`, 'json')
     const alreadyConfirmed = existing?.status === 'confirmed'
