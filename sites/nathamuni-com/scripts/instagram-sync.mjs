@@ -21,7 +21,9 @@ const SITE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const VIDEOS_JSON = join(SITE_ROOT, 'lib', 'videos.json')
 const STORIES_JSON = join(SITE_ROOT, 'lib', 'stories.json')
 const STORIES_DIR = join(SITE_ROOT, 'public', 'stories')
-const THUMBS_DIR = join(SITE_ROOT, 'public', 'images', 'thumbnails')
+// Full-resolution originals. Not served directly — scripts/optimize-thumbnails.mjs
+// derives the 540w .webp/.jpg into public/images/thumbnails/ at build time.
+const THUMBS_DIR = join(SITE_ROOT, 'assets', 'thumbnails')
 const API = 'https://graph.instagram.com/v21.0'
 
 const DRY_RUN = process.argv.includes('--dry-run')

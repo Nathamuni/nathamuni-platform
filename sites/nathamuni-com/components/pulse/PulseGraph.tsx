@@ -111,13 +111,21 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
     resize()
-    const ro = new ResizeObserver(resize)
+    // Resizing the canvas clears it. If the loop is parked nothing would repaint,
+    // leaving a blank graph until the next pointer event — so wake it.
+    const ro = new ResizeObserver(() => {
+      resize()
+      wake()
+    })
     ro.observe(wrap)
 
     // Recenter escape hatch — hand it to React so the button can call it.
     resetViewRef.current = () => {
       view.userControlled = false // autoFit resumes and lerps back to a centred fit
       setAdjusted(false)
+      // autoFit only runs inside the loop, so without this the button would clear
+      // itself while the graph stayed exactly where it was.
+      wake()
     }
     // Any deliberate pan/zoom flags the view as user-controlled (shows recenter).
     const markAdjusted = () => {
@@ -227,6 +235,15 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     let last = performance.now()
     const t0 = last
     let nextCascade = t0 + 1400
+
+    // The simulation used to redraw ~60 nodes every frame forever — including under
+    // prefers-reduced-motion, where the physics is skipped but the canvas was still
+    // repainted. It now parks itself once the layout settles and nobody is
+    // interacting, and wake() restarts it on input or resize.
+    const REST_ALPHA = 0.06
+    const IDLE_MS = 1200
+    let lastInteractionAt = t0
+    let sleeping = false
 
     function draw(now: number) {
       const dt = Math.min(50, now - last)
@@ -393,9 +410,28 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
         }
       }
 
+      const settled = reduce ? elapsed > INTRO_MS : alpha <= REST_ALPHA
+      // Holding a node still fires no pointermove, so idle alone would let the loop
+      // park mid-drag and freeze the other nodes until the pointer moved again.
+      const interacting = dragNode !== null || panning
+      const idle = now - lastInteractionAt > IDLE_MS
+      if (settled && idle && !interacting && elapsed > INTRO_MS) {
+        sleeping = true
+        raf = 0
+        return
+      }
+
       raf = requestAnimationFrame(draw)
     }
     raf = requestAnimationFrame(draw)
+
+    const wake = () => {
+      lastInteractionAt = performance.now()
+      if (!sleeping && raf !== 0) return
+      sleeping = false
+      last = performance.now()
+      raf = requestAnimationFrame(draw)
+    }
 
     // ---- Interaction: hover, drag node, pan, zoom ----
     const toGraph = (px: number, py: number) => ({
@@ -541,6 +577,13 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     canvas.addEventListener('pointerleave', onLeave)
     canvas.addEventListener('wheel', onWheel, { passive: false })
 
+    // Every input path must revive a parked loop, or hover/drag/zoom would render
+    // nothing. Registered after the handlers above so wake() runs on the same events.
+    for (const evt of ['pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'wheel']) {
+      canvas.addEventListener(evt, wake, { passive: true })
+    }
+    window.addEventListener('resize', wake, { passive: true })
+
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
@@ -550,6 +593,10 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       canvas.removeEventListener('pointercancel', onCancel)
       canvas.removeEventListener('pointerleave', onLeave)
       canvas.removeEventListener('wheel', onWheel)
+      for (const evt of ['pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'wheel']) {
+        canvas.removeEventListener(evt, wake)
+      }
+      window.removeEventListener('resize', wake)
     }
   }, [data])
 
@@ -566,7 +613,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
     >
       <canvas ref={canvasRef} className="absolute inset-0" />
       {hint && (
-        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] text-white/40 tracking-wide text-center px-4">
+        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] text-white/55 tracking-wide text-center px-4">
           drag a node · drag to pan · pinch or scroll to zoom
         </div>
       )}
@@ -603,7 +650,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
           <div className="text-white/90 font-medium leading-snug line-clamp-2">
             {hovered.node.label}
           </div>
-          <div className="text-white/45 mt-0.5 capitalize">
+          <div className="text-white/55 mt-0.5 capitalize">
             {hovered.node.kind}
             {hovered.node.er != null && (
               <span className="text-white/70"> · {hovered.node.er.toFixed(1)}% engagement</span>

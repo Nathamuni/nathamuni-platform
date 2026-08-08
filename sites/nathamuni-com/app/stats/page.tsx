@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getStats } from '@/lib/stats'
 import { getCategoryMeta } from '@/lib/categoryMeta'
 import { CountUp } from '@/components/fx/CountUp'
+import { Thumbnail } from '@/components/ui/Thumbnail'
 
 export const metadata: Metadata = {
   title: 'The library in numbers',
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 const tabularNums: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' }
 
-const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/40'
+const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/55'
 
 function StatTile({
   value,
@@ -132,7 +133,7 @@ export default function StatsPage() {
           })}
         </div>
         {firstMonth && lastMonth && (
-          <div className="flex justify-between text-[0.6rem] text-white/30 mt-2">
+          <div className="flex justify-between text-[0.6rem] text-white/55 mt-2">
             <span>{firstMonth.label}</span>
             <span>{lastMonth.label}</span>
           </div>
@@ -167,7 +168,7 @@ export default function StatsPage() {
               className="detail-tag"
               style={{ minHeight: 40, display: 'inline-flex', alignItems: 'center' }}
             >
-              #{t.tag} <span className="text-white/35 ml-1" style={tabularNums}>{t.count}</span>
+              #{t.tag} <span className="text-white/55 ml-1" style={tabularNums}>{t.count}</span>
             </Link>
           ))}
         </div>
@@ -187,10 +188,11 @@ export default function StatsPage() {
                   className="glass-card flex items-center gap-3 p-2.5 hover:border-white/30 transition-all"
                 >
                   {v.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Thumbnail
                       src={v.thumbnail}
                       alt=""
+                      width={48}
+                      height={64}
                       className="w-12 h-16 object-cover rounded-lg flex-shrink-0"
                     />
                   ) : (
@@ -212,10 +214,11 @@ export default function StatsPage() {
                   className="glass-card flex items-center gap-3 p-2.5 hover:border-white/30 transition-all"
                 >
                   {v.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Thumbnail
                       src={v.thumbnail}
                       alt=""
+                      width={48}
+                      height={64}
                       className="w-12 h-16 object-cover rounded-lg flex-shrink-0"
                     />
                   ) : (
@@ -232,7 +235,7 @@ export default function StatsPage() {
         </div>
       )}
 
-      <p className="text-xs text-white/35 border-t border-white/10 pt-4">
+      <p className="text-xs text-white/55 border-t border-white/10 pt-4">
         Data updates automatically from Instagram, daily.
       </p>
     </section>

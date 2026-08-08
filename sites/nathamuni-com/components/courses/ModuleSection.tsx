@@ -49,8 +49,11 @@ export function ModuleSection({
         <span className="crs-module-num" aria-hidden="true">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <span className="crs-module-summary-text">
-          <span className="crs-module-title">{courseModule.title}</span>
+        {/* div, not span: this wraps an <h2>, which is flow content and therefore not
+            valid inside a span. Already display:flex, so the swap changes nothing
+            visually. <summary> accepts flow content, so the nesting is now conforming. */}
+        <div className="crs-module-summary-text">
+          <h2 className="crs-module-title">{courseModule.title}</h2>
           <span className="crs-module-summary-meta">
             <span className="crs-module-summary-chips" data-testid="module-label-chips">
               {presentLabels.map((label) => (
@@ -61,7 +64,7 @@ export function ModuleSection({
               {actionCount} action{actionCount === 1 ? '' : 's'}
             </span>
           </span>
-        </span>
+        </div>
         <span className="crs-module-chevron" aria-hidden="true" />
       </summary>
 

@@ -73,7 +73,7 @@ export default function BooksPage() {
               DM me for a copy
             </a>
           </div>
-          <p className="text-white/40 text-xs mt-1">
+          <p className="text-white/55 text-xs mt-1">
             The sample: table of contents, the core principle, and the full introduction — my
             story, from the book itself.
           </p>

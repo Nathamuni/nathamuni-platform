@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getAllStories, type Story } from '@/lib/stories'
 import { ThumbPeek } from '@/components/fx/ThumbPeek'
+import { Thumbnail } from '@/components/ui/Thumbnail'
 
 function shortDate(iso: string): string {
   return new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -22,8 +23,7 @@ function CardList({ stories, hidden }: { stories: Story[]; hidden?: boolean }) {
         >
           {story.poster ? (
             <ThumbPeek src={story.poster} hue={340} className="thumb-peek-region">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={story.poster} alt="" loading="lazy" />
+              <Thumbnail src={story.poster} alt="" loading="lazy" />
             </ThumbPeek>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">

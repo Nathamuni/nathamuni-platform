@@ -93,7 +93,7 @@ const CSS = `
   margin-top: auto;
   padding-top: 0.5rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -113,7 +113,7 @@ const CSS = `
 .crs-meta-row {
   font-size: 0.72rem;
   letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.55);
   white-space: normal;
 }
 
@@ -166,7 +166,7 @@ const CSS = `
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.55);
   font-weight: 600;
   margin-bottom: 0.4rem;
 }
@@ -197,17 +197,17 @@ const CSS = `
   white-space: nowrap;
 }
 .crs-badge-tested {
-  color: #d8ccff;
+  color: var(--color-lavender-tint);
   background: rgba(139, 92, 246, 0.18);
   border: 1px solid rgba(178, 148, 255, 0.4);
 }
 .crs-badge-research {
-  color: #a5f3fc;
+  color: var(--color-cyan-tint);
   background: rgba(34, 211, 238, 0.14);
   border: 1px solid rgba(34, 211, 238, 0.4);
 }
 .crs-badge-standard {
-  color: #fde68a;
+  color: var(--color-amber-tint);
   background: rgba(245, 158, 11, 0.14);
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
@@ -225,17 +225,17 @@ const CSS = `
   flex-shrink: 0;
 }
 .crs-badge-dot-tested {
-  color: #d8ccff;
+  color: var(--color-lavender-tint);
   background: rgba(139, 92, 246, 0.22);
   border: 1px solid rgba(178, 148, 255, 0.45);
 }
 .crs-badge-dot-research {
-  color: #a5f3fc;
+  color: var(--color-cyan-tint);
   background: rgba(34, 211, 238, 0.18);
   border: 1px solid rgba(34, 211, 238, 0.45);
 }
 .crs-badge-dot-standard {
-  color: #fde68a;
+  color: var(--color-amber-tint);
   background: rgba(245, 158, 11, 0.18);
   border: 1px solid rgba(245, 158, 11, 0.45);
 }
@@ -298,6 +298,10 @@ const CSS = `
   font-size: 1.05rem;
   line-height: 1.35;
   color: #fff;
+  /* This is an h2 (it was a span, which left the course page jumping h1 -> h3).
+     Reset the UA heading box so it lays out exactly as the span did. */
+  margin: 0;
+  font-weight: inherit;
 }
 @media (min-width: 640px) {
   .crs-module-title {
@@ -317,7 +321,7 @@ const CSS = `
 }
 .crs-module-summary-count {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
 }
 .crs-module-chevron {
   flex-shrink: 0;
@@ -436,7 +440,7 @@ const CSS = `
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
 }
 .crs-blog-card-title {
   font-size: 0.92rem;
@@ -481,14 +485,14 @@ const CSS = `
   background: rgba(255, 255, 255, 0.06);
 }
 .crs-action-label[data-checked='true'] {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: line-through;
 }
 .crs-action-checkbox {
   flex-shrink: 0;
   width: 20px;
   height: 20px;
-  accent-color: #8b5cf6;
+  accent-color: var(--color-accent);
   cursor: pointer;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -514,7 +518,7 @@ const CSS = `
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), var(--color-cyan));
   transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -554,7 +558,7 @@ const CSS = `
   box-shadow: 0 0 24px -4px rgba(251, 191, 36, 0.5);
 }
 .crs-ring-done .crs-ring-value {
-  color: #fbbf24;
+  color: var(--color-amber);
 }
 .crs-ring-label {
   font-size: 0.8rem;
@@ -578,7 +582,7 @@ const CSS = `
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+  background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), var(--color-cyan));
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .crs-card-progress-pct {

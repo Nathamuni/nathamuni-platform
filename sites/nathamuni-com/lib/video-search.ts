@@ -1,0 +1,131 @@
+/**
+ * Client-safe video types and search.
+ *
+ * Deliberately does NOT import videos.json. lib/videos.ts does, so any client
+ * component importing a value from there pulled the entire 172-entry catalog into
+ * the browser bundle (measured: 105KB raw / 25KB gzip in a shared chunk).
+ * Client components import from here instead; server code can keep using
+ * lib/videos.ts, which re-exports everything below.
+ */
+
+export interface Video {
+  id: string
+  title: string
+  instagramUrl: string
+  youtubeUrl?: string
+  /** Present once the daily sync cross-posts this reel to YouTube (see scripts/youtube-upload.mjs). */
+  youtubeId?: string
+  youtubeStatus?: 'private' | 'public' | 'unlisted' | 'failed' | 'skipped-too-large'
+  thumbnail: string | null
+  /** 'reel' (video) or 'post' (photo/carousel). Absent = reel (pre-posts entries). */
+  mediaType?: 'reel' | 'post'
+  category: string
+  tags: string[]
+  problemSolved?: string
+  shortDescription: string
+  detailedDescription: string
+  keyLessons?: string[]
+  featured: boolean
+  publishedDate: string
+  /** Present once the sync successfully pulls engagement fields from the Graph API. */
+  likeCount?: number
+  commentsCount?: number
+  /** Per-post insights (reach/saved/shares/views) pulled by instagram-insights.mjs.
+   *  Saves and shares are Instagram's strongest ranking signals — richer than likes alone. */
+  reach?: number
+  saved?: number
+  shares?: number
+  views?: number
+  /** Reels only: average watch time in ms (ig_reels_avg_watch_time). */
+  avgWatchTimeMs?: number
+}
+
+/**
+ * Concept synonyms: expands what people naturally type into the vocabulary
+ * the captions actually use. Searching "exercise" should surface workout
+ * content even though no caption contains the literal word. Add new
+ * entries freely — lowercase key, lowercase expansions.
+ */
+export const SEARCH_SYNONYMS: Record<string, string[]> = {
+  exercise: ['workout', 'fitness', 'calisthenics', 'training', 'gym'],
+  exercises: ['workout', 'fitness', 'calisthenics', 'training'],
+  gym: ['workout', 'fitness', 'calisthenics'],
+  training: ['workout', 'fitness', 'calisthenics'],
+  muscle: ['workout', 'fitness', 'calisthenics', 'physique'],
+  bodyweight: ['calisthenics', 'workout', 'push'],
+  run: ['running', 'cardio'],
+  motivation: ['discipline', 'mindset', 'consistency'],
+  habit: ['discipline', 'system', 'routine'],
+  habits: ['discipline', 'system', 'routine'],
+  philosophy: ['thinkers', 'mindset', 'wisdom'],
+  productivity: ['discipline', 'system', 'consistency'],
+  app: ['ai', 'application', 'builds'],
+  apps: ['ai', 'application', 'builds'],
+  tech: ['ai', 'builds', 'application'],
+  artificial: ['ai'],
+  intelligence: ['ai'],
+  funny: ['humor', 'roast', 'meme', 'tamil'],
+  comedy: ['humor', 'roast', 'meme', 'tamil'],
+  meme: ['humor', 'tamil', 'roast'],
+  travel: ['life', 'place', 'ride'],
+  food: ['diet', 'life'],
+}
+
+function tokenize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[-_/]/g, ' ')
+    .split(/[^a-z0-9஀-௿]+/)
+    .filter((t) => t.length > 0)
+}
+
+/** A query token matches a word if either is a prefix of the other (≥3 chars). */
+function tokenMatchesWord(token: string, word: string): boolean {
+  if (token === word) return true
+  if (token.length >= 3 && word.startsWith(token)) return true
+  if (word.length >= 3 && token.startsWith(word)) return true
+  return false
+}
+
+function scoreVideo(video: Video, queryTokens: string[][]): number {
+  const titleWords = tokenize(video.title)
+  const tagWords = tokenize(video.tags.join(' ') + ' ' + video.category)
+  const bodyWords = tokenize(video.shortDescription + ' ' + video.detailedDescription)
+
+  let score = 0
+  // Every query token (or one of its synonyms) must match somewhere.
+  for (const alternatives of queryTokens) {
+    let tokenScore = 0
+    for (const alt of alternatives) {
+      if (titleWords.some((w) => tokenMatchesWord(alt, w))) tokenScore = Math.max(tokenScore, 3)
+      else if (tagWords.some((w) => tokenMatchesWord(alt, w))) tokenScore = Math.max(tokenScore, 2)
+      else if (bodyWords.some((w) => tokenMatchesWord(alt, w))) tokenScore = Math.max(tokenScore, 1)
+    }
+    if (tokenScore === 0) return 0
+    score += tokenScore
+  }
+  return score
+}
+
+export function searchAndFilterVideos(
+  videos: Video[],
+  query: string,
+  category: string | null
+): Video[] {
+  const pool = category ? videos.filter((v) => v.category === category) : videos
+  const trimmed = query.trim().toLowerCase()
+  if (!trimmed) return pool
+
+  // Each query token becomes a set of alternatives: itself + its synonyms.
+  const queryTokens = tokenize(trimmed).map((token) => [
+    token,
+    ...(SEARCH_SYNONYMS[token] ?? []),
+  ])
+  if (queryTokens.length === 0) return pool
+
+  return pool
+    .map((video) => ({ video, score: scoreVideo(video, queryTokens) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(({ video }) => video)
+}

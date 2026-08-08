@@ -17,7 +17,9 @@ import './globals.css'
 
 const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['300', '400', '600', '800'],
+  // 300 dropped — nothing requests it (no font-light, no font-weight:300 anywhere).
+  // 800 IS used, by four session components, so it stays.
+  weight: ['400', '600', '800'],
   variable: '--font-outfit',
 })
 const inter = Inter({
@@ -49,6 +51,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/',
+    // Makes /feed.xml discoverable to readers and crawlers via <link rel="alternate">.
+    types: {
+      'application/rss+xml': [{ url: '/feed.xml', title: `${PROFILE.name} — posts and videos` }],
+    },
   },
 }
 
@@ -125,6 +131,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SaveNudgeHost />
           <BackToTop />
         </AuthProvider>
+        {/* Cloudflare Web Analytics: cookieless, no consent banner needed, free and
+            unlimited — so the footer's "no trackers" claim stays literally true.
+            Inert until NEXT_PUBLIC_CF_BEACON_TOKEN is set (Cloudflare dashboard →
+            Web Analytics → the token in its snippet), so nothing ships to visitors
+            and no request is made while it is unset. */}
+        {process.env.NEXT_PUBLIC_CF_BEACON_TOKEN && (
+          <script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({
+              token: process.env.NEXT_PUBLIC_CF_BEACON_TOKEN,
+            })}
+          />
+        )}
       </body>
     </html>
   )

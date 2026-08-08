@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from 'react'
 import type { DecisionNode } from '@/lib/journey'
 
 const CARD_BORDER: Record<DecisionNode['hue'], string> = {
-  violet: 'border-[#8b5cf6]/35',
-  magenta: 'border-[#ec4899]/35',
-  cyan: 'border-[#22d3ee]/35',
+  violet: 'border-[var(--color-accent)]/35',
+  magenta: 'border-[var(--color-pink)]/35',
+  cyan: 'border-[var(--color-cyan)]/35',
 }
 
 const DOT_BG: Record<DecisionNode['hue'], string> = {
-  violet: 'bg-[#8b5cf6]',
-  magenta: 'bg-[#ec4899]',
-  cyan: 'bg-[#22d3ee]',
+  violet: 'bg-[var(--color-accent)]',
+  magenta: 'bg-[var(--color-pink)]',
+  cyan: 'bg-[var(--color-cyan)]',
 }
 
 const SPINE_PATH_LENGTH = 1000
@@ -125,7 +125,7 @@ export function DecisionMap({ nodes }: { nodes: DecisionNode[] }) {
                 className={`glass-card border p-5 sm:p-6 anim-fade-up ${CARD_BORDER[node.hue]}`}
                 data-reveal
               >
-                <p className="text-[0.65rem] uppercase tracking-widest text-white/40 mb-2">
+                <p className="text-[0.65rem] uppercase tracking-widest text-white/55 mb-2">
                   {node.period}
                 </p>
                 <p className="text-sm text-white/65 italic mb-1.5 leading-relaxed">

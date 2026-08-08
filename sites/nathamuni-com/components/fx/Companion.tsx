@@ -258,7 +258,7 @@ const CSS = `
   border-radius: 999px;
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.06);
-  color: #f5f3ff;
+  color: var(--text-on-glass);
   font-size: 13px;
   white-space: nowrap;
   cursor: pointer;
@@ -268,7 +268,7 @@ const CSS = `
   background: rgba(139, 92, 246, 0.25);
 }
 .cmp-menu-item[aria-checked='true'] {
-  border-color: #22d3ee;
+  border-color: var(--color-cyan);
   background: rgba(34, 211, 238, 0.18);
 }
 `
@@ -443,11 +443,15 @@ export function Companion() {
     window.addEventListener('scroll', onScroll, { passive: true })
 
     const loop = (now: number) => {
-      raf = requestAnimationFrame(loop)
+      // Scheduled only while visible. Re-arming before the hidden check (as this
+      // did previously) keeps a callback queued every frame for the life of a
+      // backgrounded tab; onVisibility restarts it instead.
       if (document.hidden) {
+        raf = 0
         last = now
         return
       }
+      raf = requestAnimationFrame(loop)
       const dt = Math.min(now - last, 48) / 16.67
       last = now
 
@@ -583,8 +587,19 @@ export function Companion() {
 
     raf = requestAnimationFrame(loop)
 
+    // Restart the loop when the tab comes back. `last` is reset so the first frame
+    // after a long background period doesn't integrate a huge dt.
+    const onVisibility = () => {
+      if (document.hidden || raf !== 0) return
+      last = performance.now()
+      raf = requestAnimationFrame(loop)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
     return () => {
       cancelAnimationFrame(raf)
+      raf = 0
+      document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('click', onDocClick)
       window.removeEventListener('scroll', onScroll)

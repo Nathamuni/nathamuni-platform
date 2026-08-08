@@ -1,0 +1,335 @@
+# interface-craft reference catalogue
+#
+# RULES OF USE
+#   1. Query 3-5 records per task, never the whole file. Loading all of it produces
+#      the same fashionable dark/WebGL answer for every brief.
+#   2. This file is a routing index, not a substitute for research. Live search is
+#      always allowed and often better.
+#   3. If a fetch fails, say the fetch failed. Never summarise a page you did not read.
+#      Set `fetch_status: dead` and move on.
+#   4. `tier: reference` records are for principles only. Never pull code, assets,
+#      copy, or compositions from them.
+#   5. A record with `last_verified: null` has not been checked by anything. Treat it
+#      as a lead, not a source.
+#
+# SCHEMA
+#   tier          registry | discovery | reference
+#   url           entry point
+#   specific      a concrete project/page worth reading, not the homepage. TODO = unfilled.
+#   inspect       what to actually look at when you get there
+#   lesson        the transferable principle
+#   do_not_copy   what is off-limits
+#   cost          free | freemium | paid
+#   last_verified ISO date, set only by something that actually fetched it
+#   fetch_status  verified | unverified | dead
+#   used_in       projects where this record actually changed a decision. Empty = candidate for deletion.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 1 — REGISTRIES. Installable via the shadcn MCP as @namespace. Free, MIT.
+# ─────────────────────────────────────────────────────────────────────────────
+
+- id: shadcn-ui
+  tier: registry
+  namespace: "@shadcn"
+  url: https://ui.shadcn.com
+  specific: https://ui.shadcn.com/docs/mcp
+  inspect: MCP tool surface; how components.json declares extra registries
+  lesson: Built-in namespace, no config, no key. Base primitives — start here before anything decorative.
+  cost: free
+  last_verified: 2026-08-05
+  fetch_status: verified
+  used_in: []
+
+- id: magic-ui
+  tier: registry
+  namespace: "@magicui"
+  url: https://magicui.design
+  specific: TODO
+  inspect: which animations carry meaning vs which are pure decoration
+  lesson: The animation layer of the shadcn ecosystem. 150+ free MIT components. Take the motion primitives, not the marketing-page maximalism.
+  do_not_copy: its demo-page composition — it is a showcase, not a product page
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: react-bits
+  tier: registry
+  namespace: "@reactbits"
+  url: https://reactbits.dev
+  specific: TODO
+  inspect: parameterised effects; the JS/TS and CSS/Tailwind variant split
+  lesson: Effects exposed as configurable props rather than fixed set-pieces. Copy that API shape even when writing your own.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: aceternity-ui
+  tier: registry
+  namespace: "@aceternity"
+  url: https://ui.aceternity.com
+  specific: TODO
+  inspect: hero and section motion patterns
+  lesson: Landing-page motion vocabulary. High slop risk — these components are extremely recognisable, so adapt structurally or the page reads as templated.
+  do_not_copy: hero compositions verbatim; they are widely used and instantly identifiable
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: origin-ui
+  tier: registry
+  namespace: "@originui"
+  url: https://originui.com
+  specific: TODO
+  inspect: form, input and dense-control patterns
+  lesson: Product-interface components rather than marketing decoration. The right source when the surface is an app, not a pitch.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: kibo-ui
+  tier: registry
+  namespace: "@kibo"
+  url: https://kibo-ui.com
+  specific: TODO
+  inspect: higher-order components that carry business logic
+  lesson: Composed components above the primitive layer. Audit harder — more logic means more assumptions baked in.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 2 — DISCOVERY. Find registries; do not depend on them.
+# ─────────────────────────────────────────────────────────────────────────────
+
+- id: registry-directory
+  tier: discovery
+  url: https://registry.directory/
+  inspect: sort by Popular / Stars / Recently active
+  lesson: 70+ registries indexed. No public API — browsing only, so it feeds curation, not automation. Some entries are Sponsored or Premium-only; check before wiring a namespace.
+  cost: free
+  last_verified: 2026-08-05
+  fetch_status: verified
+  used_in: []
+
+- id: awesome-shadcn-registries
+  tier: discovery
+  url: https://www.shadcn.io/awesome/registries
+  inspect: which registries support the shadcn CLI directly
+  lesson: CLI-compatible registries only. If it is not installable via namespace, it is a reference, not a dependency.
+  cost: free
+  last_verified: 2026-08-05
+  fetch_status: verified
+  used_in: []
+
+- id: 21st-dev
+  tier: discovery
+  url: https://21st.dev
+  specific: https://help.21st.dev/magic-chat/pricing
+  inspect: how it packages search + preview + install + publish in one loop
+  lesson: The product model worth copying — discovery and source code in one place, agent-readable. The workflow is the lesson, not the catalogue.
+  do_not_copy: not usable as a pipeline. Free tier is 2 component installs/day and 100 credits/month, then $20/mo. Fails a free-first requirement.
+  cost: freemium
+  last_verified: 2026-08-05
+  fetch_status: verified
+  used_in: []
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER 3 — REFERENCE. Principles only. No code, no assets, no compositions.
+# ─────────────────────────────────────────────────────────────────────────────
+# Every record below is unverified. They are leads. Fetch before citing.
+
+- id: noomo
+  tier: reference
+  url: https://noomoagency.com/
+  specific: TODO — pick one case study, not the homepage
+  inspect: how narrative order drives page structure; how technical capability is communicated without a feature list
+  lesson: >
+    Story determines medium, not the reverse. Narrative sequence IS the page architecture:
+    opening proposition, tension, reveal, evidence, exploration, resolution, action.
+    Motion carries the story or it is decoration.
+  do_not_copy: typography, copy, navigation, branded assets, any specific case-study composition. Never imply affiliation.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: noomo-labs
+  tier: reference
+  url: https://labs.noomoagency.com/
+  specific: TODO
+  inspect: how experiments are separated from client case studies
+  lesson: An explicit experimental space demonstrates capability without contaminating production work. Experiments stay isolated until they earn promotion.
+  do_not_copy: the Labs experience itself
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: active-theory
+  tier: reference
+  url: https://activetheory.net/
+  specific: TODO
+  inspect: real-time 3D as a product surface rather than an intro animation
+  lesson: When WebGL is load-bearing it is doing navigation or spatial reasoning, not ornament. Ask what the 3D is *for*.
+  do_not_copy: scenes, shaders, assets
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: lusion
+  tier: reference
+  url: https://lusion.co/
+  specific: TODO
+  inspect: scroll-linked camera movement and progressive object reveal
+  lesson: Cinematic pacing — one idea per scene, minimal text per frame, transitions that connect the closing element of one chapter to the opening of the next.
+  do_not_copy: exact transitions or 3D scenes
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: immersive-garden
+  tier: reference
+  url: https://immersive-g.com/
+  specific: TODO
+  inspect: art direction holding together across very different client sectors
+  lesson: A studio can have a method without a signature aesthetic. Tailor per product; do not stamp one look on everything.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: unseen-studio
+  tier: reference
+  url: https://unseen.co/
+  specific: TODO
+  inspect: typographic restraint alongside heavy motion
+  lesson: Expressive motion survives only when type and layout stay disciplined. Loud everywhere reads as noise.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: resn
+  tier: reference
+  url: https://resn.co.nz/
+  specific: TODO
+  inspect: playful interaction with a clear exit path back to content
+  lesson: Play is allowed; hiding the primary action is not. Every experimental navigation needs a conventional escape.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: locomotive
+  tier: reference
+  url: https://locomotive.ca/
+  specific: TODO
+  inspect: editorial structure carrying scroll behaviour
+  lesson: Smooth scroll is a cost, not a feature. It must earn its place against native scrolling and reduced-motion users.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: cuberto
+  tier: reference
+  url: https://cuberto.com/
+  specific: TODO
+  inspect: cursor and microinteraction vocabulary
+  lesson: Microinteractions read as craft when consistent and as noise when scattered. Pick a small set and apply them systematically.
+  do_not_copy: cursor implementations verbatim — heavily imitated already
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: awwwards
+  tier: discovery
+  url: https://www.awwwards.com/
+  inspect: Sites of the Day, then leave for the actual project URL
+  lesson: Discovery only. Judge the linked site, never the gallery thumbnail. No API — browsing is the only access.
+  do_not_copy: award-bait patterns that fail on mobile
+  cost: freemium
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: godly
+  tier: discovery
+  url: https://godly.website/
+  inspect: contemporary marketing sites by category
+  lesson: Strong for current landing-page conventions. Useful as a check on whether a direction is fresh or already saturated.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: siteinspire
+  tier: discovery
+  url: https://www.siteinspire.com/
+  inspect: filter by style and type
+  lesson: The restrained end of the spectrum. The correct antidote when every proposed direction is trending dark-and-glowing.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: land-book
+  tier: discovery
+  url: https://land-book.com/
+  inspect: section-level patterns and category filters
+  lesson: Good for page *composition* — section order and density — rather than visual style.
+  cost: freemium
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: mobbin
+  tier: discovery
+  url: https://mobbin.com/
+  inspect: real product flows, mobile-first
+  lesson: The reference for flows and states rather than heroes. Empty, error and loading states live here.
+  do_not_copy: screenshots are of real shipped products — principles only
+  cost: freemium
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: refero
+  tier: discovery
+  url: https://refero.design/
+  inspect: real application UI screens
+  lesson: Dense product interfaces, the opposite pole from marketing pages. Use when the surface is an app.
+  cost: freemium
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: codrops
+  tier: reference
+  url: https://tympanus.net/codrops/
+  specific: TODO
+  inspect: tutorials with working source and stated technique
+  lesson: The rare reference that is also a legitimate code source — MIT-ish demos with explanations. Check the licence per article.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []
+
+- id: motion-docs
+  tier: reference
+  url: https://motion.dev/
+  specific: TODO — the reduced-motion and layout-animation pages
+  inspect: gesture, layout, scroll, presence, reduced-motion APIs
+  lesson: Most "premium" motion is achievable here without touching WebGL. Check this before escalating cost.
+  cost: free
+  last_verified: null
+  fetch_status: unverified
+  used_in: []

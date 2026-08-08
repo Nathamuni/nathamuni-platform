@@ -88,9 +88,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    void loadMe()
+    // Deferred off the critical path. This provider wraps the whole app, so the
+    // session probe fired on every route — including fully static pages — competing
+    // with first render. It still runs everywhere (Nav/AccountWidget show signed-in
+    // state globally, so it cannot be scoped to account routes), just not until the
+    // browser is idle.
+    const useIdle = typeof window.requestIdleCallback === 'function'
+    const handle = useIdle
+      ? window.requestIdleCallback(() => void loadMe(), { timeout: 2000 })
+      : window.setTimeout(() => void loadMe(), 200)
+
     return () => {
       cancelled = true
+      if (useIdle) window.cancelIdleCallback(handle)
+      else window.clearTimeout(handle)
     }
   }, [])
 

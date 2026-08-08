@@ -56,7 +56,7 @@ export function MetricsTable({ metrics }: { metrics: Metric[] }) {
           text-transform: uppercase;
           letter-spacing: 0.08em;
           font-size: 0.62rem;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
           border-bottom: 1px solid rgba(255, 255, 255, 0.14);
         }
         .ssn-metrics-name {

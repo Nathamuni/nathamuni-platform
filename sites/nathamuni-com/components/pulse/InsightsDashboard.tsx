@@ -1,8 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { DashboardData, Metric, PostLite } from '@/lib/insights-dashboard'
+import { Thumbnail } from '@/components/ui/Thumbnail'
+import { useFocusTrap } from '@/components/ui/useFocusTrap'
 
 /**
  * Interactive insights dashboard for /pulse. Multiple real-data charts with a
@@ -11,7 +13,7 @@ import type { DashboardData, Metric, PostLite } from '@/lib/insights-dashboard'
  * SVG, no chart deps. Every categorical mark is direct-labeled.
  */
 
-const labelClass = 'text-[0.62rem] uppercase tracking-widest text-white/40'
+const labelClass = 'text-[0.62rem] uppercase tracking-widest text-white/55'
 const ink = 'rgba(236,233,255,0.88)'
 const mut = 'rgba(236,233,255,0.5)'
 const catColor = (hue: number, l = 60) => `hsl(${hue} 78% ${l}%)`
@@ -30,7 +32,7 @@ function Card({ title, sub, children }: { title: string; sub?: string; children:
     <div className="glass-card p-4 sm:p-5 flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className={labelClass}>{title}</h3>
-        {sub && <span className="text-[0.6rem] text-white/35">{sub}</span>}
+        {sub && <span className="text-[0.6rem] text-white/55">{sub}</span>}
       </div>
       {children}
     </div>
@@ -264,6 +266,18 @@ function PostsModal({
   posts: PostLite[]
   onClose: () => void
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
+
+  // This modal had no dialog semantics at all and no Escape handler.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onClose])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
@@ -271,6 +285,10 @@ function PostsModal({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${posts.length} posts — ${label}`}
         className="w-full sm:max-w-lg max-h-[80vh] rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col"
         style={{ background: 'rgba(14,11,30,0.98)', border: '1px solid rgba(178,148,255,0.28)' }}
         onClick={(e) => e.stopPropagation()}
@@ -292,8 +310,13 @@ function PostsModal({
               className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
             >
               {p.thumbnail ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.thumbnail} alt="" className="w-11 h-14 object-cover rounded-lg shrink-0" />
+                <Thumbnail
+                  src={p.thumbnail}
+                  alt=""
+                  width={44}
+                  height={56}
+                  className="w-11 h-14 object-cover rounded-lg shrink-0"
+                />
               ) : (
                 <div className="w-11 h-14 rounded-lg shrink-0 bg-gradient-to-br from-violet-600/40 to-pink-500/30" />
               )}
@@ -382,7 +405,9 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h3 className={labelClass}>Insights dashboard · <span className="text-white/30 normal-case tracking-normal">click any bar to see the posts</span></h3>
+        {/* h2, not h3: this is the page's top-level section under the h1, and the
+            cards below it are h3. As an h3 it made /pulse jump h1 -> h3. */}
+        <h2 className={labelClass}>Insights dashboard · <span className="text-white/55 normal-case tracking-normal">click any bar to see the posts</span></h2>
         <div className="flex gap-1 p-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
           {METRICS.map((m) => (
             <button
@@ -444,7 +469,7 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
       </div>
 
       {!data.hasReach && (
-        <p className="text-[0.7rem] text-white/35 mt-4">
+        <p className="text-[0.7rem] text-white/55 mt-4">
           Reach, saves, shares and reel watch-time charts unlock automatically once the daily sync
           enriches per-post insights. Audience active-hours need your one screenshot.
         </p>

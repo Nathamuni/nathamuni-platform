@@ -9,6 +9,90 @@
   --font-body: var(--font-inter), sans-serif;
 }
 
+/**
+ * Design tokens.
+ *
+ * Before this block the theme was four colours and two fonts, while the same
+ * brand values were hand-typed throughout: 122 hex literals across .tsx and 84
+ * rgba() in this file. Changing the palette meant a find-and-replace across ~63
+ * components, which is why a redesign was expensive.
+ *
+ * Every value below is byte-identical to the literal it replaces — this layer is
+ * deliberately additive and changes nothing visually. The *-rgb triples exist so
+ * translucent uses can stay tokenised: rgb(var(--accent-rgb) / 0.32).
+ *
+ * Migration status: globals.css consumes these. The inline hex values in .tsx are
+ * NOT yet migrated — that is the remaining half, tracked in the phase notes.
+ */
+:root {
+  /* ---- brand ramp (raw channels so alpha variants stay tokenised) ---- */
+  --accent-rgb: 139 92 246; /* #8b5cf6 violet — primary */
+  --cyan-rgb: 34 211 238; /* #22d3ee — secondary/interactive */
+  --pink-rgb: 236 72 153; /* #ec4899 — tertiary accent */
+  --lavender-rgb: 178 148 255; /* #b294ff — borders, glass edges */
+  --mint-rgb: 52 211 153; /* #34d399 — ambient wash only */
+  --ground-rgb: 13 10 31; /* #0d0a1f — page base */
+
+  --color-cyan: #22d3ee;
+  --color-cyan-soft: #67e8f9;
+  --color-pink: #ec4899;
+  --color-lavender: #b294ff;
+  --color-amber: #fbbf24;
+  --color-amber-deep: #f59e0b;
+
+  /* ---- status ---- */
+  --color-success: #4ade80;
+  --color-warning: #facc15;
+  --color-danger: #fca5b0;
+  --color-caution: #fcd9a8;
+  --color-rose: #fb7185;
+
+  /* ---- tints. Only values used in 2+ places are tokenised; genuine one-offs
+         stay literal, since indirection there buys nothing. ---- */
+  --text-on-glass: #f5f3ff;
+  --color-cyan-tint: #a5f3fc;
+  --color-amber-tint: #fde68a;
+  --color-amber-soft: #fcd34d;
+  --color-lavender-tint: #d8ccff;
+  --color-accent-tint: #c4b5fd;
+
+  /* ---- surfaces & borders ---- */
+  --surface-glass: rgb(148 112 255 / 0.08);
+  --surface-raised: rgb(14 11 30 / 0.98);
+  --surface-scrim: rgb(4 3 12 / 0.72);
+  --border-subtle: rgb(var(--lavender-rgb) / 0.18);
+  --border-strong: rgb(var(--lavender-rgb) / 0.4);
+
+  /* ---- text ramp. /55 is the AA floor over --color-ground (6.24:1);
+         anything dimmer fails WCAG for normal text, so there is no /35 or /40. ---- */
+  --text-primary: rgb(255 255 255 / 0.92);
+  --text-secondary: rgb(255 255 255 / 0.7);
+  --text-muted: rgb(255 255 255 / 0.55);
+
+  /* ---- radii (was 9999px x3 and 999px x1 for the same intent) ---- */
+  --radius-sm: 0.6rem;
+  --radius-md: 1rem;
+  --radius-lg: 2rem;
+  --radius-pill: 9999px;
+
+  /* ---- elevation ---- */
+  --shadow-card: 0 12px 40px rgb(5 3 15 / 0.55);
+  --shadow-lift: 0 24px 60px -18px rgb(var(--accent-rgb) / 0.5);
+
+  /* ---- type scale. Replaces nine near-identical arbitrary micro-sizes
+         (text-[0.55rem] .. text-[0.72rem]) that differed by hundredths. ---- */
+  --text-micro: 0.62rem;
+  --text-mini: 0.7rem;
+
+  /* ---- motion ---- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.2s;
+  --duration-slow: 0.5s;
+
+  /* ---- focus ---- */
+  --focus-ring: 2px solid rgb(var(--cyan-rgb) / 0.6);
+}
+
 @utility glass-card {
   @apply bg-glass border border-glass-border backdrop-blur-xl rounded-2xl;
 }
@@ -29,10 +113,10 @@
        creating a scroll container. */
     overflow-x: clip;
     background-image:
-      radial-gradient(1300px 700px at 85% -10%, rgba(139, 92, 246, 0.32), transparent 62%),
-      radial-gradient(1000px 600px at -15% 25%, rgba(34, 211, 238, 0.18), transparent 58%),
-      radial-gradient(900px 600px at 55% 115%, rgba(236, 72, 153, 0.2), transparent 60%),
-      radial-gradient(600px 400px at 25% 70%, rgba(52, 211, 153, 0.09), transparent 60%);
+      radial-gradient(1300px 700px at 85% -10%, rgb(var(--accent-rgb) / 0.32), transparent 62%),
+      radial-gradient(1000px 600px at -15% 25%, rgb(var(--cyan-rgb) / 0.18), transparent 58%),
+      radial-gradient(900px 600px at 55% 115%, rgb(var(--pink-rgb) / 0.2), transparent 60%),
+      radial-gradient(600px 400px at 25% 70%, rgb(var(--mint-rgb) / 0.09), transparent 60%);
     background-attachment: fixed;
   }
   h1,
@@ -49,12 +133,12 @@
     touch-action: manipulation;
   }
   ::selection {
-    background: rgba(139, 92, 246, 0.5);
+    background: rgb(var(--accent-rgb) / 0.5);
   }
   a:focus-visible,
   button:focus-visible,
   input:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.9);
+    outline: 2px solid rgb(var(--accent-rgb) / 0.9);
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -177,25 +261,25 @@
     @apply cursor-pointer bg-transparent text-sm inline-flex items-center gap-1;
   }
   .nav-menu-btn:hover {
-    background: rgba(178, 148, 255, 0.12);
+    background: rgb(var(--lavender-rgb) / 0.12);
   }
   .nav-menu-btn.is-active {
     @apply text-white;
-    background: linear-gradient(120deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.25));
+    background: linear-gradient(120deg, rgb(var(--accent-rgb) / 0.35), rgb(var(--pink-rgb) / 0.25));
   }
   .site-nav-links a:hover {
-    background: rgba(178, 148, 255, 0.12);
+    background: rgb(var(--lavender-rgb) / 0.12);
   }
   .site-nav-links a.is-active {
     @apply text-white;
-    background: linear-gradient(120deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.25));
+    background: linear-gradient(120deg, rgb(var(--accent-rgb) / 0.35), rgb(var(--pink-rgb) / 0.25));
   }
 
   .tab-bar {
     @apply sm:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5;
     background: rgba(13, 10, 31, 0.82);
     backdrop-filter: blur(18px);
-    border-top: 1px solid rgba(178, 148, 255, 0.16);
+    border-top: 1px solid rgb(var(--lavender-rgb) / 0.16);
     padding-bottom: env(safe-area-inset-bottom);
   }
   .tab-item {
@@ -249,7 +333,7 @@
 
   .site-footer {
     @apply mt-20 px-4 py-8 sm:px-8 sm:py-10 max-w-6xl mx-auto flex flex-col gap-8 text-sm text-white/55;
-    border-top: 1px solid rgba(178, 148, 255, 0.14);
+    border-top: 1px solid rgb(var(--lavender-rgb) / 0.14);
   }
   .site-footer-top {
     @apply flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between;
@@ -265,7 +349,7 @@
     color: transparent;
   }
   .site-footer-tagline {
-    @apply text-xs text-white/45 leading-relaxed;
+    @apply text-xs text-white/55 leading-relaxed;
   }
   .site-footer-nav {
     @apply grid grid-cols-3 gap-6 sm:gap-10;
@@ -274,7 +358,7 @@
     @apply flex flex-col gap-2;
   }
   .site-footer-col-title {
-    @apply text-[0.65rem] uppercase tracking-widest text-white/35 mb-1;
+    @apply text-[0.65rem] uppercase tracking-widest text-white/55 mb-1;
   }
   .site-footer-col-links {
     @apply flex flex-col gap-1.5;
@@ -284,13 +368,13 @@
   }
   .site-footer-bottom {
     @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-6;
-    border-top: 1px solid rgba(178, 148, 255, 0.1);
+    border-top: 1px solid rgb(var(--lavender-rgb) / 0.1);
   }
   .site-footer-note {
-    @apply text-xs text-white/35 text-center sm:text-left;
+    @apply text-xs text-white/55 text-center sm:text-left;
   }
   .site-footer-copy {
-    @apply text-xs text-white/35 text-center sm:text-right;
+    @apply text-xs text-white/55 text-center sm:text-right;
   }
 
   /* ---------- 3D tilt system ---------- */
@@ -375,7 +459,7 @@
     height: 320px;
     top: -10%;
     right: 4%;
-    background: rgba(139, 92, 246, 0.22);
+    background: rgb(var(--accent-rgb) / 0.22);
     transform: translate3d(calc(var(--par-x) * -34px), calc(var(--par-y) * -26px), 0);
     animation: hero-orb-drift-1 24s ease-in-out infinite alternate;
   }
@@ -448,7 +532,7 @@
     @apply relative italic sm:border-l-2 sm:pl-4;
     font-size: clamp(1.05rem, 2.2vw, 1.35rem);
     line-height: 1.45;
-    border-color: rgba(139, 92, 246, 0.55);
+    border-color: rgb(var(--accent-rgb) / 0.55);
     color: rgba(199, 184, 253, 0.92);
   }
   .hero-promise {
@@ -485,8 +569,8 @@
   .hero-portrait-img {
     @apply relative w-full h-full object-cover rounded-2xl;
     z-index: 1;
-    border: 1px solid rgba(178, 148, 255, 0.28);
-    box-shadow: 0 30px 90px -24px rgba(139, 92, 246, 0.55);
+    border: 1px solid rgb(var(--lavender-rgb) / 0.28);
+    box-shadow: 0 30px 90px -24px rgb(var(--accent-rgb) / 0.55);
     animation: hero-portrait-float 7s ease-in-out infinite;
   }
   @keyframes hero-ring-spin {
@@ -511,8 +595,8 @@
     @apply glass-card flex items-center gap-3 px-5 py-3 mt-1 text-white/50 hover:text-white/80 transition-all;
   }
   .hero-search:hover {
-    border-color: rgba(139, 92, 246, 0.6);
-    box-shadow: 0 0 32px -8px rgba(139, 92, 246, 0.5);
+    border-color: rgb(var(--accent-rgb) / 0.6);
+    box-shadow: 0 0 32px -8px rgb(var(--accent-rgb) / 0.5);
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-orb-1,
@@ -546,9 +630,9 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(139, 92, 246, 0.65),
-      rgba(236, 72, 153, 0.65),
-      rgba(34, 211, 238, 0.65),
+      rgb(var(--accent-rgb) / 0.65),
+      rgb(var(--pink-rgb) / 0.65),
+      rgb(var(--cyan-rgb) / 0.65),
       transparent
     );
     background-size: 200% 100%;
@@ -668,7 +752,7 @@
     font-variant-numeric: tabular-nums;
   }
   .pg-head-stat-label {
-    @apply text-[0.6rem] uppercase tracking-widest text-white/40;
+    @apply text-[0.6rem] uppercase tracking-widest text-white/55;
   }
 
   /* ---------- category tiles ---------- */
@@ -758,8 +842,8 @@
     @apply glass-card w-full px-5 py-3 bg-transparent outline-none placeholder-white/35 transition-all;
   }
   .search-bar:focus {
-    border-color: rgba(139, 92, 246, 0.7);
-    box-shadow: 0 0 28px -8px rgba(139, 92, 246, 0.55);
+    border-color: rgb(var(--accent-rgb) / 0.7);
+    box-shadow: 0 0 28px -8px rgb(var(--accent-rgb) / 0.55);
   }
   .category-filter {
     @apply flex flex-wrap gap-2;
@@ -772,11 +856,11 @@
   }
   .category-filter-btn.is-active {
     @apply text-white border-accent;
-    background: rgba(139, 92, 246, 0.16);
-    box-shadow: 0 0 22px -8px rgba(139, 92, 246, 0.6);
+    background: rgb(var(--accent-rgb) / 0.16);
+    box-shadow: 0 0 22px -8px rgb(var(--accent-rgb) / 0.6);
   }
   .explorer-count {
-    @apply text-xs text-white/40;
+    @apply text-xs text-white/55;
   }
 
   /* ---------- video grid & cards ---------- */
@@ -840,13 +924,13 @@
     @apply text-xs text-white/55 leading-relaxed mt-0.5;
   }
   .video-card-date {
-    @apply text-[0.65rem] text-white/35 mt-auto pt-1;
+    @apply text-[0.65rem] text-white/55 mt-auto pt-1;
   }
   .video-card-tags {
     @apply flex flex-wrap gap-x-2 gap-y-1 mt-1;
   }
   .video-card-tag {
-    @apply inline-block text-[0.65rem] text-white/45 hover:text-white/90 transition-colors py-1;
+    @apply inline-block text-[0.65rem] text-white/55 hover:text-white/90 transition-colors py-1;
   }
 
   .media-type-badge {
@@ -874,10 +958,10 @@
   }
   .social-button-primary {
     @apply border-accent text-white;
-    background: linear-gradient(120deg, rgba(139, 92, 246, 0.45), rgba(236, 72, 153, 0.35));
+    background: linear-gradient(120deg, rgb(var(--accent-rgb) / 0.45), rgb(var(--pink-rgb) / 0.35));
   }
   .social-button-primary:hover {
-    box-shadow: 0 0 30px -8px rgba(139, 92, 246, 0.7);
+    box-shadow: 0 0 30px -8px rgb(var(--accent-rgb) / 0.7);
     transform: translateY(-2px);
   }
   .social-button-secondary {
@@ -988,7 +1072,7 @@
     @apply text-white/80 leading-relaxed whitespace-pre-line;
   }
   .video-detail-date {
-    @apply text-xs text-white/40;
+    @apply text-xs text-white/55;
   }
   .video-detail-lessons ul {
     @apply list-disc list-inside text-white/70 mt-2;
@@ -1052,7 +1136,7 @@
     aspect-ratio: 9 / 16;
     min-width: 8rem;
     scroll-snap-align: start;
-    border: 1px solid rgba(178, 148, 255, 0.22);
+    border: 1px solid rgb(var(--lavender-rgb) / 0.22);
   }
   @media (min-width: 640px) {
     .moment-strip-card {
@@ -1064,8 +1148,8 @@
   }
   .moment-strip-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(236, 72, 153, 0.6);
-    box-shadow: 0 14px 36px -12px rgba(236, 72, 153, 0.45);
+    border-color: rgb(var(--pink-rgb) / 0.6);
+    box-shadow: 0 14px 36px -12px rgb(var(--pink-rgb) / 0.45);
   }
   /* The media element (poster wrapper or gradient fallback) always fills the
      card via absolute positioning — never sized by its own content. */
@@ -1086,7 +1170,7 @@
   }
   .moment-strip-more {
     @apply flex items-center justify-center text-center font-display text-sm text-white;
-    background: linear-gradient(140deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.3));
+    background: linear-gradient(140deg, rgb(var(--accent-rgb) / 0.35), rgb(var(--pink-rgb) / 0.3));
   }
 
   .moments-grid {
@@ -1098,8 +1182,8 @@
   }
   .moment-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(236, 72, 153, 0.6);
-    box-shadow: 0 14px 40px -12px rgba(236, 72, 153, 0.45);
+    border-color: rgb(var(--pink-rgb) / 0.6);
+    box-shadow: 0 14px 40px -12px rgb(var(--pink-rgb) / 0.45);
   }
   .moment-poster {
     @apply w-full h-full object-cover;
@@ -1114,7 +1198,7 @@
   .moment-stall {
     @apply absolute inset-x-4 bottom-16 z-10 flex flex-col items-center gap-2 rounded-2xl px-4 py-3 text-center text-sm text-white/85;
     background: rgba(13, 10, 31, 0.88);
-    border: 1px solid rgba(178, 148, 255, 0.3);
+    border: 1px solid rgb(var(--lavender-rgb) / 0.3);
     backdrop-filter: blur(10px);
     animation: peek-fade 0.3s ease;
   }
@@ -1202,7 +1286,7 @@
     border-radius: 9999px;
     transform: translateY(-50%);
     background: rgba(13, 10, 31, 0.55);
-    border: 1px solid rgba(178, 148, 255, 0.35);
+    border: 1px solid rgb(var(--lavender-rgb) / 0.35);
     backdrop-filter: blur(8px);
     transition: transform 0.2s ease, background 0.2s ease;
   }
@@ -1211,7 +1295,7 @@
     background: rgba(13, 10, 31, 0.75);
   }
   .moment-nav:focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.9);
+    outline: 2px solid rgb(var(--accent-rgb) / 0.9);
     outline-offset: 2px;
   }
   .moment-nav-prev {
@@ -1349,11 +1433,11 @@
     @apply flex-shrink-0 w-48 sm:w-56 rounded-xl flex flex-col items-center justify-center text-center p-6 gap-3;
     aspect-ratio: 2 / 3;
     background:
-      radial-gradient(120% 80% at 80% 0%, rgba(139, 92, 246, 0.5), transparent 60%),
-      radial-gradient(100% 70% at 10% 100%, rgba(236, 72, 153, 0.35), transparent 55%),
+      radial-gradient(120% 80% at 80% 0%, rgb(var(--accent-rgb) / 0.5), transparent 60%),
+      radial-gradient(100% 70% at 10% 100%, rgb(var(--pink-rgb) / 0.35), transparent 55%),
       #14102b;
-    border: 1px solid rgba(178, 148, 255, 0.35);
-    box-shadow: 0 24px 70px -20px rgba(139, 92, 246, 0.55);
+    border: 1px solid rgb(var(--lavender-rgb) / 0.35);
+    box-shadow: 0 24px 70px -20px rgb(var(--accent-rgb) / 0.55);
   }
   .book-cover-title {
     @apply font-display text-xl leading-snug;
@@ -1395,7 +1479,7 @@
   }
   .book-quote {
     @apply glass-card px-5 py-4 text-white/85 font-display text-base sm:text-lg leading-relaxed;
-    border-left: 3px solid rgba(139, 92, 246, 0.8);
+    border-left: 3px solid rgb(var(--accent-rgb) / 0.8);
   }
   .book-audience {
     @apply max-w-3xl mx-auto mt-12 p-6 sm:p-8;

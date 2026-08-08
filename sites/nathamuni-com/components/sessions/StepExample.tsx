@@ -63,11 +63,11 @@ export function StepExample({ example }: { example: StepExampleData }) {
           font-weight: 700;
         }
         .ssn-example-good .ssn-example-glyph {
-          color: #4ade80;
+          color: var(--color-success);
           background: rgba(34, 197, 94, 0.18);
         }
         .ssn-example-bad .ssn-example-glyph {
-          color: #fb7185;
+          color: var(--color-rose);
           background: rgba(244, 63, 94, 0.18);
         }
         .ssn-example-body {

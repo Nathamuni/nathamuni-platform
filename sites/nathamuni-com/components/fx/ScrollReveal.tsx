@@ -53,7 +53,20 @@ export function ScrollReveal() {
     }
     observeNew()
 
-    const mo = new MutationObserver(observeNew)
+    // Watching the whole body subtree means a burst of DOM changes (a client island
+    // hydrating, a list re-rendering) would each trigger a full-document
+    // querySelectorAll. Coalesce to one scan per frame.
+    let scanQueued = false
+    const queueScan = () => {
+      if (scanQueued) return
+      scanQueued = true
+      requestAnimationFrame(() => {
+        scanQueued = false
+        observeNew()
+      })
+    }
+
+    const mo = new MutationObserver(queueScan)
     mo.observe(document.body, { childList: true, subtree: true })
 
     return () => {

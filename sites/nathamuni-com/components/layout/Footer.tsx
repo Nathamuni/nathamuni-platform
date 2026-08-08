@@ -33,7 +33,10 @@ const MORE_LINKS: FooterLink[] = [
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div className="site-footer-col">
-      <h3 className="site-footer-col-title">{title}</h3>
+      {/* h2, not h3: these are the top-level groupings inside the footer landmark.
+          As h3 they made any page whose content has no h2 (e.g. /moments) jump
+          h1 -> h3, which axe reports as a heading-order violation site-wide. */}
+      <h2 className="site-footer-col-title">{title}</h2>
       <ul className="site-footer-col-links">
         {links.map((link) => (
           <li key={link.href}>
@@ -65,7 +68,13 @@ export function Footer() {
 
       <div className="site-footer-bottom">
         <SocialButtons />
-        <p className="site-footer-note">No servers. No trackers. Built to be searched.</p>
+        {/* "No servers" was untrue: the site runs a Cloudflare Worker with KV and
+            Workers AI behind /api/*. No-trackers still holds — nothing analytics-like
+            is loaded. */}
+        {/* Page views are counted with Cloudflare Web Analytics, which is cookieless and
+            does not follow visitors between sites — but it is still measurement, so this
+            no longer claims a blanket "no trackers". */}
+        <p className="site-footer-note">No ads. No cookies. Built to be searched.</p>
         <p className="site-footer-copy">&copy; {PROFILE.name}. All rights reserved.</p>
       </div>
     </footer>

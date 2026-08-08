@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { getAllCategories, searchAndFilterVideos, type Video } from '@/lib/videos'
+// From lib/video-search, not lib/videos — the latter imports videos.json and would
+// bundle the whole catalog into this client component.
+import { searchAndFilterVideos, type Video } from '@/lib/video-search'
 import { SearchBar } from './SearchBar'
 import { CategoryFilter } from './CategoryFilter'
 import { VideoGrid } from './VideoGrid'
@@ -17,7 +19,12 @@ export function VideoExplorer({
   const [category, setCategory] = useState<string | null>(null)
   const [mediaType, setMediaType] = useState<'all' | 'reel' | 'post'>('all')
   const [semanticIds, setSemanticIds] = useState<string[]>([])
-  const categories = useMemo(() => getAllCategories(), [])
+  // Derived from the videos already passed in, rather than re-reading the catalog.
+  // Same result as getAllCategories(): unique categories, sorted.
+  const categories = useMemo(
+    () => Array.from(new Set(videos.map((v) => v.category))).sort(),
+    [videos]
+  )
 
   // Deep-link support on a static export: category tiles and tag pills link
   // to /videos?category=... / ?tag=... / ?q=..., read client-side on mount.
@@ -88,6 +95,7 @@ export function VideoExplorer({
             <button
               key={t}
               type="button"
+              aria-pressed={mediaType === t}
               className={mediaType === t ? 'category-filter-btn is-active' : 'category-filter-btn'}
               onClick={() => setMediaType(t)}
             >
@@ -95,11 +103,18 @@ export function VideoExplorer({
             </button>
           ))}
         </div>
-        {isBrowsing && (
-          <span className="explorer-count" data-testid="explorer-count">
-            {results.length} result{results.length === 1 ? '' : 's'} found
-          </span>
-        )}
+        {/* Always mounted so the live region exists before the count changes —
+            results arrive asynchronously from /api/search and were announced to
+            nobody. Empty until the visitor actually starts browsing. */}
+        <span
+          className="explorer-count"
+          data-testid="explorer-count"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {isBrowsing ? `${results.length} result${results.length === 1 ? '' : 's'} found` : ''}
+        </span>
       </div>
       <VideoGrid videos={results} />
     </div>

@@ -39,8 +39,12 @@ export function SessionTimeline({
             )}
             <span className="ssn-timeline-name">{block.phase}</span>
             <p className="ssn-timeline-focus">{block.focus}</p>
+            {/* role="img" so the dot cluster can carry a name: aria-label is prohibited
+                on a bare span, whose implicit generic role cannot be labelled. The dots
+                themselves stay aria-hidden, so this reads as one "Steps 3, 4" unit. */}
             <span
               className="ssn-timeline-steps"
+              role="img"
               aria-label={`Steps ${block.stepIndexes.map((i) => i + 1).join(', ')}`}
             >
               {block.stepIndexes.map((i) => (
@@ -64,7 +68,7 @@ export function SessionTimeline({
           font-size: 0.65rem;
           text-transform: uppercase;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-timeline-rail {
           list-style: none;
@@ -95,7 +99,7 @@ export function SessionTimeline({
           font-size: 0.62rem;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-timeline-name {
           font-size: 0.95rem;
@@ -140,7 +144,7 @@ export function SessionTimeline({
           letter-spacing: 0.1em;
           padding: 0.15rem 0.5rem;
           border-radius: 9999px;
-          color: #0d0a1f;
+          color: var(--color-ground);
           background: hsl(var(--cat) 85% 65%);
         }
 

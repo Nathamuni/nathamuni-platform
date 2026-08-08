@@ -53,7 +53,10 @@ jobs:
           fi
           git config user.name "instagram-sync[bot]"
           git config user.email "actions@github.com"
-          git add lib/videos.json lib/stories.json lib/insights.json lib/insights-history.json public/images/thumbnails public/stories
+          # assets/thumbnails, not public/images/thumbnails: the public copy is now
+          # build-generated from it and gitignored, so adding that path would commit
+          # nothing and new reels would build with no source image.
+          git add lib/videos.json lib/stories.json lib/insights.json lib/insights-history.json assets/thumbnails public/stories
           git commit -m "FEAT: auto-sync new reels from Instagram"
           git push
 

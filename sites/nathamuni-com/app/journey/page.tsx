@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/journey' },
 }
 
-const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/40'
+const labelClass = 'text-[0.65rem] uppercase tracking-widest text-white/55'
 
 export default function JourneyPage() {
   const principles = getPrinciples()

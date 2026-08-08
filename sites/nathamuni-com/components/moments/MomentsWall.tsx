@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Story } from "@/lib/stories";
 import { SOCIAL_LINKS } from "@/lib/social";
 import { ThoughtCard } from "./ThoughtCard";
+import { Thumbnail } from "@/components/ui/Thumbnail";
+import { useFocusTrap } from "@/components/ui/useFocusTrap";
 
 function formatDate(iso: string): string {
   return new Date(iso + "T00:00:00").toLocaleDateString("en-GB", {
@@ -110,13 +112,7 @@ function MomentCardMedia({ story }: { story: Story }) {
       onPointerLeave={() => setPreview(false)}
     >
       {story.poster ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={story.poster}
-          alt=""
-          loading="lazy"
-          className="moment-poster"
-        />
+        <Thumbnail src={story.poster} alt="" loading="lazy" className="moment-poster" />
       ) : (
         <span className="moment-poster bg-gradient-to-br from-violet-600/40 to-pink-500/30 flex items-center justify-center">
           <span aria-hidden className="text-2xl text-white/70">
@@ -151,6 +147,8 @@ function MomentCardMedia({ story }: { story: Story }) {
  */
 export function MomentsWall({ stories }: { stories: Story[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(lightboxRef, activeIndex !== null);
   const active = activeIndex !== null ? stories[activeIndex] : null;
   const gridItems = useMemo(() => buildGridItems(stories), [stories]);
   const [playbackStarted, setPlaybackStarted] = useState(false);
@@ -245,10 +243,12 @@ export function MomentsWall({ stories }: { stories: Story[] }) {
       {active &&
         createPortal(
           <div
+            ref={lightboxRef}
             className="moment-lightbox"
             data-testid="moment-lightbox"
             role="dialog"
             aria-modal="true"
+            aria-label="Moment"
             onClick={close}
           >
             <div

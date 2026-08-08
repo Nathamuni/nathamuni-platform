@@ -28,6 +28,10 @@ export default function VideosPage() {
           { value: categories.length, label: 'Pillars' },
         ]}
       />
+      {/* Card titles are h3, so without this the page jumped h1 -> h3 (axe
+          heading-order). Visually hidden: the header above already reads as the
+          section's title, this only restores the level for screen readers. */}
+      <h2 className="sr-only">Video library</h2>
       <VideoExplorer videos={videos} />
     </section>
   )

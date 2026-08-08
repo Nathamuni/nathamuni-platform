@@ -73,11 +73,13 @@ describe('AccountWidget', () => {
 
     await user.click(await screen.findByTestId('account-widget-toggle'))
 
-    expect(
-      screen.getByText(
-        'Email + password only, so your course and session progress follows you to any device. No newsletters, no tracking, nothing shared.'
-      )
-    ).toBeInTheDocument()
+    // Asserts the substance rather than an exact sentence. The previous wording claimed
+    // "nothing shared" while signup uploads the progress blob — including health numbers
+    // — so this now pins the disclosure that must not silently disappear again.
+    const why = screen.getByTestId('account-widget-why')
+    expect(why).toHaveTextContent(/uploaded/i)
+    expect(why).toHaveTextContent(/health/i)
+    expect(why).toHaveTextContent(/never shared with anyone else/i)
     expect(screen.getByRole('tab', { name: 'Login' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Create account' })).toBeInTheDocument()
     expect(screen.getByText(/already saved in this browser/i)).toBeInTheDocument()

@@ -108,8 +108,11 @@ export default async function SessionDetailPage({
       </div>
       <CompletionRitual slug={session.slug} stepCount={session.steps.length} />
 
+      {/* section, not aside: these sit inside <main>, and a complementary landmark
+          nested in another landmark is reported by axe and mis-announced by AT.
+          They are part of the page's main content, not tangential to it. */}
       {relatedPosts.length > 0 && (
-        <aside className="ssn-session-reading" data-testid="session-related-posts">
+        <section className="ssn-session-reading" data-testid="session-related-posts">
           <h2 className="section-title">Read the deep dive</h2>
           <ul className="ssn-session-reading-list">
             {relatedPosts.map((post) => (
@@ -120,18 +123,18 @@ export default async function SessionDetailPage({
               </li>
             ))}
           </ul>
-        </aside>
+        </section>
       )}
 
       {relatedVideos.length > 0 && (
-        <aside data-testid="session-related-videos">
+        <section data-testid="session-related-videos">
           <h2 className="section-title">Watch it</h2>
           <div className="related-grid">
             {relatedVideos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </div>
-        </aside>
+        </section>
       )}
 
       <Link href="/sessions" className="link-more">
@@ -154,7 +157,7 @@ export default async function SessionDetailPage({
         .ssn-session-forwhom {
           margin: 0;
           font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(255, 255, 255, 0.55);
         }
         .ssn-session-reading-list {
           list-style: none;

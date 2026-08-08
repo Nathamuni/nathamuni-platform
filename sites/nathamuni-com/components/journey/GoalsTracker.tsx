@@ -27,7 +27,7 @@ export function GoalsTracker({ goals }: { goals: Goal[] }) {
         if (items.length === 0) return null
         return (
           <div key={group.state} data-reveal>
-            <h3 className="text-[0.65rem] uppercase tracking-widest text-white/40 mb-3 sm:mb-4">
+            <h3 className="text-[0.65rem] uppercase tracking-widest text-white/55 mb-3 sm:mb-4">
               {group.heading}
             </h3>
             <ul className="flex flex-col gap-3">
@@ -44,7 +44,7 @@ export function GoalsTracker({ goals }: { goals: Goal[] }) {
                       </span>
                       {goal.dateLabel && (
                         <span
-                          className="text-[0.65rem] uppercase tracking-widest text-white/40"
+                          className="text-[0.65rem] uppercase tracking-widest text-white/55"
                           style={tabularNums}
                         >
                           {goal.dateLabel}
@@ -71,10 +71,10 @@ export function GoalsTracker({ goals }: { goals: Goal[] }) {
           flex-shrink: 0;
         }
         .jny-marker-achieved {
-          background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+          background: linear-gradient(135deg, var(--color-accent), var(--color-cyan));
         }
         .jny-marker-progress {
-          background: conic-gradient(from 0deg, #8b5cf6, #ec4899, #22d3ee, #8b5cf6);
+          background: conic-gradient(from 0deg, var(--color-accent), var(--color-pink), var(--color-cyan), var(--color-accent));
           animation: jny-spin 3s linear infinite;
         }
         .jny-marker-dream {

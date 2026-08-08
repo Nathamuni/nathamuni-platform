@@ -71,7 +71,7 @@ export default function ProjectsPage() {
           data-reveal
           data-testid="github-strip"
         >
-          <span className="text-xs uppercase tracking-widest text-white/40 font-semibold">
+          <span className="text-xs uppercase tracking-widest text-white/55 font-semibold">
             On GitHub
           </span>
           <span className="text-sm text-white/75" style={{ fontVariantNumeric: 'tabular-nums' }}>

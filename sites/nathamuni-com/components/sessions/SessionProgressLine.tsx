@@ -63,7 +63,7 @@ export function SessionProgressLine({ slug, totalSteps }: { slug: string; totalS
           display: block;
           height: 100%;
           border-radius: 999px;
-          background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), #22d3ee);
+          background: linear-gradient(90deg, hsla(var(--cat, 262), 85%, 65%, 1), var(--color-cyan));
           transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .ssn-card-progress-pct {

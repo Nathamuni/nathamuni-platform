@@ -21,6 +21,17 @@ export const PROGRESS_PREFIXES = ['course-', 'session-', 'metrics-'] as const
 let authed = false
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
+/**
+ * Keys this tab has written locally that the server has not been told about yet.
+ *
+ * Session hydration is asynchronous, so there is a window on every page load where the
+ * visitor is signed in but `authed` is still false: writes in that window skip
+ * scheduleSyncUp(), and then applyProgress() lands the server's older blob on top of
+ * them, silently discarding a just-checked step. applyProgress() therefore refuses to
+ * overwrite anything in this set, and pushes it up instead.
+ */
+const locallyDirty = new Set<string>()
+
 /** Flip the module-level "is this visitor signed in" flag. */
 export function setAuthed(value: boolean): void {
   authed = value
@@ -42,6 +53,9 @@ export function loadItem(key: string): string | null {
 
 export function saveItem(key: string, value: string): void {
   if (typeof window === 'undefined') return
+  // Recorded before the write so a value entered pre-hydration still wins over the
+  // server copy that arrives moments later.
+  if (!authed) locallyDirty.add(key)
   try {
     window.localStorage.setItem(key, value)
   } catch {
@@ -85,15 +99,25 @@ export function collectProgress(): Record<string, string> {
  */
 export function applyProgress(obj: Record<string, string>): void {
   if (typeof window === 'undefined') return
+  let hadLocalEdits = false
   try {
     for (const [key, value] of Object.entries(obj)) {
       if (!PROGRESS_PREFIXES.some((prefix) => key.startsWith(prefix))) continue
+      // Anything edited in this tab before the session was known wins: the server copy
+      // is older by definition, and overwriting it would throw away work the visitor
+      // just did. Those keys go up on the next sync instead.
+      if (locallyDirty.has(key)) {
+        hadLocalEdits = true
+        continue
+      }
       window.localStorage.setItem(key, value)
     }
   } catch {
     /* localStorage unavailable (privacy mode) */
   }
   window.dispatchEvent(new Event('nm-progress-applied'))
+  // Push the preserved local edits so the server stops being stale.
+  if (hadLocalEdits) scheduleSyncUp()
 }
 
 /**
@@ -105,12 +129,15 @@ export async function syncUp(): Promise<void> {
   if (!authed) return
   if (typeof window === 'undefined') return
   try {
-    await fetch('/api/auth/progress', {
+    const res = await fetch('/api/auth/progress', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       credentials: 'same-origin',
       body: JSON.stringify({ progress: collectProgress() }),
     })
+    // The server now has these; they no longer need protecting from applyProgress.
+    // Only cleared on success, so a failed sync keeps them shielded.
+    if (res.ok) locallyDirty.clear()
   } catch {
     /* ignore — best-effort sync, local copy is always the source of truth */
   }

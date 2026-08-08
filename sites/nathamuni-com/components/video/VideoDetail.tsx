@@ -3,6 +3,8 @@ import type { Video } from '@/lib/videos'
 import { getCategoryMeta } from '@/lib/categoryMeta'
 import { PlaceholderArt } from './PlaceholderArt'
 import { VideoCard } from './VideoCard'
+import { Thumbnail } from '@/components/ui/Thumbnail'
+import { YouTubePlayer } from './YouTubePlayer'
 
 function formatDate(iso: string): string {
   const d = new Date(iso + 'T00:00:00')
@@ -19,9 +21,23 @@ export function VideoDetail({ video, related = [] }: { video: Video; related?: V
         style={{ '--cat': meta.hue } as React.CSSProperties}
       >
         <div className="video-detail-media">
-          {video.thumbnail ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={video.thumbnail} alt={video.title} className="video-detail-thumbnail" />
+          {/* Watchable in place when the reel is public on YouTube (21 of them are);
+              otherwise the poster, as before. Previously every visitor was sent to
+              Instagram to watch, which is the one thing they came here to do. */}
+          {video.youtubeId && video.youtubeStatus === 'public' ? (
+            <YouTubePlayer
+              youtubeId={video.youtubeId}
+              title={video.title}
+              poster={video.thumbnail}
+            />
+          ) : video.thumbnail ? (
+            <Thumbnail
+              src={video.thumbnail}
+              alt={video.title}
+              loading="eager"
+              fetchPriority="high"
+              className="video-detail-thumbnail"
+            />
           ) : (
             <PlaceholderArt category={video.category} />
           )}

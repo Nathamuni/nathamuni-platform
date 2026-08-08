@@ -64,15 +64,29 @@ export function BackToTop() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => {
+    // Coalesce to one layout read per frame — the raw scroll event can fire far more
+    // often than that, and each call reads scrollY/innerHeight. Mirrors ScrollProgress.
+    let ticking = false
+    let raf = 0
+
+    const update = () => {
+      ticking = false
       setVisible(window.scrollY > window.innerHeight * SHOW_AFTER_VIEWPORTS)
     }
-    onScroll()
+
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      raf = requestAnimationFrame(update)
+    }
+
+    update()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
+      cancelAnimationFrame(raf)
     }
   }, [])
 

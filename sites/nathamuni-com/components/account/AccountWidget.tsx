@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from './AuthProvider'
+import { useFocusTrap } from '@/components/ui/useFocusTrap'
 
 /** Only these sections have progress worth saving — the pill stays out of the way everywhere else. */
 function isProgressPage(pathname: string | null): boolean {
@@ -11,7 +12,7 @@ function isProgressPage(pathname: string | null): boolean {
 }
 
 const WHY_LINE =
-  'Email + password only, so your course and session progress follows you to any device. No newsletters, no tracking, nothing shared.'
+  'Email + password only. Your progress — including any health numbers you enter in the session tools — is uploaded so it follows you to any device. No newsletters, no tracking, never shared with anyone else.'
 
 type Tab = 'login' | 'signup'
 
@@ -40,7 +41,7 @@ const ACCT_CSS = `
   border: 1px solid rgba(178, 148, 255, 0.22);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  color: #f5f3ff;
+  color: var(--text-on-glass);
   font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
@@ -69,7 +70,7 @@ const ACCT_CSS = `
   border-radius: 9999px;
   border: 1px solid rgba(178, 148, 255, 0.22);
   background: rgba(255, 255, 255, 0.06);
-  color: #f5f3ff;
+  color: var(--text-on-glass);
   font-size: 0.72rem;
   cursor: pointer;
 }
@@ -152,7 +153,7 @@ const ACCT_CSS = `
   border-radius: 0.7rem;
   border: 1px solid rgba(34, 211, 238, 0.45);
   background: rgba(34, 211, 238, 0.18);
-  color: #67e8f9;
+  color: var(--color-cyan-soft);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -194,6 +195,10 @@ export function AccountWidget() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const cardRef = useRef<HTMLDivElement | null>(null)
+  // Must track whether the dialog is actually rendered, not just `open`: this widget
+  // returns null off the course/session routes, and a stale-active trap held a
+  // listener against the detached card that swallowed Shift+Tab site-wide.
+  useFocusTrap(cardRef, open && isProgressPage(pathname))
 
   // A SaveNudge anywhere on the page can pop this dialog open.
   useEffect(() => {
@@ -320,7 +325,9 @@ export function AccountWidget() {
             </button>
           </div>
 
-          <p className="acct-why">{WHY_LINE}</p>
+          <p className="acct-why" data-testid="account-widget-why">
+            {WHY_LINE}
+          </p>
 
           <form className="acct-form" onSubmit={handleSubmit}>
             <label className="acct-field">

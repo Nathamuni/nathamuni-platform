@@ -32,8 +32,8 @@ export function DisclaimerCard() {
           justify-content: center;
           font-weight: 700;
           font-size: 0.9rem;
-          color: #0d0a1f;
-          background: #f59e0b;
+          color: var(--color-ground);
+          background: var(--color-amber-deep);
         }
         .ssn-disclaimer p {
           margin: 0;

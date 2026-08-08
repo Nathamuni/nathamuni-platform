@@ -35,7 +35,10 @@ describe('Footer', () => {
   it('shows the privacy line and copyright', () => {
     render(<Footer />)
     const footer = screen.getByTestId('site-footer')
-    expect(footer).toHaveTextContent('No servers. No trackers. Built to be searched.')
+    // Twice corrected: "No servers" was untrue (the site runs a Worker with KV and
+    // Workers AI), and "No trackers" stopped being true once page views were counted.
+    // Cookieless analytics is still measurement.
+    expect(footer).toHaveTextContent('No ads. No cookies. Built to be searched.')
     expect(footer).toHaveTextContent(`${PROFILE.name}. All rights reserved.`)
   })
 })
