@@ -1,5 +1,10 @@
 {
-  "name": "nathamuni-com",
+  // Must match the Worker that actually serves nathamuni.com. Workers Builds deploys to
+  // the dashboard-configured project regardless of this field, which is why the previous
+  // value ("nathamuni-com" — a Worker that does not exist) never broke CI. A local
+  // `wrangler deploy` does honour it, though, and would have created a stray Worker
+  // instead of updating production.
+  "name": "nathamuni-platform",
   "compatibility_date": "2026-01-01",
   "main": "worker/index.mjs",
   "assets": {
