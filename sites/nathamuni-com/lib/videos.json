@@ -4160,11 +4160,13 @@
     "publishedDate": "2026-09-14",
     "likeCount": 77,
     "commentsCount": 2,
-    "youtubeStatus": "failed",
+    "youtubeStatus": "public",
     "reach": 627,
     "saved": 4,
     "shares": 4,
     "views": 1082,
-    "avgWatchTimeMs": 7411
+    "avgWatchTimeMs": 7411,
+    "youtubeId": "azcKpcZlY4g",
+    "youtubeUrl": "https://youtube.com/shorts/azcKpcZlY4g"
   }
 ]
