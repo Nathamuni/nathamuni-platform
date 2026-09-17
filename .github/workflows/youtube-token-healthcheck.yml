@@ -1,0 +1,49 @@
+name: YouTube Token Health Check
+
+# The refresh token has no expiry date (the OAuth consent screen is published
+# "In production"), but Google still kills a refresh token that goes 6 months
+# unused — and instagram-sync only touches YouTube when there is a new reel to
+# upload. A quiet posting stretch could therefore let the token lapse silently.
+#
+# This job does the cheapest possible authenticated call once a week: exchange
+# the refresh token for an access token. That resets the idle clock AND turns a
+# dead token into a failed run within 7 days instead of whenever the next reel
+# happens to land.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays ~11:30 IST
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exchange refresh token for an access token
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          for name in YOUTUBE_CLIENT_ID YOUTUBE_CLIENT_SECRET YOUTUBE_REFRESH_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name secret is not set — YouTube cross-posting cannot work."
+              exit 1
+            fi
+          done
+
+          RESP=$(curl -s -o body.json -w '%{http_code}' \
+            --data-urlencode "client_id=${YOUTUBE_CLIENT_ID}" \
+            --data-urlencode "client_secret=${YOUTUBE_CLIENT_SECRET}" \
+            --data-urlencode "refresh_token=${YOUTUBE_REFRESH_TOKEN}" \
+            --data-urlencode 'grant_type=refresh_token' \
+            https://oauth2.googleapis.com/token)
+
+          # body.json holds an access token on success — never echo it.
+          if [ "$RESP" != "200" ]; then
+            ERR=$(python3 -c 'import json;d=json.load(open("body.json"));print(d.get("error_description") or d.get("error") or "unknown")' 2>/dev/null || echo unknown)
+            echo "::error::YouTube refresh token is dead (HTTP $RESP: $ERR). Re-run sites/nathamuni-com/scripts/youtube-get-refresh-token.mjs locally and update the YOUTUBE_REFRESH_TOKEN secret. Check too that the OAuth consent screen is still 'In production' and that the app is still listed at myaccount.google.com/connections."
+            exit 1
+          fi
+
+          echo "YouTube refresh token is healthy — access token issued, idle clock reset."
