@@ -15,7 +15,6 @@ export default function MomentsPage() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="The 24-hour archive"
         title="Stories that didn't disappear."
         lede="Instagram deletes these after a day. Every one is captured and self-hosted here instead — the moments behind the content, kept."
         accentHue={340}

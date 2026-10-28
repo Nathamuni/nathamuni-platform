@@ -93,7 +93,7 @@ export function SessionTimeline({
           width: 8px;
           height: 8px;
           border-radius: 9999px;
-          box-shadow: 0 0 0 3px rgba(13, 10, 31, 0.9);
+          box-shadow: 0 0 0 3px rgb(var(--ground-rgb) / 0.9);
         }
         .ssn-timeline-span {
           font-size: 0.62rem;

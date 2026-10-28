@@ -21,9 +21,9 @@ export function VideoDetail({ video, related = [] }: { video: Video; related?: V
         style={{ '--cat': meta.hue } as React.CSSProperties}
       >
         <div className="video-detail-media">
-          {/* Watchable in place when the reel is public on YouTube (21 of them are);
-              otherwise the poster, as before. Previously every visitor was sent to
-              Instagram to watch, which is the one thing they came here to do. */}
+          {/* Watchable in place when the reel is public on YouTube; otherwise the poster,
+              as before. Previously every visitor was sent to Instagram to watch, which
+              is the one thing they came here to do. */}
           {video.youtubeId && video.youtubeStatus === 'public' ? (
             <YouTubePlayer
               youtubeId={video.youtubeId}
@@ -79,7 +79,7 @@ export function VideoDetail({ video, related = [] }: { video: Video; related?: V
             className="social-button social-button-primary detail-cta"
             data-testid="watch-on-instagram"
           >
-            {(video.mediaType ?? 'reel') === 'post' ? '📷 View on Instagram' : '🎬 Watch on Instagram'}
+            {(video.mediaType ?? 'reel') === 'post' ? 'View on Instagram' : 'Watch on Instagram'}
           </a>
         </div>
       </article>

@@ -5,10 +5,13 @@ static-export constraint. Content/growth tactics live in
 [GROWTH-IDEAS.md](./GROWTH-IDEAS.md); phased sequencing lives in
 [ROADMAP.md](./ROADMAP.md). Ordered by priority, not size.
 
-**Hard constraints for every item:** free-first, no database, no auth, no
-API routes — `next.config.ts` sets `output: 'export'` and Cloudflare
-Workers serves static assets only. Anything needing server logic is a
-separate Cloudflare Worker, not a Next.js route.
+**Hard constraints for every item:** free-first, no database —
+`next.config.ts` sets `output: 'export'` and Cloudflare Workers serves the
+static assets. Server logic never lives in a Next.js route: it goes in the
+thin Worker (`worker/index.mjs`, which already serves `/api/search`) or
+`worker/auth.mjs` (opt-in accounts in the `INBOX` KV namespace). See
+CLAUDE.md for the current architecture; the library is 200+ videos now,
+so counts quoted below are historical.
 
 ## 1. Per-category static pages (`/category/<slug>`)
 

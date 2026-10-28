@@ -419,12 +419,12 @@ export function TheaterMode({ slug, hue, steps }: { slug: string; hue: number; s
           font-weight: 700;
           letter-spacing: 0.01em;
           cursor: pointer;
-          box-shadow: 0 4px 18px rgba(236, 72, 153, 0.35);
+          box-shadow: 0 4px 18px rgb(var(--pink-rgb) / 0.35);
           transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
         .ssn-theater-open:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 24px rgba(236, 72, 153, 0.5);
+          box-shadow: 0 6px 24px rgb(var(--pink-rgb) / 0.5);
         }
         .ssn-theater-open:focus-visible {
           outline: 2px solid #fff;

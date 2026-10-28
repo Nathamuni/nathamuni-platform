@@ -166,7 +166,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           color: rgba(255, 255, 255, 0.55);
           margin-bottom: 0.9rem;
           padding-bottom: 0.6rem;
-          border-bottom: 1px solid rgba(178, 148, 255, 0.16);
+          border-bottom: 1px solid rgb(var(--lavender-rgb) / 0.16);
         }
         /* A gallery, not a reading column: 236 of the 244 entries are images or video,
            so the artefact leads and the label follows it. The single wide row this
@@ -192,8 +192,8 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           aspect-ratio: 3 / 4;
           border-radius: 0.85rem;
           overflow: hidden;
-          background: rgba(13, 10, 31, 0.55);
-          border: 1px solid rgba(178, 148, 255, 0.14);
+          background: rgb(var(--ground-rgb) / 0.55);
+          border: 1px solid rgb(var(--lavender-rgb) / 0.14);
           transition: border-color 0.28s ease, box-shadow 0.28s ease;
         }
         .feed-row:hover .feed-row-thumb {
@@ -252,7 +252,7 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
         }
-        .feed-kind-blog { color: #ede9ff; background: rgba(139, 92, 246, 0.55); }
+        .feed-kind-blog { color: #ede9ff; background: rgb(var(--accent-rgb) / 0.55); }
         .feed-kind-reel { color: #ecfeff; background: rgba(14, 116, 144, 0.6); }
         .feed-kind-post { color: #fdf2f8; background: rgba(157, 23, 106, 0.6); }
         .feed-kind-story { color: #fff1f2; background: rgba(159, 18, 57, 0.6); }
@@ -307,8 +307,8 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           border-radius: 999px;
           cursor: pointer;
           color: rgba(255, 255, 255, 0.65);
-          background: rgba(148, 112, 255, 0.08);
-          border: 1px solid rgba(178, 148, 255, 0.18);
+          background: rgb(var(--lavender-rgb) / 0.08);
+          border: 1px solid rgb(var(--lavender-rgb) / 0.18);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
           transition: all 0.2s ease;
@@ -319,14 +319,14 @@ export function FeedTimeline({ entries }: { entries: FeedEntry[] }) {
           color: rgba(255, 255, 255, 0.55);
           font-variant-numeric: tabular-nums;
         }
-        .feed-filter-chip:hover { border-color: rgba(178, 148, 255, 0.45); color: #fff; }
+        .feed-filter-chip:hover { border-color: rgb(var(--lavender-rgb) / 0.45); color: #fff; }
         .feed-filter-input:checked + .feed-filter-chip {
           color: #fff;
-          background: linear-gradient(120deg, rgba(139, 92, 246, 0.35), rgba(236, 72, 153, 0.25));
-          border-color: rgba(178, 148, 255, 0.6);
+          background: linear-gradient(120deg, rgb(var(--accent-rgb) / 0.35), rgb(var(--pink-rgb) / 0.25));
+          border-color: rgb(var(--lavender-rgb) / 0.6);
         }
         .feed-filter-input:focus-visible + .feed-filter-chip {
-          outline: 2px solid rgba(139, 92, 246, 0.9);
+          outline: 2px solid rgb(var(--accent-rgb) / 0.9);
           outline-offset: 2px;
         }
         .feed-shell:has(#fk-reel:checked) .feed-row:not([data-kind='reel']),

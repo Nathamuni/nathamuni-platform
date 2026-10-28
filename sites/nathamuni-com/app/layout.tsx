@@ -4,6 +4,9 @@ import { Nav } from '@/components/layout/Nav'
 import { ScrollReveal } from '@/components/fx/ScrollReveal'
 import { ScrollProgress } from '@/components/fx/ScrollProgress'
 import { Companion } from '@/components/fx/Companion'
+import { StylePicker } from '@/components/layout/StylePicker'
+import { SiteBackdrop } from '@/components/layout/SiteBackdrop'
+import { ALT_BG_IDS, ALT_MOTION_IDS, ALT_THEME_IDS } from '@/lib/themes'
 import { BackToTop } from '@/components/fx/BackToTop'
 import { Footer } from '@/components/layout/Footer'
 import { AuthProvider } from '@/components/account/AuthProvider'
@@ -108,9 +111,17 @@ const websiteJsonLd = {
   },
 }
 
+/**
+ * Applies the saved colour theme, hero motion and background design before first paint,
+ * so there is no flash of the default look. The allow-lists come from lib/themes.ts, so a
+ * new theme cannot be added there and forgotten here; values outside them are ignored,
+ * and storage can throw (private windows), hence the try/catch.
+ */
+const STYLE_INIT = `try{var d=document.documentElement,g=function(k){return localStorage.getItem(k)},t=g('nm-theme'),m=g('nm-motion'),b=g('nm-bg');if(/^(${ALT_THEME_IDS.join('|')})$/.test(t))d.setAttribute('data-theme',t);if(/^(${ALT_MOTION_IDS.join('|')})$/.test(m))d.setAttribute('data-motion',m);if(/^(${ALT_BG_IDS.join('|')})$/.test(b))d.setAttribute('data-bg',b)}catch(e){}`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${inter.variable}`} suppressHydrationWarning>
       <body>
         <script
           type="application/ld+json"
@@ -120,6 +131,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+        <script id="nm-style-init" dangerouslySetInnerHTML={{ __html: STYLE_INIT }} />
+        <SiteBackdrop />
         <AuthProvider>
           <Nav />
           <ScrollReveal />
@@ -127,6 +140,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <Companion />
+          <StylePicker />
           <AccountWidget />
           <SaveNudgeHost />
           <BackToTop />

@@ -198,13 +198,13 @@ const CSS = `
 }
 .crs-badge-tested {
   color: var(--color-lavender-tint);
-  background: rgba(139, 92, 246, 0.18);
-  border: 1px solid rgba(178, 148, 255, 0.4);
+  background: rgb(var(--accent-rgb) / 0.18);
+  border: 1px solid rgb(var(--lavender-rgb) / 0.4);
 }
 .crs-badge-research {
   color: var(--color-cyan-tint);
-  background: rgba(34, 211, 238, 0.14);
-  border: 1px solid rgba(34, 211, 238, 0.4);
+  background: rgb(var(--cyan-rgb) / 0.14);
+  border: 1px solid rgb(var(--cyan-rgb) / 0.4);
 }
 .crs-badge-standard {
   color: var(--color-amber-tint);
@@ -226,13 +226,13 @@ const CSS = `
 }
 .crs-badge-dot-tested {
   color: var(--color-lavender-tint);
-  background: rgba(139, 92, 246, 0.22);
-  border: 1px solid rgba(178, 148, 255, 0.45);
+  background: rgb(var(--accent-rgb) / 0.22);
+  border: 1px solid rgb(var(--lavender-rgb) / 0.45);
 }
 .crs-badge-dot-research {
   color: var(--color-cyan-tint);
-  background: rgba(34, 211, 238, 0.18);
-  border: 1px solid rgba(34, 211, 238, 0.45);
+  background: rgb(var(--cyan-rgb) / 0.18);
+  border: 1px solid rgb(var(--cyan-rgb) / 0.45);
 }
 .crs-badge-dot-standard {
   color: var(--color-amber-tint);
@@ -423,8 +423,8 @@ const CSS = `
   gap: 0.15rem;
   padding: 0.85rem 1rem;
   border-radius: 0.9rem;
-  border: 1px solid rgba(178, 148, 255, 0.18);
-  background: rgba(148, 112, 255, 0.06);
+  border: 1px solid rgb(var(--lavender-rgb) / 0.18);
+  background: rgb(var(--lavender-rgb) / 0.06);
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -433,8 +433,8 @@ const CSS = `
   }
 }
 .crs-blog-card:hover {
-  border-color: rgba(178, 148, 255, 0.45);
-  background: rgba(148, 112, 255, 0.12);
+  border-color: rgb(var(--lavender-rgb) / 0.45);
+  background: rgb(var(--lavender-rgb) / 0.12);
 }
 .crs-blog-card-label {
   font-size: 0.65rem;
@@ -538,7 +538,7 @@ const CSS = `
   display: grid;
   place-items: center;
   background:
-    radial-gradient(closest-side, #17103a 82%, transparent 83%),
+    radial-gradient(closest-side, color-mix(in srgb, rgb(var(--ground-rgb)), white 7%) 82%, transparent 83%),
     conic-gradient(
       hsla(var(--cat, 262), 85%, 65%, 1) calc(var(--pct) * 1%),
       rgba(255, 255, 255, 0.1) 0
@@ -553,7 +553,7 @@ const CSS = `
 /* Peak-end: the finished ring turns gold. */
 .crs-ring-done {
   background:
-    radial-gradient(closest-side, #17103a 82%, transparent 83%),
+    radial-gradient(closest-side, color-mix(in srgb, rgb(var(--ground-rgb)), white 7%) 82%, transparent 83%),
     conic-gradient(#fbbf24, #f59e0b);
   box-shadow: 0 0 24px -4px rgba(251, 191, 36, 0.5);
 }

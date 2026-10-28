@@ -23,7 +23,6 @@ export default function ProjectsPage() {
   return (
     <section className="section" data-testid="projects-page">
       <PageHeader
-        eyebrow="Shipped, not pitched"
         title="What I actually built."
         lede="The problem each one solved, what got built, and where it honestly stands today — including the ones that never left internal use."
         accentHue={192}

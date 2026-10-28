@@ -37,8 +37,8 @@ const ACCT_CSS = `
   min-height: 44px;
   padding: 0 1rem;
   border-radius: 9999px;
-  background: rgba(13, 10, 31, 0.6);
-  border: 1px solid rgba(178, 148, 255, 0.22);
+  background: rgb(var(--ground-rgb) / 0.6);
+  border: 1px solid rgb(var(--lavender-rgb) / 0.22);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   color: var(--text-on-glass);
@@ -48,7 +48,7 @@ const ACCT_CSS = `
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 .acct-pill:hover {
-  border-color: rgba(178, 148, 255, 0.4);
+  border-color: rgb(var(--lavender-rgb) / 0.4);
 }
 .acct-pill-disabled {
   cursor: default;
@@ -68,14 +68,14 @@ const ACCT_CSS = `
   min-height: 36px;
   padding: 0 0.75rem;
   border-radius: 9999px;
-  border: 1px solid rgba(178, 148, 255, 0.22);
+  border: 1px solid rgb(var(--lavender-rgb) / 0.22);
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-on-glass);
   font-size: 0.72rem;
   cursor: pointer;
 }
 .acct-signout-btn:hover {
-  background: rgba(178, 148, 255, 0.16);
+  background: rgb(var(--lavender-rgb) / 0.16);
 }
 .acct-card {
   margin-top: 0.6rem;
@@ -85,8 +85,8 @@ const ACCT_CSS = `
   flex-direction: column;
   gap: 0.85rem;
   border-radius: 1.1rem;
-  background: rgba(13, 10, 31, 0.88);
-  border: 1px solid rgba(178, 148, 255, 0.25);
+  background: rgb(var(--ground-rgb) / 0.88);
+  border: 1px solid rgb(var(--lavender-rgb) / 0.25);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 12px 40px rgba(5, 3, 15, 0.55);
@@ -109,8 +109,8 @@ const ACCT_CSS = `
 }
 .acct-tab.is-active {
   color: #fff;
-  background: linear-gradient(120deg, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.3));
-  border-color: rgba(178, 148, 255, 0.4);
+  background: linear-gradient(120deg, rgb(var(--accent-rgb) / 0.4), rgb(var(--pink-rgb) / 0.3));
+  border-color: rgb(var(--lavender-rgb) / 0.4);
 }
 .acct-why {
   margin: 0;
@@ -134,13 +134,13 @@ const ACCT_CSS = `
   min-height: 44px;
   padding: 0 0.8rem;
   border-radius: 0.6rem;
-  background: rgba(13, 10, 31, 0.5);
+  background: rgb(var(--ground-rgb) / 0.5);
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: #fff;
   font-size: 0.9rem;
 }
 .acct-field input:focus-visible {
-  outline: 2px solid rgba(34, 211, 238, 0.6);
+  outline: 2px solid rgb(var(--cyan-rgb) / 0.6);
   outline-offset: 1px;
 }
 .acct-error {
@@ -151,8 +151,8 @@ const ACCT_CSS = `
 .acct-submit {
   min-height: 44px;
   border-radius: 0.7rem;
-  border: 1px solid rgba(34, 211, 238, 0.45);
-  background: rgba(34, 211, 238, 0.18);
+  border: 1px solid rgb(var(--cyan-rgb) / 0.45);
+  background: rgb(var(--cyan-rgb) / 0.18);
   color: var(--color-cyan-soft);
   font-size: 0.85rem;
   font-weight: 600;
@@ -160,7 +160,7 @@ const ACCT_CSS = `
   transition: background 0.2s ease;
 }
 .acct-submit:hover:not(:disabled) {
-  background: rgba(34, 211, 238, 0.3);
+  background: rgb(var(--cyan-rgb) / 0.3);
 }
 .acct-submit:disabled {
   opacity: 0.6;

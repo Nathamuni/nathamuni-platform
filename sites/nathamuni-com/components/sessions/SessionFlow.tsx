@@ -116,7 +116,7 @@ export function SessionFlow({
           background: rgba(255, 255, 255, 0.06);
         }
         a.ssn-flow-node:focus-visible {
-          outline: 2px solid rgba(34, 211, 238, 0.6);
+          outline: 2px solid rgb(var(--cyan-rgb) / 0.6);
           outline-offset: 2px;
         }
         .ssn-flow-ring {
@@ -130,7 +130,7 @@ export function SessionFlow({
           font-size: 0.8rem;
           font-weight: 700;
           font-variant-numeric: tabular-nums;
-          background: rgba(13, 10, 31, 0.9);
+          background: rgb(var(--ground-rgb) / 0.9);
           border: 2px solid rgba(255, 255, 255, 0.2);
           z-index: 1;
         }

@@ -20,7 +20,7 @@ export function DisclaimerCard() {
           gap: 0.9rem;
           padding: 1.1rem 1.3rem;
           border-color: rgba(245, 158, 11, 0.35);
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(13, 10, 31, 0.6) 70%);
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgb(var(--ground-rgb) / 0.6) 70%);
         }
         .ssn-disclaimer-mark {
           flex-shrink: 0;

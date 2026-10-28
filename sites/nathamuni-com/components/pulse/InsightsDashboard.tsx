@@ -290,7 +290,7 @@ function PostsModal({
         aria-modal="true"
         aria-label={`${posts.length} posts — ${label}`}
         className="w-full sm:max-w-lg max-h-[80vh] rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col"
-        style={{ background: 'rgba(14,11,30,0.98)', border: '1px solid rgba(178,148,255,0.28)' }}
+        style={{ background: 'rgb(var(--ground-rgb) / 0.98)', border: '1px solid rgb(var(--lavender-rgb) / 0.28)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-3 p-4 border-b border-white/10">
@@ -393,8 +393,8 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
             left: tip.x + 14,
             top: tip.y + 14,
             transform: tip.x > tip.w - 200 ? 'translateX(calc(-100% - 28px))' : undefined,
-            background: 'rgba(13,10,31,0.96)',
-            border: '1px solid rgba(178,148,255,0.4)',
+            background: 'rgb(var(--ground-rgb) / 0.96)',
+            border: '1px solid rgb(var(--lavender-rgb) / 0.4)',
             color: 'rgba(236,233,255,0.92)',
             backdropFilter: 'blur(10px)',
             boxShadow: '0 6px 24px rgba(0,0,0,0.45)',
@@ -415,7 +415,7 @@ export function InsightsDashboard({ data }: { data: DashboardData }) {
               onClick={() => setMetric(m.key)}
               className="px-3 py-1 rounded-full text-[0.7rem] transition-colors"
               style={{
-                background: metric === m.key ? 'rgba(178,148,255,0.28)' : 'transparent',
+                background: metric === m.key ? 'rgb(var(--lavender-rgb) / 0.28)' : 'transparent',
                 color: metric === m.key ? '#fff' : mut,
               }}
               aria-pressed={metric === m.key}

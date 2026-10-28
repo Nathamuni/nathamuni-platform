@@ -4,8 +4,9 @@ import Link from 'next/link'
  * Shared rich page header for interior pages.
  *
  * Replaces the plain `section-title` + `section-sub` pair so the library and
- * content pages carry the same weight as /pulse and /stats: an eyebrow label,
- * display-scale title, a lede, and optional real-data stat chips.
+ * content pages carry the same weight as /pulse and /stats: a display-scale
+ * title, a lede, and an optional quiet line of real-data stats. No kicker label
+ * above the title — the heading carries its own weight.
  *
  * Every value passed in must be real (counts from the actual library) — this
  * component never invents numbers.
@@ -19,14 +20,12 @@ export interface HeaderStat {
 }
 
 export function PageHeader({
-  eyebrow,
   title,
   lede,
   stats = [],
   accentHue = 262,
   children,
 }: {
-  eyebrow: string
   title: string
   lede?: string
   stats?: HeaderStat[]
@@ -36,7 +35,6 @@ export function PageHeader({
 }) {
   return (
     <header className="pg-head" style={{ '--pg-hue': accentHue } as React.CSSProperties} data-reveal>
-      <span className="pg-head-eyebrow">{eyebrow}</span>
       <h1 className="pg-head-title">{title}</h1>
       {lede && <p className="pg-head-lede">{lede}</p>}
 

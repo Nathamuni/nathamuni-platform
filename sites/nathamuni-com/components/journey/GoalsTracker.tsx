@@ -79,8 +79,8 @@ export function GoalsTracker({ goals }: { goals: Goal[] }) {
         }
         .jny-marker-dream {
           background: transparent;
-          border: 1.5px solid rgba(236, 72, 153, 0.65);
-          box-shadow: 0 0 8px rgba(236, 72, 153, 0.45);
+          border: 1.5px solid rgb(var(--pink-rgb) / 0.65);
+          box-shadow: 0 0 8px rgb(var(--pink-rgb) / 0.45);
         }
         @keyframes jny-spin {
           to { transform: rotate(360deg); }

@@ -17,7 +17,6 @@ export default function FeedPage() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="Reverse chronological"
         title="Everything, as it happened."
         lede="Reels, posts, moments, and essays in one unbroken stream — the whole record in the order it was made."
         accentHue={286}

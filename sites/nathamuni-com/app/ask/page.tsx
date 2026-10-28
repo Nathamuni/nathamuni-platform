@@ -14,7 +14,6 @@ export default function AskPage() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="Grounded in the record"
         title="Ask the twin."
         lede="An AI trained only on what I've actually published — direct, tested-on-myself, no guru-speak. If it isn't in the record, it says so."
         accentHue={192}

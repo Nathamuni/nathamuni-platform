@@ -155,11 +155,11 @@ export function HealthTools() {
           color: #fff;
           font-size: 0.95rem;
         }
-        .ht-input:focus { outline: none; border-color: rgba(139, 92, 246, 0.6); }
+        .ht-input:focus { outline: none; border-color: rgb(var(--accent-rgb) / 0.6); }
         .ht-toggle { display: flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; color: rgba(255,255,255,0.7); padding-bottom: 0.55rem; cursor: pointer; }
         .ht-results { display: flex; gap: 1.5rem; flex-wrap: wrap; }
         .ht-result { display: flex; flex-direction: column; gap: 0.15rem; }
-        .ht-result-value { font-size: 1.5rem; font-weight: 700; background: linear-gradient(90deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .ht-result-value { font-size: 1.5rem; font-weight: 700; background: linear-gradient(90deg, var(--accent-solid), var(--color-cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .ht-result-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
         .ht-note { margin: 0; font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.55); }
       `}</style>

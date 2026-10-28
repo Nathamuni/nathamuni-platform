@@ -136,10 +136,10 @@ export function SaveNudgeHost() {
           max-width: min(92vw, 26rem);
           padding: 0.7rem 0.9rem;
           border-radius: 16px;
-          border: 1px solid rgba(178, 148, 255, 0.35);
+          border: 1px solid rgb(var(--lavender-rgb) / 0.35);
           background: rgba(23, 16, 48, 0.92);
           backdrop-filter: blur(16px);
-          box-shadow: 0 18px 50px -12px rgba(139, 92, 246, 0.45);
+          box-shadow: 0 18px 50px -12px rgb(var(--accent-rgb) / 0.45);
           animation: nudge-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
         @media (min-width: 640px) {
@@ -164,7 +164,7 @@ export function SaveNudgeHost() {
           width: 26px;
           height: 26px;
           flex-shrink: 0;
-          color: #a78bfa;
+          color: var(--color-accent-tint);
         }
         .nudge-toast-body {
           display: flex;

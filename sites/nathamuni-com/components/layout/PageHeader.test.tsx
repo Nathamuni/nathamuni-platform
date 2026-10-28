@@ -3,20 +3,19 @@ import { render, screen } from '@testing-library/react'
 import { PageHeader } from './PageHeader'
 
 describe('PageHeader', () => {
-  it('renders eyebrow, title, and lede', () => {
-    render(<PageHeader eyebrow="The library" title="Everything, searchable." lede="A lede." />)
-    expect(screen.getByText('The library')).toBeTruthy()
+  it('renders title and lede', () => {
+    render(<PageHeader title="Everything, searchable." lede="A lede." />)
     expect(screen.getByRole('heading', { level: 1, name: 'Everything, searchable.' })).toBeTruthy()
     expect(screen.getByText('A lede.')).toBeTruthy()
   })
 
   it('omits the stats row when no stats are given', () => {
-    const { container } = render(<PageHeader eyebrow="E" title="T" />)
+    const { container } = render(<PageHeader title="T" />)
     expect(container.querySelector('.pg-head-stats')).toBeNull()
   })
 
   it('formats numeric stat values with thousands separators', () => {
-    render(<PageHeader eyebrow="E" title="T" stats={[{ value: 4823, label: 'Followers' }]} />)
+    render(<PageHeader title="T" stats={[{ value: 4823, label: 'Followers' }]} />)
     expect(screen.getByText('4,823')).toBeTruthy()
     expect(screen.getByText('Followers')).toBeTruthy()
   })
@@ -24,7 +23,7 @@ describe('PageHeader', () => {
   it('renders a stat as a link only when href is provided', () => {
     render(
       <PageHeader
-        eyebrow="E"
+       
         title="T"
         stats={[
           { value: 165, label: 'Videos', href: '/videos' },
@@ -41,7 +40,7 @@ describe('PageHeader', () => {
   })
 
   it('applies the accent hue as a CSS custom property', () => {
-    const { container } = render(<PageHeader eyebrow="E" title="T" accentHue={340} />)
+    const { container } = render(<PageHeader title="T" accentHue={340} />)
     const head = container.querySelector('.pg-head') as HTMLElement
     expect(head.style.getPropertyValue('--pg-hue')).toBe('340')
   })

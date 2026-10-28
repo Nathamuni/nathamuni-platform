@@ -25,7 +25,6 @@ export default function BlogPage() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="Long form"
         title="The ideas, written out."
         lede="Where a reel runs sixty seconds, these run as long as the idea needs — every one tested on myself before it was written down."
         accentHue={262}

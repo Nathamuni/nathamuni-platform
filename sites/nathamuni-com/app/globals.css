@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-ground: #0d0a1f;
-  --color-glass: rgba(148, 112, 255, 0.08);
-  --color-glass-border: rgba(178, 148, 255, 0.18);
-  --color-accent: #8b5cf6;
+  --color-ground: rgb(var(--ground-rgb));
+  --color-glass: rgb(var(--lavender-rgb) / 0.08);
+  --color-glass-border: rgb(var(--lavender-rgb) / 0.18);
+  --color-accent: rgb(var(--accent-rgb));
   --font-display: var(--font-outfit), sans-serif;
   --font-body: var(--font-inter), sans-serif;
 }
@@ -33,10 +33,10 @@
   --mint-rgb: 52 211 153; /* #34d399 — ambient wash only */
   --ground-rgb: 13 10 31; /* #0d0a1f — page base */
 
-  --color-cyan: #22d3ee;
-  --color-cyan-soft: #67e8f9;
-  --color-pink: #ec4899;
-  --color-lavender: #b294ff;
+  --color-cyan: rgb(var(--cyan-rgb));
+  --color-cyan-soft: color-mix(in srgb, rgb(var(--cyan-rgb)) 65%, white);
+  --color-pink: rgb(var(--pink-rgb));
+  --color-lavender: rgb(var(--lavender-rgb));
   --color-amber: #fbbf24;
   --color-amber-deep: #f59e0b;
 
@@ -49,16 +49,18 @@
 
   /* ---- tints. Only values used in 2+ places are tokenised; genuine one-offs
          stay literal, since indirection there buys nothing. ---- */
-  --text-on-glass: #f5f3ff;
-  --color-cyan-tint: #a5f3fc;
+  --text-on-glass: color-mix(in srgb, rgb(var(--lavender-rgb)) 8%, white);
+  --color-cyan-tint: color-mix(in srgb, rgb(var(--cyan-rgb)) 35%, white);
   --color-amber-tint: #fde68a;
   --color-amber-soft: #fcd34d;
-  --color-lavender-tint: #d8ccff;
-  --color-accent-tint: #c4b5fd;
+  --color-lavender-tint: color-mix(in srgb, rgb(var(--lavender-rgb)) 40%, white);
+  --color-accent-tint: color-mix(in srgb, rgb(var(--accent-rgb)) 45%, white);
+  --accent-solid: rgb(var(--accent-rgb));
+  --ground-solid: rgb(var(--ground-rgb));
 
   /* ---- surfaces & borders ---- */
-  --surface-glass: rgb(148 112 255 / 0.08);
-  --surface-raised: rgb(14 11 30 / 0.98);
+  --surface-glass: rgb(var(--lavender-rgb) / 0.08);
+  --surface-raised: rgb(var(--ground-rgb) / 0.98);
   --surface-scrim: rgb(4 3 12 / 0.72);
   --border-subtle: rgb(var(--lavender-rgb) / 0.18);
   --border-strong: rgb(var(--lavender-rgb) / 0.4);
@@ -93,6 +95,102 @@
   --focus-ring: 2px solid rgb(var(--cyan-rgb) / 0.6);
 }
 
+/**
+ * Themes. The default (violet) is :root above. Each theme below only swaps the
+ * palette channels; every tint, surface, border and glow derives from them, so a
+ * theme is five lines, not a stylesheet. Dark only: text is white-on-ground
+ * throughout, so a light theme would be a rewrite, not a variable swap.
+ * Chosen via <html data-theme>, set before first paint by the script in layout.tsx.
+ */
+html[data-theme='ocean'] {
+  --accent-rgb: 14 165 233; /* sky */
+  --cyan-rgb: 45 212 191; /* teal */
+  --pink-rgb: 129 140 248; /* indigo */
+  --lavender-rgb: 125 211 252;
+  --mint-rgb: 52 211 153;
+  --ground-rgb: 5 14 28;
+}
+html[data-theme='ember'] {
+  --accent-rgb: 249 115 22; /* orange */
+  --cyan-rgb: 251 191 36; /* amber */
+  --pink-rgb: 244 63 94; /* rose */
+  --lavender-rgb: 253 186 116;
+  --mint-rgb: 250 204 21;
+  --ground-rgb: 20 9 8;
+}
+html[data-theme='rose'] {
+  --accent-rgb: 244 63 120; /* rose */
+  --cyan-rgb: 253 164 175; /* soft rose */
+  --pink-rgb: 192 38 211; /* fuchsia */
+  --lavender-rgb: 251 182 206;
+  --mint-rgb: 253 186 116;
+  --ground-rgb: 22 6 14;
+}
+html[data-theme='gold'] {
+  --accent-rgb: 234 179 8; /* gold */
+  --cyan-rgb: 253 224 71; /* yellow */
+  --pink-rgb: 249 115 22; /* orange */
+  --lavender-rgb: 253 230 138;
+  --mint-rgb: 163 230 53;
+  --ground-rgb: 18 13 4;
+}
+html[data-theme='crimson'] {
+  --accent-rgb: 220 38 38; /* red */
+  --cyan-rgb: 248 113 113;
+  --pink-rgb: 190 24 93;
+  --lavender-rgb: 252 165 165;
+  --mint-rgb: 251 146 60;
+  --ground-rgb: 20 6 6;
+}
+html[data-theme='teal'] {
+  --accent-rgb: 20 184 166;
+  --cyan-rgb: 94 234 212;
+  --pink-rgb: 56 189 248;
+  --lavender-rgb: 153 246 228;
+  --mint-rgb: 52 211 153;
+  --ground-rgb: 4 18 20;
+}
+html[data-theme='berry'] {
+  --accent-rgb: 192 38 211; /* fuchsia */
+  --cyan-rgb: 232 121 249;
+  --pink-rgb: 244 114 182;
+  --lavender-rgb: 240 171 252;
+  --mint-rgb: 167 139 250;
+  --ground-rgb: 18 5 22;
+}
+html[data-theme='sunset'] {
+  --accent-rgb: 251 113 60; /* orange-red */
+  --cyan-rgb: 253 186 116;
+  --pink-rgb: 236 72 153;
+  --lavender-rgb: 253 186 140;
+  --mint-rgb: 250 204 21;
+  --ground-rgb: 24 9 12;
+}
+html[data-theme='slate'] {
+  --accent-rgb: 148 163 184; /* silver */
+  --cyan-rgb: 226 232 240;
+  --pink-rgb: 203 213 225;
+  --lavender-rgb: 203 213 225;
+  --mint-rgb: 148 163 184;
+  --ground-rgb: 10 12 16;
+}
+html[data-theme='sapphire'] {
+  --accent-rgb: 37 99 235;
+  --cyan-rgb: 96 165 250;
+  --pink-rgb: 99 102 241;
+  --lavender-rgb: 147 197 253;
+  --mint-rgb: 56 189 248;
+  --ground-rgb: 4 8 24;
+}
+html[data-theme='forest'] {
+  --accent-rgb: 16 185 129; /* emerald */
+  --cyan-rgb: 163 230 53; /* lime */
+  --pink-rgb: 45 212 191; /* teal */
+  --lavender-rgb: 110 231 183;
+  --mint-rgb: 134 239 172;
+  --ground-rgb: 6 18 14;
+}
+
 @utility glass-card {
   @apply bg-glass border border-glass-border backdrop-blur-xl rounded-2xl;
 }
@@ -114,10 +212,19 @@
     overflow-x: clip;
     background-image:
       radial-gradient(1300px 700px at 85% -10%, rgb(var(--accent-rgb) / 0.32), transparent 62%),
-      radial-gradient(1000px 600px at -15% 25%, rgb(var(--cyan-rgb) / 0.18), transparent 58%),
-      radial-gradient(900px 600px at 55% 115%, rgb(var(--pink-rgb) / 0.2), transparent 60%),
-      radial-gradient(600px 400px at 25% 70%, rgb(var(--mint-rgb) / 0.09), transparent 60%);
+      radial-gradient(1000px 600px at -15% 25%, rgb(var(--cyan-rgb) / 0.1), transparent 58%),
+      radial-gradient(900px 600px at 55% 115%, rgb(var(--pink-rgb) / 0.14), transparent 60%);
     background-attachment: fixed;
+  }
+  /* Browser surfaces the page did not draw: scrollbar, form accents, caret. */
+  html {
+    scrollbar-color: rgb(var(--lavender-rgb) / 0.4) var(--color-ground);
+    scrollbar-width: thin;
+    accent-color: var(--color-accent);
+  }
+  input,
+  textarea {
+    caret-color: var(--color-amber);
   }
   h1,
   h2,
@@ -240,10 +347,13 @@
   }
   .site-nav-brand {
     @apply font-display text-lg tracking-wide;
-    background: linear-gradient(90deg, #fff, #a78bfa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--text-on-glass);
+  }
+  /* The one place the brand voice shifts colour: the closing syllable. */
+  .site-nav-brand > span,
+  .site-nav-brand em {
+    font-style: normal;
+    color: var(--color-accent-tint);
   }
   .site-nav-links {
     @apply hidden sm:flex items-center gap-1 text-sm;
@@ -277,7 +387,7 @@
 
   .tab-bar {
     @apply sm:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5;
-    background: rgba(13, 10, 31, 0.82);
+    background: rgb(var(--ground-rgb) / 0.82);
     backdrop-filter: blur(18px);
     border-top: 1px solid rgb(var(--lavender-rgb) / 0.16);
     padding-bottom: env(safe-area-inset-bottom);
@@ -306,7 +416,7 @@
     @apply text-[0.62rem] tracking-wide;
   }
   .tab-item.is-active {
-    color: #c4b5fd;
+    color: var(--color-accent-tint);
   }
   /* Active indicator: a slim gradient bar sliding in above the icon. */
   .tab-item::before {
@@ -316,7 +426,7 @@
     width: 18px;
     height: 2.5px;
     border-radius: 999px;
-    background: linear-gradient(90deg, #a78bfa, #22d3ee);
+    background: linear-gradient(90deg, var(--color-accent-tint), var(--color-cyan));
     opacity: 0;
     transform: scaleX(0.3);
     transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -343,10 +453,7 @@
   }
   .site-footer-brand-name {
     @apply font-display text-lg;
-    background: linear-gradient(90deg, #8b5cf6, #ec4899, #22d3ee);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--text-on-glass);
   }
   .site-footer-tagline {
     @apply text-xs text-white/55 leading-relaxed;
@@ -447,8 +554,8 @@
     z-index: -1;
     border-radius: 2rem;
     background:
-      radial-gradient(120% 85% at 50% 40%, transparent 20%, rgba(13, 10, 31, 0.55) 65%, rgba(13, 10, 31, 0.94) 100%),
-      linear-gradient(to bottom, rgba(13, 10, 31, 0.12), rgba(13, 10, 31, 0.7) 90%);
+      radial-gradient(120% 85% at 50% 40%, transparent 20%, rgb(var(--ground-rgb) / 0.55) 65%, rgb(var(--ground-rgb) / 0.94) 100%),
+      linear-gradient(to bottom, rgb(var(--ground-rgb) / 0.12), rgb(var(--ground-rgb) / 0.7) 90%);
   }
   .hero-orb {
     @apply absolute rounded-full pointer-events-none;
@@ -468,7 +575,7 @@
     height: 220px;
     bottom: -12%;
     left: 8%;
-    background: rgba(6, 182, 212, 0.16);
+    background: rgb(var(--cyan-rgb) / 0.16);
     transform: translate3d(calc(var(--par-x) * 24px), calc(var(--par-y) * 20px), 0);
     animation: hero-orb-drift-2 30s ease-in-out infinite alternate;
   }
@@ -477,7 +584,7 @@
     height: 150px;
     top: 30%;
     left: 42%;
-    background: rgba(244, 63, 94, 0.12);
+    background: rgb(var(--pink-rgb) / 0.12);
     transform: translate3d(calc(var(--par-x) * -14px), calc(var(--par-y) * 18px), 0);
     animation: hero-orb-drift-3 19s ease-in-out infinite alternate;
   }
@@ -505,35 +612,15 @@
     @apply font-display leading-[0.95];
     font-size: clamp(2.9rem, 7.6vw, 5.6rem);
     text-wrap: balance;
-    background: linear-gradient(
-      100deg,
-      #ffffff 8%,
-      #c4b5fd 28%,
-      #f0abfc 48%,
-      #67e8f9 68%,
-      #c4b5fd 86%,
-      #ffffff 100%
-    );
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: hero-title-shimmer 8s ease-in-out infinite alternate;
-  }
-  @keyframes hero-title-shimmer {
-    from {
-      background-position: 0% 50%;
-    }
-    to {
-      background-position: 100% 50%;
-    }
+    letter-spacing: -0.02em;
+    color: var(--text-on-glass);
   }
   .hero-quote {
     @apply relative italic sm:border-l-2 sm:pl-4;
     font-size: clamp(1.05rem, 2.2vw, 1.35rem);
     line-height: 1.45;
     border-color: rgb(var(--accent-rgb) / 0.55);
-    color: rgba(199, 184, 253, 0.92);
+    color: var(--color-lavender-tint);
   }
   .hero-promise {
     @apply hidden sm:block text-sm text-white/50;
@@ -549,7 +636,7 @@
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      inset 0 -30px 50px -24px rgba(13, 10, 31, 0.6);
+      inset 0 -30px 50px -24px rgb(var(--ground-rgb) / 0.6);
   }
   @media (hover: hover) and (pointer: fine) {
     .hero-portrait-frame {
@@ -561,7 +648,7 @@
     @apply absolute rounded-[2rem] pointer-events-none;
     inset: -10%;
     z-index: 0;
-    background: conic-gradient(from 0deg, #8b5cf6, #ec4899, #22d3ee, #8b5cf6);
+    background: conic-gradient(from 0deg, var(--accent-solid), var(--color-pink), var(--color-cyan), var(--accent-solid));
     filter: blur(36px);
     opacity: 0.5;
     animation: hero-ring-spin 18s linear infinite;
@@ -669,7 +756,7 @@
     width: 44px;
     height: 3px;
     border-radius: 9999px;
-    background: linear-gradient(90deg, #8b5cf6, #22d3ee);
+    background: linear-gradient(90deg, var(--accent-solid), var(--color-cyan));
     transform-origin: left center;
     transform: scaleX(1);
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
@@ -715,44 +802,38 @@
       transparent 70%
     );
   }
-  .pg-head-eyebrow {
-    @apply block text-[0.65rem] uppercase tracking-[0.22em] mb-2.5;
-    color: hsl(var(--pg-hue, 262) 80% 78% / 0.85);
-  }
   .pg-head-title {
-    @apply font-display text-3xl sm:text-5xl leading-[1.05] tracking-tight mb-3;
-    background: linear-gradient(
-      100deg,
-      #fff 10%,
-      hsl(var(--pg-hue, 262) 85% 82%) 55%,
-      hsl(var(--pg-hue, 262) 90% 72%)
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    @apply font-display text-4xl sm:text-6xl leading-[1.02] mb-4;
+    letter-spacing: -0.025em;
+    color: var(--text-on-glass);
   }
   .pg-head-lede {
-    @apply text-sm sm:text-base text-white/55 leading-relaxed max-w-2xl;
+    @apply text-base sm:text-lg leading-relaxed;
+    max-width: 38rem;
+    color: var(--text-secondary);
   }
+  /* A quiet run of facts, not a row of cards: the numbers are the content, so
+     they get weight, and the page's own hue underlines the one that is a link. */
   .pg-head-stats {
-    @apply flex flex-wrap gap-2.5 mt-6;
+    @apply flex flex-wrap items-baseline gap-x-6 gap-y-1 mt-6;
   }
   .pg-head-stat {
-    @apply glass-card flex flex-col gap-0.5 px-4 py-2.5;
-    min-width: 5.5rem;
+    @apply flex items-baseline gap-1.5;
   }
   .pg-head-stat.is-link {
     @apply transition-colors;
   }
-  .pg-head-stat.is-link:hover {
-    border-color: hsl(var(--pg-hue, 262) 85% 70% / 0.45);
+  .pg-head-stat.is-link:hover .pg-head-stat-label {
+    color: hsl(var(--pg-hue, 262) 85% 82%);
   }
   .pg-head-stat-value {
-    @apply font-display text-xl sm:text-2xl leading-none text-white;
+    @apply font-display text-xl sm:text-2xl leading-none;
+    color: hsl(var(--pg-hue, 262) 85% 84%);
     font-variant-numeric: tabular-nums;
   }
   .pg-head-stat-label {
-    @apply text-[0.6rem] uppercase tracking-widest text-white/55;
+    @apply text-sm;
+    color: var(--text-muted);
   }
 
   /* ---------- category tiles ---------- */
@@ -775,7 +856,7 @@
   .category-tile-media {
     @apply relative overflow-hidden flex items-center justify-center transition-transform duration-500;
     aspect-ratio: 4 / 5;
-    background: radial-gradient(120% 120% at 30% 15%, hsla(var(--cat), 70%, 45%, 0.32), rgba(13, 10, 31, 0.65) 72%);
+    background: radial-gradient(120% 120% at 30% 15%, hsla(var(--cat), 70%, 45%, 0.32), rgb(var(--ground-rgb) / 0.65) 72%);
   }
   .tilt-card:hover .category-tile-media,
   .category-tile:hover .category-tile-media {
@@ -794,7 +875,7 @@
   .category-tile-plate {
     @apply relative z-10 flex flex-col gap-0.5 px-3.5 py-3 sm:px-4 sm:py-3.5;
     border-radius: 0 0 1rem 1rem;
-    background: linear-gradient(135deg, hsla(var(--cat), 70%, 20%, 0.78), rgba(13, 10, 31, 0.94) 70%);
+    background: linear-gradient(135deg, hsla(var(--cat), 70%, 20%, 0.78), rgb(var(--ground-rgb) / 0.94) 70%);
     border-top: 1px solid hsla(var(--cat), 85%, 75%, 0.45);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
@@ -841,9 +922,12 @@
   .search-bar {
     @apply glass-card w-full px-5 py-3 bg-transparent outline-none placeholder-white/35 transition-all;
   }
+  .search-bar {
+    caret-color: var(--color-amber);
+  }
   .search-bar:focus {
-    border-color: rgb(var(--accent-rgb) / 0.7);
-    box-shadow: 0 0 28px -8px rgb(var(--accent-rgb) / 0.55);
+    border-color: rgb(var(--lavender-rgb) / 0.7);
+    box-shadow: 0 8px 24px -12px rgb(var(--accent-rgb) / 0.6);
   }
   .category-filter {
     @apply flex flex-wrap gap-2;
@@ -856,8 +940,8 @@
   }
   .category-filter-btn.is-active {
     @apply text-white border-accent;
-    background: rgb(var(--accent-rgb) / 0.16);
-    box-shadow: 0 0 22px -8px rgb(var(--accent-rgb) / 0.6);
+    background: rgb(var(--accent-rgb) / 0.4);
+    box-shadow: 0 6px 16px -8px rgb(var(--accent-rgb) / 0.7);
   }
   .explorer-count {
     @apply text-xs text-white/55;
@@ -935,7 +1019,7 @@
 
   .media-type-badge {
     @apply absolute top-2 right-2 z-10 text-xs rounded-full px-1.5 py-0.5;
-    background: rgba(13, 10, 31, 0.65);
+    background: rgb(var(--ground-rgb) / 0.65);
     backdrop-filter: blur(6px);
   }
   .type-filter {
@@ -956,12 +1040,17 @@
   .social-button {
     @apply glass-card px-5 py-2 text-sm transition-all;
   }
+  /* The one warm note on a cool page: the primary action is amber, so the eye
+     finds "follow / watch" before anything else. Dark text keeps it at ~11:1. */
   .social-button-primary {
-    @apply border-accent text-white;
-    background: linear-gradient(120deg, rgb(var(--accent-rgb) / 0.45), rgb(var(--pink-rgb) / 0.35));
+    @apply font-semibold;
+    color: #1a1033;
+    background: var(--color-amber);
+    border-color: var(--color-amber-soft);
   }
   .social-button-primary:hover {
-    box-shadow: 0 0 30px -8px rgb(var(--accent-rgb) / 0.7);
+    background: var(--color-amber-soft);
+    box-shadow: 0 10px 28px -10px rgb(251 191 36 / 0.55);
     transform: translateY(-2px);
   }
   .social-button-secondary {
@@ -1003,65 +1092,26 @@
   .video-detail-body {
     @apply flex-1 flex flex-col gap-3 min-w-0;
   }
-  /* Instagram-brand CTA: distinct from every other button on the page —
-     IG's yellow→pink→purple gradient with a slow breathing glow + sheen
-     sweep. Animations are gated off under prefers-reduced-motion. */
+  /* Secondary to the in-place player: an outlined button, so the video is the one
+     loud thing on the page. It sat on a looping glow + sheen before, which pulled
+     the eye away from the thing the visitor came to watch. */
   .detail-cta {
     @apply w-fit px-7;
-    position: relative;
-    overflow: hidden;
-    border-color: transparent;
-    background: linear-gradient(45deg, #f9ce34, #ee2a7b 50%, #6228d7);
-    font-weight: 700;
-    animation: cta-glow 2.6s ease-in-out infinite;
   }
-  .detail-cta::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      115deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.35) 50%,
-      transparent 70%
-    );
-    transform: translateX(-100%);
-    animation: cta-sheen 3.4s ease-in-out infinite;
-    pointer-events: none;
+  .video-detail-body .detail-cta {
+    font-weight: 600;
+    color: var(--text-on-glass);
+    background: transparent;
+    border-color: var(--border-strong);
   }
-  .detail-cta:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 0 42px -4px rgba(238, 42, 123, 0.85);
-  }
-  @keyframes cta-glow {
-    0%,
-    100% {
-      box-shadow: 0 0 18px -6px rgba(238, 42, 123, 0.55);
-    }
-    50% {
-      box-shadow: 0 0 34px -2px rgba(238, 42, 123, 0.85), 0 0 18px -6px rgba(98, 40, 215, 0.6);
-    }
-  }
-  @keyframes cta-sheen {
-    0%,
-    55% {
-      transform: translateX(-100%);
-    }
-    85%,
-    100% {
-      transform: translateX(100%);
-    }
+  .video-detail-body .detail-cta:hover {
+    background: rgb(var(--accent-rgb) / 0.22);
+    border-color: var(--color-lavender);
+    box-shadow: 0 10px 24px -12px rgb(var(--accent-rgb) / 0.7);
+    transform: translateY(-2px);
   }
   @media (prefers-reduced-motion: reduce) {
-    .detail-cta {
-      animation: none;
-      box-shadow: 0 0 24px -4px rgba(238, 42, 123, 0.7);
-    }
-    .detail-cta::after {
-      animation: none;
-      display: none;
-    }
-    .detail-cta:hover {
+    .video-detail-body .detail-cta:hover {
       transform: none;
     }
   }
@@ -1163,7 +1213,7 @@
   .moment-strip-card::after {
     content: '';
     @apply absolute inset-x-0 bottom-0 h-1/2 pointer-events-none;
-    background: linear-gradient(to top, rgba(13, 10, 31, 0.75), transparent);
+    background: linear-gradient(to top, rgb(var(--ground-rgb) / 0.75), transparent);
   }
   .moment-strip-date {
     @apply absolute bottom-1.5 left-2 z-10 text-[0.65rem] text-white/90;
@@ -1197,19 +1247,19 @@
   }
   .moment-stall {
     @apply absolute inset-x-4 bottom-16 z-10 flex flex-col items-center gap-2 rounded-2xl px-4 py-3 text-center text-sm text-white/85;
-    background: rgba(13, 10, 31, 0.88);
+    background: rgb(var(--ground-rgb) / 0.88);
     border: 1px solid rgb(var(--lavender-rgb) / 0.3);
     backdrop-filter: blur(10px);
     animation: peek-fade 0.3s ease;
   }
   .moment-stall a {
     @apply font-semibold;
-    color: #e879a9;
+    color: color-mix(in srgb, rgb(var(--pink-rgb)) 70%, white);
   }
   .moment-play {
     /* Decorative — must not swallow the hover that starts the card preview. */
     @apply absolute inset-0 flex items-center justify-center text-2xl text-white/85 pointer-events-none;
-    background: linear-gradient(to top, rgba(13, 10, 31, 0.55), transparent 45%);
+    background: linear-gradient(to top, rgb(var(--ground-rgb) / 0.55), transparent 45%);
   }
   .moment-date {
     @apply absolute bottom-1.5 inset-x-0 text-center text-[0.6rem] text-white/80 pointer-events-none;
@@ -1227,7 +1277,7 @@
     background: linear-gradient(
       160deg,
       hsla(var(--cat), 85%, 60%, 0.35),
-      rgba(13, 10, 31, 0.9)
+      rgb(var(--ground-rgb) / 0.9)
     );
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
@@ -1250,7 +1300,7 @@
     background: linear-gradient(
       160deg,
       hsla(var(--cat), 90%, 62%, 0.55),
-      rgba(13, 10, 31, 0.88)
+      rgb(var(--ground-rgb) / 0.88)
     );
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.12),
@@ -1285,14 +1335,14 @@
     height: 40px;
     border-radius: 9999px;
     transform: translateY(-50%);
-    background: rgba(13, 10, 31, 0.55);
+    background: rgb(var(--ground-rgb) / 0.55);
     border: 1px solid rgb(var(--lavender-rgb) / 0.35);
     backdrop-filter: blur(8px);
     transition: transform 0.2s ease, background 0.2s ease;
   }
   .moment-nav:hover {
     transform: translateY(-50%) scale(1.08);
-    background: rgba(13, 10, 31, 0.75);
+    background: rgb(var(--ground-rgb) / 0.75);
   }
   .moment-nav:focus-visible {
     outline: 2px solid rgb(var(--accent-rgb) / 0.9);
@@ -1398,10 +1448,7 @@
   }
   .post-title {
     @apply text-2xl sm:text-4xl leading-tight;
-    background: linear-gradient(100deg, #ffffff 20%, #d8ccff 80%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--text-on-glass);
   }
   .post-body {
     @apply flex flex-col gap-4 mt-2 text-white/85 leading-relaxed text-[0.95rem] sm:text-base;
@@ -1424,7 +1471,7 @@
   .book-banner-fade {
     @apply absolute inset-x-0 bottom-0 pointer-events-none;
     height: 45%;
-    background: linear-gradient(to top, rgba(13, 10, 31, 0.92), transparent);
+    background: linear-gradient(to top, rgb(var(--ground-rgb) / 0.92), transparent);
   }
   .book-hero {
     @apply flex flex-col sm:flex-row gap-8 items-center sm:items-start max-w-4xl mx-auto;
@@ -1435,16 +1482,13 @@
     background:
       radial-gradient(120% 80% at 80% 0%, rgb(var(--accent-rgb) / 0.5), transparent 60%),
       radial-gradient(100% 70% at 10% 100%, rgb(var(--pink-rgb) / 0.35), transparent 55%),
-      #14102b;
+      color-mix(in srgb, rgb(var(--ground-rgb)), white 5%);
     border: 1px solid rgb(var(--lavender-rgb) / 0.35);
     box-shadow: 0 24px 70px -20px rgb(var(--accent-rgb) / 0.55);
   }
   .book-cover-title {
     @apply font-display text-xl leading-snug;
-    background: linear-gradient(100deg, #fff, #c4b5fd);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--text-on-glass);
   }
   .book-cover-author {
     @apply text-xs text-white/60 tracking-widest uppercase;
@@ -1469,7 +1513,7 @@
   }
   .book-part h3 {
     @apply text-base mb-1;
-    color: #c4b5fd;
+    color: var(--color-accent-tint);
   }
   .book-part p {
     @apply text-sm text-white/65 leading-relaxed;
@@ -1478,8 +1522,7 @@
     @apply max-w-3xl mx-auto mt-12 flex flex-col gap-4;
   }
   .book-quote {
-    @apply glass-card px-5 py-4 text-white/85 font-display text-base sm:text-lg leading-relaxed;
-    border-left: 3px solid rgb(var(--accent-rgb) / 0.8);
+    @apply glass-card px-6 py-5 text-white/85 font-display text-base sm:text-lg leading-relaxed italic;
   }
   .book-audience {
     @apply max-w-3xl mx-auto mt-12 p-6 sm:p-8;
@@ -1490,4 +1533,556 @@
   .book-promise {
     @apply mt-3 text-sm text-white/50 italic;
   }
+}
+
+/* ---------- themed hero art ----------
+   Every theme's twin image is in the DOM; only the one matching <html data-theme> shows.
+   Variants are loading="lazy", which browsers skip while display:none, so a visitor only
+   downloads the art for the theme they are on. */
+.hero-backdrop-clip {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  border-radius: 2rem;
+  pointer-events: none;
+}
+.themed-img:not(.themed-img-default) {
+  display: none;
+}
+html[data-theme] .themed-img-default {
+  display: none;
+}
+html[data-theme='ocean'] .themed-img-ocean,
+html[data-theme='ember'] .themed-img-ember,
+html[data-theme='forest'] .themed-img-forest,
+html[data-theme='rose'] .themed-img-rose,
+html[data-theme='gold'] .themed-img-gold,
+html[data-theme='crimson'] .themed-img-crimson,
+html[data-theme='teal'] .themed-img-teal,
+html[data-theme='berry'] .themed-img-berry,
+html[data-theme='sunset'] .themed-img-sunset,
+html[data-theme='slate'] .themed-img-slate,
+html[data-theme='sapphire'] .themed-img-sapphire {
+  display: block;
+}
+
+/* ---------- hero motion styles (html[data-motion]) ----------
+   Default is "drift", the original orbs + ring + float. Each style below only restyles
+   those same elements. Only transform, opacity and the individual translate/rotate/scale
+   properties animate (compositor-only), except glint's sweep, which repaints one portrait-
+   sized box. Everything but "still" sits behind no-preference: reduced-motion users get
+   the static composition whatever they picked. */
+html[data-motion='still'] .hero-orb,
+html[data-motion='still'] .hero-portrait-ring,
+html[data-motion='still'] .hero-portrait-img,
+html[data-motion='still'] .hero-backdrop {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Aurora: the backdrop pans and breathes, the orbs hold still */
+  html[data-motion='aurora'] .hero-backdrop {
+    animation: hero-aurora 26s ease-in-out infinite alternate;
+  }
+  html[data-motion='aurora'] .hero-orb {
+    animation: none;
+  }
+  @keyframes hero-aurora {
+    from {
+      transform: scale(1.05) translate3d(-2%, 1%, 0);
+      opacity: 0.34;
+    }
+    to {
+      transform: scale(1.22) translate3d(3%, -3%, 0);
+      opacity: 0.66;
+    }
+  }
+
+  /* Pulse: a heartbeat glow behind a still portrait */
+  html[data-motion='pulse'] .hero-portrait-ring {
+    opacity: 0.55;
+    animation:
+      hero-ring-spin 18s linear infinite,
+      hero-pulse 3.4s ease-in-out infinite;
+  }
+  html[data-motion='pulse'] .hero-portrait-img {
+    animation: none;
+  }
+  html[data-motion='pulse'] .hero-orb {
+    animation: hero-orb-breathe 3.4s ease-in-out infinite;
+  }
+  @keyframes hero-pulse {
+    0%,
+    100% {
+      scale: 0.94;
+      opacity: 0.3;
+    }
+    50% {
+      scale: 1.14;
+      opacity: 0.8;
+    }
+  }
+  @keyframes hero-orb-breathe {
+    0%,
+    100% {
+      scale: 0.85;
+    }
+    50% {
+      scale: 1.25;
+    }
+  }
+
+  /* Orbit: the three orbs circle the hero centre at different radii and speeds. Each
+     sits at --r from the centre and rotates about that centre via transform-origin. */
+  html[data-motion='orbit'] .hero-orb {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin: calc(var(--w) / -2) 0 0 calc(var(--r) - var(--w) / 2);
+    transform-origin: calc(var(--w) / 2 - var(--r)) calc(var(--w) / 2);
+    filter: blur(44px);
+  }
+  html[data-motion='orbit'] .hero-orb-1 {
+    --w: 320px;
+    --r: 260px;
+    background: rgb(var(--accent-rgb) / 0.34);
+    animation: hero-orbit 22s linear infinite;
+  }
+  html[data-motion='orbit'] .hero-orb-2 {
+    --w: 220px;
+    --r: 200px;
+    background: rgb(var(--cyan-rgb) / 0.3);
+    animation: hero-orbit 16s linear infinite reverse;
+  }
+  html[data-motion='orbit'] .hero-orb-3 {
+    --w: 150px;
+    --r: 330px;
+    background: rgb(var(--pink-rgb) / 0.3);
+    animation: hero-orbit 30s linear infinite;
+  }
+  @media (max-width: 639px) {
+    html[data-motion='orbit'] .hero-orb-1 {
+      --r: 130px;
+    }
+    html[data-motion='orbit'] .hero-orb-2 {
+      --r: 100px;
+    }
+    html[data-motion='orbit'] .hero-orb-3 {
+      --r: 160px;
+    }
+  }
+  @keyframes hero-orbit {
+    from {
+      rotate: 0deg;
+    }
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  /* Glint: a diagonal light sweep crosses the portrait every few seconds */
+  html[data-motion='glint'] .hero-portrait-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: 1rem;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.3) 50%, transparent 62%);
+    background-size: 280% 100%;
+    background-position: 140% 0;
+    animation: hero-glint 4.8s ease-in-out infinite;
+  }
+  html[data-motion='glint'] .hero-orb {
+    animation: none;
+  }
+  @keyframes hero-glint {
+    0%,
+    40% {
+      background-position: 140% 0;
+    }
+    80%,
+    100% {
+      background-position: -40% 0;
+    }
+  }
+}
+
+/* ---------- style picker (floating, beside the companion button) ---------- */
+.style-picker {
+  position: fixed;
+  right: 4.5rem;
+  bottom: 88px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .style-picker {
+    bottom: 16px;
+  }
+}
+.style-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-raised);
+  color: var(--text-on-glass);
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--duration-fast), transform var(--duration-fast) var(--ease-out);
+}
+.style-toggle:hover {
+  border-color: var(--color-lavender);
+  transform: translateY(-2px);
+}
+.style-panel {
+  width: min(18.5rem, calc(100vw - 2rem));
+  padding: 1rem 1.1rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-card);
+}
+.style-panel-title {
+  margin: 0.1rem 0 0.55rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.style-panel-title:not(:first-child) {
+  margin-top: 1rem;
+}
+.style-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+.style-swatch {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background: var(--swatch);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast);
+}
+.style-swatch:hover {
+  transform: translateY(-2px);
+}
+.style-swatch[aria-pressed='true'] {
+  border-color: var(--text-on-glass);
+  box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.7);
+}
+.style-motions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.style-motion {
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.style-motion:hover {
+  color: var(--text-on-glass);
+  border-color: var(--border-strong);
+}
+.style-motion[aria-pressed='true'] {
+  background: rgb(var(--accent-rgb) / 0.4);
+  border-color: var(--color-accent);
+  color: var(--text-on-glass);
+}
+@media (prefers-reduced-motion: reduce) {
+  .style-toggle,
+  .style-swatch,
+  .style-motion {
+    transition: none;
+  }
+  .style-toggle:hover,
+  .style-swatch:hover {
+    transform: none;
+  }
+}
+
+/* ---------- site-wide backdrop (every page) ----------
+   A fixed layer behind all content: the themed art, soft orbs, and optional patterns.
+   <html data-bg> picks the design (aurora = the art, default), <html data-motion> animates
+   it, <html data-theme> recolours it. Only transform/opacity/translate/rotate/scale
+   animate, so it stays on the compositor. */
+.site-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  pointer-events: none;
+}
+.site-backdrop-art {
+  position: absolute;
+  inset: 0;
+}
+.site-backdrop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.24;
+  filter: saturate(1.1);
+}
+html[data-bg]:not([data-bg='aurora']) .site-backdrop-art,
+html[data-bg]:not([data-bg='aurora']) .hero-backdrop-clip {
+  display: none;
+}
+.site-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+}
+.site-orb-1 {
+  width: 46vmax;
+  height: 46vmax;
+  top: -14vmax;
+  right: -10vmax;
+  background: rgb(var(--accent-rgb) / 0.16);
+}
+.site-orb-2 {
+  width: 38vmax;
+  height: 38vmax;
+  bottom: -12vmax;
+  left: -10vmax;
+  background: rgb(var(--cyan-rgb) / 0.12);
+}
+html[data-bg='mesh'] .site-orb-1 {
+  background: rgb(var(--accent-rgb) / 0.34);
+}
+html[data-bg='mesh'] .site-orb-2 {
+  background: rgb(var(--cyan-rgb) / 0.26);
+}
+html[data-bg='plain'] .site-backdrop {
+  display: none;
+}
+html[data-bg='plain'] body {
+  background-image: none;
+}
+/* Patterns: an oversized layer inside a masked wrapper, so it can drift by exactly one
+   tile (a seamless loop) without the fade mask moving with it. */
+.site-backdrop-patternwrap {
+  position: absolute;
+  inset: 0;
+  display: none;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 35%, #000 15%, transparent 78%);
+  mask-image: radial-gradient(ellipse at 50% 35%, #000 15%, transparent 78%);
+}
+html[data-bg='grid'] .site-backdrop-patternwrap,
+html[data-bg='dots'] .site-backdrop-patternwrap,
+html[data-bg='lines'] .site-backdrop-patternwrap {
+  display: block;
+}
+.site-backdrop-pattern {
+  position: absolute;
+  inset: -80px;
+  --tile-x: 0px;
+  --tile-y: 0px;
+}
+html[data-bg='grid'] .site-backdrop-pattern {
+  --tile-x: 64px;
+  --tile-y: 64px;
+  background-image:
+    linear-gradient(rgb(var(--lavender-rgb) / 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--lavender-rgb) / 0.09) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+html[data-bg='dots'] .site-backdrop-pattern {
+  --tile-x: 28px;
+  --tile-y: 28px;
+  background-image: radial-gradient(rgb(var(--lavender-rgb) / 0.28) 1.3px, transparent 1.8px);
+  background-size: 28px 28px;
+}
+html[data-bg='lines'] .site-backdrop-pattern {
+  --tile-x: 31.11px;
+  --tile-y: 0px;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgb(var(--lavender-rgb) / 0.1) 0 1px,
+    transparent 1px 22px
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-orb-1 {
+    animation: site-orb-drift-1 40s ease-in-out infinite alternate;
+  }
+  .site-orb-2 {
+    animation: site-orb-drift-2 52s ease-in-out infinite alternate;
+  }
+  .site-backdrop-pattern {
+    animation: site-pattern-drift 42s linear infinite;
+  }
+  @keyframes site-orb-drift-1 {
+    from { translate: 0 0; }
+    to { translate: -6vmax 5vmax; }
+  }
+  @keyframes site-orb-drift-2 {
+    from { translate: 0 0; }
+    to { translate: 7vmax -5vmax; }
+  }
+  @keyframes site-pattern-drift {
+    to { translate: var(--tile-x) var(--tile-y); }
+  }
+
+  /* aurora: the art pans and breathes */
+  html[data-motion='aurora'] .site-backdrop-img {
+    animation: site-aurora 28s ease-in-out infinite alternate;
+  }
+  @keyframes site-aurora {
+    from { transform: scale(1.05) translate3d(-2%, 1%, 0); opacity: 0.16; }
+    to { transform: scale(1.22) translate3d(3%, -3%, 0); opacity: 0.36; }
+  }
+
+  /* pulse: the orbs breathe */
+  html[data-motion='pulse'] .site-orb {
+    animation: site-orb-breathe 4s ease-in-out infinite;
+  }
+  @keyframes site-orb-breathe {
+    0%, 100% { scale: 0.85; }
+    50% { scale: 1.25; }
+  }
+
+  /* orbit: both orbs circle the middle of the screen */
+  html[data-motion='orbit'] .site-orb {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin: calc(var(--w) / -2) 0 0 calc(var(--r) - var(--w) / 2);
+    transform-origin: calc(var(--w) / 2 - var(--r)) calc(var(--w) / 2);
+  }
+  html[data-motion='orbit'] .site-orb-1 {
+    --w: 46vmax;
+    --r: 24vmax;
+    animation: hero-orbit 34s linear infinite;
+  }
+  html[data-motion='orbit'] .site-orb-2 {
+    --w: 38vmax;
+    --r: 20vmax;
+    animation: hero-orbit 26s linear infinite reverse;
+  }
+
+  /* glint: a soft beam crosses the whole page every so often */
+  html[data-motion='glint'] .site-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: linear-gradient(115deg, transparent 42%, rgb(var(--lavender-rgb) / 0.11) 50%, transparent 58%);
+    animation: site-glint 10s ease-in-out infinite;
+  }
+  html[data-motion='glint'] .site-orb {
+    animation: none;
+  }
+  @keyframes site-glint {
+    0%, 35% { translate: -60% 0; }
+    80%, 100% { translate: 60% 0; }
+  }
+}
+html[data-motion='still'] .site-orb,
+html[data-motion='still'] .site-backdrop-img,
+html[data-motion='still'] .site-backdrop-pattern {
+  animation: none;
+}
+
+/* Colour auto-change and manual switches crossfade where the browser supports view
+   transitions; elsewhere they simply swap. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 1.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
+/* picker additions: 12 swatches, an auto switch, background chips, tall-panel scroll */
+.style-panel {
+  max-height: calc(100dvh - 8rem);
+  overflow-y: auto;
+}
+.style-auto {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  margin: 0.85rem 0 0;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+}
+.style-auto:hover {
+  color: var(--text-on-glass);
+  border-color: var(--border-strong);
+}
+.style-auto-track {
+  flex: none;
+  position: relative;
+  width: 2rem;
+  height: 1.15rem;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.18);
+  transition: background var(--duration-fast);
+}
+.style-auto-track::after {
+  content: '';
+  position: absolute;
+  top: 0.15rem;
+  left: 0.15rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  background: #fff;
+  transition: translate var(--duration-fast) var(--ease-out);
+}
+.style-auto[aria-checked='true'] {
+  color: var(--text-on-glass);
+  border-color: var(--color-accent);
+}
+.style-auto[aria-checked='true'] .style-auto-track {
+  background: var(--color-accent);
+}
+.style-auto[aria-checked='true'] .style-auto-track::after {
+  translate: 0.85rem 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .style-auto-track,
+  .style-auto-track::after {
+    transition: none;
+  }
+}
+
+/* A chosen theme wins over the per-page hues in page headers (default violet keeps them). */
+html[data-theme] .pg-head::before {
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.16), transparent 70%);
+}
+html[data-theme] .pg-head-stat-value {
+  color: var(--color-accent-tint);
+}
+html[data-theme] .pg-head-stat.is-link:hover .pg-head-stat-label {
+  color: var(--color-accent-tint);
 }

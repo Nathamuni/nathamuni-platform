@@ -31,7 +31,10 @@ npm test           # vitest
   `.webp`/`.jpg` into `public/images/thumbnails/`, which is generated and gitignored —
   do not put files there by hand, they will not be committed
 - **Profile/bio copy:** `lib/profile.ts` — single source of truth for hero/about/metadata
-- **Hero video assets:** `public/video/portrait-*.webm`; static fallbacks in `public/images/`
+- **Hero:** a static portrait (`components/hero/HeroPortrait.tsx`, `public/images/generated/about-portrait.jpg`);
+  the hero video was dropped in v9 and `public/video/` no longer exists
+- **Watch in place:** reels with `youtubeStatus: "public"` play via the click-to-load
+  `components/video/YouTubePlayer.tsx`; the rest link out to Instagram
 
 ## Architecture Rules
 

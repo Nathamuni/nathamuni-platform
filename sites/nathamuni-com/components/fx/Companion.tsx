@@ -71,9 +71,9 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef, reducedMotion }: KittySvgP
     <svg width={56} height={56} viewBox="0 0 64 64" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#8b5cf6" />
-          <stop offset="50%" stopColor="#ec4899" />
-          <stop offset="100%" stopColor="#22d3ee" />
+          <stop offset="0%" stopColor="var(--accent-solid)" />
+          <stop offset="50%" stopColor="var(--color-pink)" />
+          <stop offset="100%" stopColor="var(--color-cyan)" />
           {!reducedMotion && (
             <animateTransform
               attributeName="gradientTransform"
@@ -102,10 +102,10 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef, reducedMotion }: KittySvgP
         style={{ transformBox: 'fill-box', transformOrigin: '0% 100%' }}
       />
       <ellipse cx="30" cy="46" rx="20" ry="14" fill={`url(#${gradId})`} />
-      <path d="M18 18 L14 4 L28 16 Z" fill="#8b5cf6" />
-      <path d="M46 18 L50 4 L36 16 Z" fill="#8b5cf6" />
-      <path d="M20 14 L18 7 L24 14 Z" fill="#22d3ee" />
-      <path d="M44 14 L46 7 L40 14 Z" fill="#22d3ee" />
+      <path d="M18 18 L14 4 L28 16 Z" fill="var(--accent-solid)" />
+      <path d="M46 18 L50 4 L36 16 Z" fill="var(--accent-solid)" />
+      <path d="M20 14 L18 7 L24 14 Z" fill="var(--color-cyan)" />
+      <path d="M44 14 L46 7 L40 14 Z" fill="var(--color-cyan)" />
       <circle cx="32" cy="28" r="16" fill={`url(#${gradId})`} />
       {[26, 38].map((cx, i) => (
         <g
@@ -116,7 +116,7 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef, reducedMotion }: KittySvgP
           style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
         >
           <circle cx={cx} cy="27" r="4.8" fill="#ffffff" />
-          <circle cx={cx} cy="27" r="4.8" fill="none" stroke="#22d3ee" strokeOpacity={0.55} strokeWidth={0.6} />
+          <circle cx={cx} cy="27" r="4.8" fill="none" stroke="var(--color-cyan)" strokeOpacity={0.55} strokeWidth={0.6} />
           <circle
             ref={(el) => {
               pupilRefs.current[i] = el
@@ -124,7 +124,7 @@ function KittySvg({ uid, pupilRefs, eyeRefs, tailRef, reducedMotion }: KittySvgP
             cx={cx}
             cy="27"
             r="2.1"
-            fill="#0d0a1f"
+            fill="var(--ground-solid)"
           />
         </g>
       ))}
@@ -151,9 +151,9 @@ function SparkSvg({ uid, pupilRefs, eyeRefs, reducedMotion }: EyeRefs) {
       <defs>
         <radialGradient id={gradId} cx="35%" cy="30%" r="75%">
           <stop offset="0%" stopColor="#67e8f9" />
-          <stop offset="35%" stopColor="#22d3ee" />
-          <stop offset="65%" stopColor="#8b5cf6" />
-          <stop offset="100%" stopColor="#ec4899" />
+          <stop offset="35%" stopColor="var(--color-cyan)" />
+          <stop offset="65%" stopColor="var(--accent-solid)" />
+          <stop offset="100%" stopColor="var(--color-pink)" />
         </radialGradient>
         <filter id={blurId} x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation={4.5} />
@@ -173,7 +173,7 @@ function SparkSvg({ uid, pupilRefs, eyeRefs, reducedMotion }: EyeRefs) {
           }}
           style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
         >
-          <circle cx={cx} cy="29" r="3.4" fill="#0d0a1f" opacity={0.85} />
+          <circle cx={cx} cy="29" r="3.4" fill="var(--ground-solid)" opacity={0.85} />
           <circle
             ref={(el) => {
               pupilRefs.current[i] = el
@@ -217,8 +217,8 @@ const CSS = `
   width: 44px;
   height: 44px;
   border-radius: 999px;
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  background: rgba(13, 10, 31, 0.55);
+  border: 1px solid rgb(var(--accent-rgb) / 0.35);
+  background: rgb(var(--ground-rgb) / 0.55);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #fff;
@@ -228,12 +228,12 @@ const CSS = `
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 18px rgb(var(--accent-rgb) / 0.35);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .cmp-picker-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 6px 22px rgb(var(--pink-rgb) / 0.4);
 }
 .cmp-menu {
   position: absolute;
@@ -244,11 +244,11 @@ const CSS = `
   gap: 6px;
   padding: 8px;
   border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  background: rgba(13, 10, 31, 0.78);
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
+  background: rgb(var(--ground-rgb) / 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 30px rgba(13, 10, 31, 0.45);
+  box-shadow: 0 8px 30px rgb(var(--ground-rgb) / 0.45);
 }
 .cmp-menu-item {
   display: flex;
@@ -265,11 +265,11 @@ const CSS = `
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .cmp-menu-item:hover {
-  background: rgba(139, 92, 246, 0.25);
+  background: rgb(var(--accent-rgb) / 0.25);
 }
 .cmp-menu-item[aria-checked='true'] {
   border-color: var(--color-cyan);
-  background: rgba(34, 211, 238, 0.18);
+  background: rgb(var(--cyan-rgb) / 0.18);
 }
 `
 

@@ -84,9 +84,9 @@ export function DecisionMap({ nodes }: { nodes: DecisionNode[] }) {
       >
         <defs>
           <linearGradient id="jny-spine-gradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="50%" stopColor="#ec4899" />
-            <stop offset="100%" stopColor="#22d3ee" />
+            <stop offset="0%" stopColor="var(--accent-solid)" />
+            <stop offset="50%" stopColor="var(--color-pink)" />
+            <stop offset="100%" stopColor="var(--color-cyan)" />
           </linearGradient>
         </defs>
         <path d="M1.5 0 L1.5 100" stroke="rgba(255,255,255,0.08)" strokeWidth="3" fill="none" />
@@ -143,15 +143,15 @@ export function DecisionMap({ nodes }: { nodes: DecisionNode[] }) {
 
       <style>{`
         .jny-dot {
-          box-shadow: 0 0 0 4px rgba(13, 10, 31, 0.9);
+          box-shadow: 0 0 0 4px rgb(var(--ground-rgb) / 0.9);
         }
         .jny-dot.is-visible {
           animation: jny-pulse 2.2s ease-out 1;
         }
         @keyframes jny-pulse {
-          0% { box-shadow: 0 0 0 4px rgba(13, 10, 31, 0.9), 0 0 0 4px rgba(139, 92, 246, 0.45); }
-          70% { box-shadow: 0 0 0 4px rgba(13, 10, 31, 0.9), 0 0 0 12px rgba(139, 92, 246, 0); }
-          100% { box-shadow: 0 0 0 4px rgba(13, 10, 31, 0.9), 0 0 0 12px rgba(139, 92, 246, 0); }
+          0% { box-shadow: 0 0 0 4px rgb(var(--ground-rgb) / 0.9), 0 0 0 4px rgb(var(--accent-rgb) / 0.45); }
+          70% { box-shadow: 0 0 0 4px rgb(var(--ground-rgb) / 0.9), 0 0 0 12px rgb(var(--accent-rgb) / 0); }
+          100% { box-shadow: 0 0 0 4px rgb(var(--ground-rgb) / 0.9), 0 0 0 12px rgb(var(--accent-rgb) / 0); }
         }
         @media (prefers-reduced-motion: reduce) {
           .jny-dot.is-visible { animation: none; }

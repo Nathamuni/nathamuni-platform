@@ -69,7 +69,11 @@ describe('Companion', () => {
     const stops = Array.from(container.querySelectorAll('stop'))
     expect(stops.length).toBeGreaterThanOrEqual(3)
     const colors = stops.map((s) => s.getAttribute('stop-color'))
-    expect(colors).toEqual(expect.arrayContaining(['#8b5cf6', '#ec4899', '#22d3ee']))
+    // Stops reference the palette tokens (violet / pink / cyan by default) so the
+    // character follows the active theme instead of staying violet on every theme.
+    expect(colors).toEqual(
+      expect.arrayContaining(['var(--accent-solid)', 'var(--color-pink)', 'var(--color-cyan)'])
+    )
   })
 
   it('places the character in the bottom lane on mount, never mid-page', () => {

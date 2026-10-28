@@ -95,7 +95,7 @@ export default function PulsePage() {
                   className="flex-1 rounded-t"
                   style={{
                     height: `${pct}%`,
-                    background: peak ? 'rgba(74,222,128,0.9)' : 'rgba(178,148,255,0.5)',
+                    background: peak ? 'rgba(74,222,128,0.9)' : 'rgb(var(--lavender-rgb) / 0.5)',
                   }}
                 />
               )

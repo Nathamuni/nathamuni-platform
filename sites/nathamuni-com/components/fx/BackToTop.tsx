@@ -23,13 +23,13 @@ const CSS = `
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  background: rgba(13, 10, 31, 0.55);
+  border: 1px solid rgb(var(--accent-rgb) / 0.35);
+  background: rgb(var(--ground-rgb) / 0.55);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 18px rgb(var(--accent-rgb) / 0.35);
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
@@ -41,7 +41,7 @@ const CSS = `
   pointer-events: auto;
 }
 .btt-btn:hover {
-  box-shadow: 0 6px 22px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 6px 22px rgb(var(--pink-rgb) / 0.4);
 }
 @media (max-width: 639px) {
   .btt-btn {

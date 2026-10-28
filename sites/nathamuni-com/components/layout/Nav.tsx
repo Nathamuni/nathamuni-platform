@@ -107,8 +107,8 @@ function AboutMenu({ pathname }: { pathname: string | null }) {
           role="menu"
           className="absolute right-0 top-full mt-2 min-w-[10rem] flex flex-col gap-0.5 rounded-2xl p-2 z-30"
           style={{
-            background: 'rgba(13, 10, 31, 0.92)',
-            border: '1px solid rgba(178, 148, 255, 0.25)',
+            background: 'rgb(var(--ground-rgb) / 0.92)',
+            border: '1px solid rgb(var(--lavender-rgb) / 0.25)',
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
           }}
@@ -143,7 +143,7 @@ export function Nav() {
     <>
       <nav className="site-nav" data-testid="site-nav">
         <Link href="/" className="site-nav-brand">
-          Nathamuni
+          Natha<span>muni</span>
         </Link>
         <ul className="site-nav-links">
           {NAV_LINKS.map((link) => (

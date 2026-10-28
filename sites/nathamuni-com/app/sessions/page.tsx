@@ -16,7 +16,6 @@ export default function SessionsPage() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="Run, don't read"
         title="Protocols you actually execute."
         lede="A session isn't an article. Pick one, enter focus mode, follow the steps, track the numbers — it holds your place until it's done."
         accentHue={152}

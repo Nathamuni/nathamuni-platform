@@ -17,7 +17,6 @@ export default function CoursesPage() {
     <section className="section">
       <CoursesStyles />
       <PageHeader
-        eyebrow="Not lectures — plans"
         title="Paths assembled from what I did."
         lede="Everything here is built from what I actually ran, labeled honestly where research or standard practice fills the gaps."
         accentHue={152}

@@ -113,7 +113,7 @@ export function AskChat() {
                   className="glass-card px-4 py-2.5 max-w-[85%] sm:max-w-[70%]"
                   style={{
                     background:
-                      'linear-gradient(120deg, rgba(139, 92, 246, 0.28), rgba(236, 72, 153, 0.18))',
+                      'linear-gradient(120deg, rgb(var(--accent-rgb) / 0.28), rgb(var(--pink-rgb) / 0.18))',
                   }}
                 >
                   <p className="text-sm sm:text-base text-white/90 whitespace-pre-wrap leading-relaxed">

@@ -23,7 +23,6 @@ export default function Error({
   return (
     <section className="section">
       <header className="pg-head" style={{ '--pg-hue': 38 } as React.CSSProperties}>
-        <span className="pg-head-eyebrow">Something broke</span>
         <h1 className="pg-head-title">This page hit an error.</h1>
         <p className="pg-head-lede">
           Not your fault — something in the page failed to load. Trying again usually clears it.

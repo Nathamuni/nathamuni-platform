@@ -12,7 +12,6 @@ export default function PrivacyPage() {
     <div className="anim-fade-up">
       <section className="section">
         <header className="pg-head" style={{ '--pg-hue': 260 } as React.CSSProperties}>
-          <span className="pg-head-eyebrow">Legal</span>
           <h1 className="pg-head-title">Privacy Policy</h1>
           <p className="pg-head-lede">Last updated: 2026-07-28</p>
         </header>

@@ -99,7 +99,7 @@ export function VideoExplorer({
               className={mediaType === t ? 'category-filter-btn is-active' : 'category-filter-btn'}
               onClick={() => setMediaType(t)}
             >
-              {t === 'all' ? 'Everything' : t === 'reel' ? '🎬 Reels' : '📷 Posts'}
+              {t === 'all' ? 'Everything' : t === 'reel' ? 'Reels' : 'Posts'}
             </button>
           ))}
         </div>

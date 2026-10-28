@@ -24,7 +24,6 @@ export default function JourneyPage() {
       <section className="section" data-testid="journey-page">
         <div className="mb-10 sm:mb-14 max-w-2xl" data-reveal>
           <PageHeader
-            eyebrow="Not a highlight reel"
             title="The rules, and what they cost."
             lede="The principles I run on, the decisions that shaped them, and an honest tally of what's done, in progress, and still just a dream."
             accentHue={38}

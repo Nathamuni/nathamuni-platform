@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { ThemedImage } from '@/components/ui/ThemedImage'
 
 /**
  * Renders the hero section with pointer-parallax depth: floating gradient
@@ -47,15 +48,16 @@ export function HeroParallax({ children }: { children: React.ReactNode }) {
 
   return (
     <section ref={ref} className="hero" data-testid="hero-section">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/generated/hero-bg.jpg"
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        fetchPriority="low"
-        className="hero-backdrop"
-      />
+      <div className="hero-backdrop-clip" aria-hidden="true">
+        <ThemedImage
+          base="/images/generated/hero-bg"
+          alt=""
+          ariaHidden
+          loading="eager"
+          fetchPriority="low"
+          className="hero-backdrop"
+        />
+      </div>
       <span className="hero-backdrop-vignette" aria-hidden />
       <span className="hero-orb hero-orb-1" aria-hidden />
       <span className="hero-orb hero-orb-2" aria-hidden />

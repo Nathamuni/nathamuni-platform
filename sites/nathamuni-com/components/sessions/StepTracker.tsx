@@ -203,7 +203,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           padding: 0.85rem 1rem;
           border-radius: 14px;
           border: 1px solid rgba(251, 191, 36, 0.4);
-          background: linear-gradient(120deg, rgba(251, 191, 36, 0.12), rgba(139, 92, 246, 0.1));
+          background: linear-gradient(120deg, rgba(251, 191, 36, 0.12), rgb(var(--accent-rgb) / 0.1));
           font-size: 0.9rem;
           color: rgba(255, 255, 255, 0.85);
           animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -228,15 +228,15 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           gap: 0.65rem;
           padding: 1.2rem 1.3rem;
           border-radius: 1rem;
-          background: rgba(148, 112, 255, 0.05);
-          border: 1px solid rgba(178, 148, 255, 0.14);
+          background: rgb(var(--lavender-rgb) / 0.05);
+          border: 1px solid rgb(var(--lavender-rgb) / 0.14);
           backdrop-filter: blur(20px);
           transition: border-color 0.25s ease, background 0.25s ease;
           scroll-margin-top: 5.5rem;
         }
         .ssn-step-done {
-          border-color: rgba(34, 211, 238, 0.4);
-          background: rgba(34, 211, 238, 0.07);
+          border-color: rgb(var(--cyan-rgb) / 0.4);
+          background: rgb(var(--cyan-rgb) / 0.07);
         }
         .ssn-step-head {
           display: flex;
@@ -268,13 +268,13 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
         }
         .ssn-badge-tested {
           color: var(--color-accent-tint);
-          background: rgba(139, 92, 246, 0.15);
-          border-color: rgba(139, 92, 246, 0.4);
+          background: rgb(var(--accent-rgb) / 0.15);
+          border-color: rgb(var(--accent-rgb) / 0.4);
         }
         .ssn-badge-research {
           color: var(--color-cyan-soft);
-          background: rgba(34, 211, 238, 0.13);
-          border-color: rgba(34, 211, 238, 0.4);
+          background: rgb(var(--cyan-rgb) / 0.13);
+          border-color: rgb(var(--cyan-rgb) / 0.4);
         }
         .ssn-badge-standard {
           color: var(--color-amber-soft);
@@ -320,7 +320,7 @@ export function StepTracker({ slug, steps }: { slug: string; steps: Step[] }) {
           border-color: var(--color-cyan);
         }
         .ssn-step-checkpoint input:focus-visible + .ssn-check-mark {
-          outline: 2px solid rgba(34, 211, 238, 0.6);
+          outline: 2px solid rgb(var(--cyan-rgb) / 0.6);
           outline-offset: 2px;
         }
         .ssn-step-reference {

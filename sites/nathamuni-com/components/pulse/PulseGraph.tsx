@@ -607,7 +607,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
       style={{
         background:
           'radial-gradient(circle at 50% 40%, rgba(26,14,50,0.7), rgba(6,5,16,0.97))',
-        border: '1px solid rgba(178,148,255,0.18)',
+        border: '1px solid rgb(var(--lavender-rgb) / 0.18)',
         cursor: 'grab',
       }}
     >
@@ -623,8 +623,8 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
           onClick={() => resetViewRef.current()}
           className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.7rem] text-white/80 transition-colors hover:text-white"
           style={{
-            background: 'rgba(13,10,31,0.9)',
-            border: '1px solid rgba(178,148,255,0.4)',
+            background: 'rgb(var(--ground-rgb) / 0.9)',
+            border: '1px solid rgb(var(--lavender-rgb) / 0.4)',
             backdropFilter: 'blur(8px)',
           }}
           aria-label="Recenter the graph"
@@ -642,7 +642,7 @@ export function PulseGraph({ data }: { data: PulseGraphData }) {
           style={{
             left: Math.min(hovered.x + 12, 999),
             top: hovered.y + 12,
-            background: 'rgba(13,10,31,0.94)',
+            background: 'rgb(var(--ground-rgb) / 0.94)',
             border: `1px solid ${hsla(hovered.node.hue, 85, 70, 0.5)}`,
             backdropFilter: 'blur(10px)',
           }}

@@ -72,8 +72,8 @@ function Sparkline({ entries, gradientId }: { entries: MetricEntry[]; gradientId
     >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#8b5cf6" />
-          <stop offset="100%" stopColor="#22d3ee" />
+          <stop offset="0%" stopColor="var(--accent-solid)" />
+          <stop offset="100%" stopColor="var(--color-cyan)" />
         </linearGradient>
       </defs>
       <path
@@ -84,7 +84,7 @@ function Sparkline({ entries, gradientId }: { entries: MetricEntry[]; gradientId
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx={lastX} cy={lastY} r="2.5" fill="#22d3ee" />
+      <circle cx={lastX} cy={lastY} r="2.5" fill="var(--color-cyan)" />
     </svg>
   )
 }
@@ -281,8 +281,8 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           gap: 0.6rem;
           padding: 0.9rem 1rem;
           border-radius: 0.9rem;
-          background: rgba(148, 112, 255, 0.05);
-          border: 1px solid rgba(178, 148, 255, 0.14);
+          background: rgb(var(--lavender-rgb) / 0.05);
+          border: 1px solid rgb(var(--lavender-rgb) / 0.14);
         }
         .ssn-tracker-row-head {
           display: flex;
@@ -319,14 +319,14 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           min-height: 44px;
           padding: 0.5rem 0.8rem;
           border-radius: 0.6rem;
-          background: rgba(13, 10, 31, 0.5);
+          background: rgb(var(--ground-rgb) / 0.5);
           border: 1px solid rgba(255, 255, 255, 0.14);
           color: #fff;
           font-size: 0.9rem;
           font-variant-numeric: tabular-nums;
         }
         .ssn-tracker-input:focus-visible {
-          outline: 2px solid rgba(34, 211, 238, 0.6);
+          outline: 2px solid rgb(var(--cyan-rgb) / 0.6);
           outline-offset: 1px;
         }
         .ssn-tracker-log {
@@ -335,8 +335,8 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           min-height: 44px;
           padding: 0.5rem 1rem;
           border-radius: 0.6rem;
-          background: rgba(34, 211, 238, 0.16);
-          border: 1px solid rgba(34, 211, 238, 0.45);
+          background: rgb(var(--cyan-rgb) / 0.16);
+          border: 1px solid rgb(var(--cyan-rgb) / 0.45);
           color: var(--color-cyan-soft);
           font-size: 0.85rem;
           font-weight: 600;
@@ -344,7 +344,7 @@ export function MetricTracker({ slug, metrics }: { slug: string; metrics: Metric
           transition: background 0.2s ease;
         }
         .ssn-tracker-log:hover {
-          background: rgba(34, 211, 238, 0.28);
+          background: rgb(var(--cyan-rgb) / 0.28);
         }
         .ssn-tracker-stats {
           display: flex;

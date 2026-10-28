@@ -6,8 +6,9 @@ import { Thumbnail } from '@/components/ui/Thumbnail'
 /**
  * Click-to-load YouTube player.
  *
- * 21 reels are already public on YouTube, but every video page sent visitors off to
- * Instagram to watch — the one thing they came to do could not be done here.
+ * Reels that are public on YouTube (youtubeStatus === 'public' in lib/videos.json; the
+ * sync job keeps adding them) play here. Before this, every video page sent visitors off
+ * to Instagram to watch — the one thing they came to do could not be done here.
  *
  * Deliberately a facade, not a bare <iframe>: embedding YouTube directly pulls roughly
  * three quarters of a megabyte of player JS and sets cookies on every page view, whether

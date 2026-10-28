@@ -23,7 +23,6 @@ export default function NotFound() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="404 — nothing here"
         title="This page doesn't exist."
         lede="A link went stale, or the address has a typo. Nothing behind it was lost — the library is all still here."
         accentHue={340}

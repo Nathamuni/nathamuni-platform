@@ -18,7 +18,6 @@ export default function VideosPage() {
   return (
     <section className="section">
       <PageHeader
-        eyebrow="The library"
         title="Everything, searchable."
         lede="No endless scrolling. Search the whole library by topic, tag, or pillar — every video tested on myself before it went up."
         accentHue={192}
