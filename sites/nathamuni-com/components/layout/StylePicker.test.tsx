@@ -82,22 +82,54 @@ describe('StylePicker', () => {
   })
 
   describe('auto-change', () => {
-    it('is off by default and remembers when switched on', async () => {
+    const reducedMotion = (matches: boolean) =>
+      vi.spyOn(window, 'matchMedia').mockImplementation(
+        (q: string) =>
+          ({
+            matches: matches && q.includes('prefers-reduced-motion'),
+            media: q,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+          }) as unknown as MediaQueryList
+      )
+
+    afterEach(() => vi.restoreAllMocks())
+
+    it('is on by default', async () => {
+      reducedMotion(false)
       render(<StylePicker />)
       await openPanel()
-      const sw = screen.getByRole('switch', { name: /every 30 seconds/i })
-      expect(sw).toHaveAttribute('aria-checked', 'false')
-      await userEvent.click(sw)
-      expect(sw).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('switch', { name: /every 30 seconds/i })).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('is off by default for visitors who prefer reduced motion', async () => {
+      reducedMotion(true)
+      render(<StylePicker />)
+      await openPanel()
+      expect(screen.getByRole('switch', { name: /every 30 seconds/i })).toHaveAttribute('aria-checked', 'false')
+    })
+
+    it('a reduced-motion visitor can still switch it on, and that is remembered', async () => {
+      reducedMotion(true)
+      render(<StylePicker />)
+      await openPanel()
+      await userEvent.click(screen.getByRole('switch', { name: /every 30 seconds/i }))
       expect(localStorage.getItem('nm-auto')).toBe('1')
     })
 
-    it('moves to the next colour every interval, wrapping through the list', async () => {
-      vi.useFakeTimers({ shouldAdvanceTime: true })
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    it('switching it off is remembered as off, not as the default', async () => {
+      reducedMotion(false)
       render(<StylePicker />)
-      await openPanel(user)
-      await user.click(screen.getByRole('switch', { name: /every 30 seconds/i }))
+      await openPanel()
+      await userEvent.click(screen.getByRole('switch', { name: /every 30 seconds/i }))
+      expect(screen.getByRole('switch', { name: /every 30 seconds/i })).toHaveAttribute('aria-checked', 'false')
+      expect(localStorage.getItem('nm-auto')).toBe('0')
+    })
+
+    it('moves to the next colour every interval, wrapping through the list', async () => {
+      reducedMotion(false)
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      render(<StylePicker />)
 
       // violet -> second theme; the 2s allowance covers art preloading, which never
       // completes in jsdom.
@@ -107,27 +139,23 @@ describe('StylePicker', () => {
       expect(root().getAttribute('data-theme')).toBe(THEMES[2].id)
     })
 
-    it('does not change anything while off', async () => {
+    it('does not change anything when the visitor has turned it off', async () => {
+      reducedMotion(false)
+      localStorage.setItem('nm-auto', '0')
       vi.useFakeTimers({ shouldAdvanceTime: true })
       render(<StylePicker />)
       await vi.advanceTimersByTimeAsync(AUTO_INTERVAL_MS * 3)
       expect(root().hasAttribute('data-theme')).toBe(false)
     })
 
-    it('picking a colour by hand turns it off', async () => {
+    it('picking a colour by hand turns it off and keeps it off', async () => {
+      reducedMotion(false)
       render(<StylePicker />)
       await openPanel()
-      await userEvent.click(screen.getByRole('switch', { name: /every 30 seconds/i }))
       await userEvent.click(screen.getByRole('button', { name: 'Gold theme' }))
       expect(screen.getByRole('switch', { name: /every 30 seconds/i })).toHaveAttribute('aria-checked', 'false')
-      expect(localStorage.getItem('nm-auto')).toBeNull()
-    })
-
-    it('resumes from storage on load', async () => {
-      localStorage.setItem('nm-auto', '1')
-      render(<StylePicker />)
-      await openPanel()
-      expect(screen.getByRole('switch', { name: /every 30 seconds/i })).toHaveAttribute('aria-checked', 'true')
+      expect(localStorage.getItem('nm-auto')).toBe('0')
+      expect(root().getAttribute('data-theme')).toBe('gold')
     })
   })
 })

@@ -17,13 +17,16 @@ import {
 
 /**
  * Floating colour / background / motion picker, plus "auto-change" (the colour moves to
- * the next palette every 30 seconds).
+ * the next palette every 30 seconds). Auto-change is ON by default; the saved value is
+ * '1' (on) / '0' (off) and no value means "default": on, except for visitors who have
+ * asked their system to reduce motion, who must opt in.
  *
  * Each choice lives on <html> (data-theme / data-bg / data-motion; the defaults are the
  * absence of the attribute) and in localStorage. A script in layout.tsx applies the saved
  * values before first paint, so this component only reads them back and changes them.
  * Storage is wrapped in try/catch because private windows and blocked site data throw.
- * Picking a colour by hand turns auto-change off: the visitor has said what they want.
+ * Picking a colour by hand turns auto-change off (and keeps it off): the visitor has said
+ * what they want.
  */
 function readAttr<T extends string>(name: string, allowed: readonly { id: T }[], fallback: T): T {
   const v = document.documentElement.getAttribute(name)
@@ -75,11 +78,14 @@ export function StylePicker() {
     setTheme(readAttr('data-theme', THEMES, 'violet'))
     setMotion(readAttr('data-motion', MOTIONS, 'drift'))
     setBg(readAttr('data-bg', BACKGROUNDS, 'aurora'))
+    let saved: string | null = null
     try {
-      setAuto(localStorage.getItem(AUTO_STORAGE_KEY) === '1')
+      saved = localStorage.getItem(AUTO_STORAGE_KEY)
     } catch {
-      /* storage blocked: auto stays off */
+      /* storage blocked: fall through to the default */
     }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    setAuto(saved === '1' || (saved === null && !reduced))
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [])
 
@@ -125,10 +131,11 @@ export function StylePicker() {
     }
   }, [open])
 
+  // Always store an explicit value: removing it would put the visitor back on the default.
   function toggleAuto() {
     const next = !auto
     setAuto(next)
-    store(AUTO_STORAGE_KEY, next ? '1' : null)
+    store(AUTO_STORAGE_KEY, next ? '1' : '0')
   }
 
   return (
@@ -149,7 +156,7 @@ export function StylePicker() {
                 onClick={() => {
                   if (auto) {
                     setAuto(false)
-                    store(AUTO_STORAGE_KEY, null)
+                    store(AUTO_STORAGE_KEY, '0')
                   }
                   applyTheme(t.id)
                 }}
