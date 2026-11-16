@@ -1076,6 +1076,15 @@ html[data-theme='forest'] {
   .link-more {
     @apply inline-block mt-4 text-accent hover:brightness-125 transition-all;
   }
+  .about-now-label {
+    @apply text-xs uppercase tracking-widest text-accent mb-2;
+  }
+  .about-now-roles {
+    @apply flex flex-wrap gap-2 mb-3 list-none p-0;
+  }
+  .about-now-roles li {
+    @apply text-xs sm:text-sm px-3 py-1 rounded-full border border-white/20 text-white/90;
+  }
 
   /* ---------- video detail ---------- */
   .video-detail {

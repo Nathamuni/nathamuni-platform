@@ -17,6 +17,21 @@ const EXPERIMENTS = [
   },
 ] as const
 
+const NOW_FOCUS = [
+  {
+    title: 'Research',
+    body: 'How expert systems — rule-driven, explainable AI — and modern models can work together for SMEs, where data is small, budgets are real and a wrong answer costs money.',
+  },
+  {
+    title: 'Advisory',
+    body: "Helping owners decide where AI is worth it, where it isn't, and what to keep on their own hardware. Straight answers, no hype.",
+  },
+  {
+    title: 'Freelance builds',
+    body: 'When the research points to something worth making, I build it — offline-first and privacy-respecting by default.',
+  },
+] as const
+
 const PRINCIPLES = [
   {
     title: 'Preparedness over prediction',
@@ -64,6 +79,21 @@ export function AboutContent() {
         </div>
       </section>
 
+      <section className="section" data-reveal data-testid="about-now-section">
+        <h2 className="section-title">Now</h2>
+        <p className="section-sub">
+          Since {PROFILE.now.since} — {PROFILE.now.roles.join(' · ')}.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {NOW_FOCUS.map((item) => (
+            <div key={item.title} className="glass-card p-5 flex flex-col gap-2">
+              <h3 className="font-display text-base">{item.title}</h3>
+              <p className="text-white/70 text-sm leading-relaxed">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="section" data-reveal>
         <h2 className="section-title">The arc</h2>
         <p className="section-sub">Where the self-teaching habit actually came from.</p>
@@ -99,11 +129,11 @@ export function AboutContent() {
       <section className="section" data-reveal>
         <h2 className="section-title">What I build</h2>
         <p className="text-white/80 leading-relaxed">
-          Most of what I build, for work and for myself, is offline-first, on-device AI — the kind
-          that doesn&apos;t ship your data to a server you don&apos;t control. AI architecture work
-          and offline-first mobile systems fill the weekdays; whatever idea outgrows a work laptop
-          ships as its own app. Sixteen-plus applications later, here are the ones worth a proper
-          write-up.
+          Offline-first, on-device AI — the kind that doesn&apos;t ship your data to a server you
+          don&apos;t control. Nearly two years of AI architecture and offline-first mobile work at
+          Reveal IT Solutions taught me how it holds up in production; now the same thinking goes
+          into research and client work for SMEs. Whatever idea outgrows a project ships as its
+          own app. Sixteen-plus applications later, here are the ones worth a proper write-up.
         </p>
         <Link href="/projects" className="link-more" data-testid="about-projects-link">
           See the build log →

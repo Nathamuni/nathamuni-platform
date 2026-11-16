@@ -26,16 +26,24 @@ export const PROFILE = {
     'Videos on discipline, calisthenics, and AI — tested on myself first. No endless scrolling: search them.',
   /** Short intro for the homepage About preview. */
   aboutShort:
-    "Self-taught since a childhood where school didn't come easy, now a software developer in Chennai building offline-first AI. I test everything on myself first — six months on 50 thinkers, a solo marathon with no race bib, a back injury I trained back from — before it becomes a video or a line of code.",
+    "Self-taught since a childhood where school didn't come easy. Since November 2026 I work independently as an AI researcher, consultant and advisor — studying how expert systems and AI can run inside small and mid-sized businesses without handing their data away. I test everything on myself first, before it becomes a video, a client recommendation or a line of code.",
   /** Intro paragraphs shown at the top of the about page, beside the portrait. */
   aboutLong: [
-    "I'm Nathamuni — twenty-three, from Trichy, Tamil Nadu, now working in Chennai as a software developer on AI-driven, offline-first systems. Off paper: the same kid who found school hard and decided to teach himself everything else instead.",
-    "Nothing goes on this site until it survives contact with my own life first — training, habits, the AI I build, the philosophies I test. If it didn't hold up under me, it doesn't get taught to you.",
+    "I'm Nathamuni — twenty-three, from Trichy, Tamil Nadu, based in Chennai. Since November 2026 I've worked for myself: an AI researcher studying expert systems and AI for SMEs, an AI advisor to the people deciding where to use it, and a freelancer who builds what the research points to. Before that, nearly two years as a software engineer building AI-driven, offline-first systems.",
+    "Off paper: the same kid who found school hard and decided to teach himself everything else instead. Nothing goes on this site, or into a recommendation, until it survives contact with my own life first. If it didn't hold up under me, it doesn't get taught to you.",
   ],
+  /** "Now" status block — what Nathamuni is doing at present. Refresh when it changes. */
+  now: {
+    since: 'November 2026',
+    heading: 'Now',
+    roles: ['AI Researcher', 'AI Advisor', 'Consultant', 'Freelancer'],
+    summary:
+      'Researching how expert systems and AI work for SMEs, advising owners on where AI is worth it (and where it is not), and taking on freelance builds.',
+  },
   /** Used in metadata + JSON-LD. */
-  jobTitle: 'Software Developer & AI Architect',
+  jobTitle: 'AI Researcher, Consultant & Advisor',
   metaDescription:
-    'Nathamuni: software developer and AI architect, self-taught since childhood, tested on himself first — offline-first AI, calisthenics, and a book built from three years of failure.',
+    'Nathamuni: AI researcher, consultant and advisor for SMEs, researching expert systems and offline-first AI — self-taught since childhood, tested on himself first, author of The Silence That Haunts.',
 
   /**
    * Entity attributes for structured data. These disambiguate Nathamuni the
@@ -50,6 +58,9 @@ export const PROFILE = {
   alumniOf: 'Saranathan College of Engineering',
   knowsAbout: [
     'Artificial Intelligence',
+    'Expert systems',
+    'AI for small and mid-sized businesses',
+    'AI consulting',
     'Offline-first AI',
     'On-device machine learning',
     'Calisthenics',
