@@ -7,18 +7,18 @@ is not publishable without asking him. **Never invent facts.**
 
 ## Publish-safe identity
 
-- Nathamuni S R, 23, Tiruchirappalli (Trichy), Tamil Nadu, India. Tamil is core
+- Nathamuni S R, 24, Tiruchirappalli (Trichy), Tamil Nadu, India. Tamil is core
   to his identity. Ethos he cites: *"Yaadhum oore yaavarum kelir"* (யாதும் ஊரே
   யாவரும் கேளிர்) — "every town is my town, everyone is my kin."
 - Identity line (exact): `☬ Fear lives in one place only... Thats in you Mind🗿 —
   Distinguished Engr | Author | Calisthenics | Meditation | Memer | AI Architect | Generalist`
 - BE Computer Science & Engineering, Saranathan College of Engineering, 2020–2024.
-- **Current (confirmed 2026-07-11): software developer, working in Chennai.**
+- **Current (since November 2026): independent — AI researcher (expert systems and AI for SMEs), AI advisor, consultant and freelancer. Not based in Chennai any more (worked there before); do not state a current city. Do not invent clients, rates or outcomes.**
 - Previous: Software Engineer (Contract) → Engineer at Reveal IT Solutions
   (Jun 2024 – Mar 2026). Specializes in AI-driven ecosystems and offline-first
   mobile solutions. The "distinguished engineer at a startup" phrasing is his
   identity-line branding — fine in the roles line, but employment copy must say
-  software developer in Chennai (current) with the rest as past experience.
+  AI researcher, consultant, advisor and freelancer (current, since November 2026) with software engineering at Reveal IT Solutions as past experience.
 - Childhood: ADHD, struggled academically; deliberately self-taught across game dev,
   app dev, frontend, mathematics, hacking (ethical/curiosity framing only), 3D
   modelling, crafts; used to study 10–11 hours a day; won hackathons; deliberately
