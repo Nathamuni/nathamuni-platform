@@ -52,7 +52,7 @@ export const PROFILE = {
    */
   fullName: 'Nathamuni S R',
   alternateNames: ['Nathamuni S R', 'Nathamuni SR', 'Nathamuni Nathamuni'],
-  homeLocation: 'Tamil Nadu, India',
+  homeLocation: 'India',
   birthPlace: 'Tiruchirappalli, Tamil Nadu, India',
   nationality: 'Indian',
   alumniOf: 'Saranathan College of Engineering',
