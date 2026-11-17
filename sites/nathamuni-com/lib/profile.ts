@@ -29,7 +29,7 @@ export const PROFILE = {
     "Self-taught since a childhood where school didn't come easy. Since November 2026 I work independently as an AI researcher, consultant and advisor — studying how expert systems and AI can run inside small and mid-sized businesses without handing their data away. I test everything on myself first, before it becomes a video, a client recommendation or a line of code.",
   /** Intro paragraphs shown at the top of the about page, beside the portrait. */
   aboutLong: [
-    "I'm Nathamuni — twenty-three, from Trichy, Tamil Nadu, based in Chennai. Since November 2026 I've worked for myself: an AI researcher studying expert systems and AI for SMEs, an AI advisor to the people deciding where to use it, and a freelancer who builds what the research points to. Before that, nearly two years as a software engineer building AI-driven, offline-first systems.",
+    "I'm Nathamuni — twenty-four, from Trichy, Tamil Nadu. Since November 2026 I've worked for myself: an AI researcher studying expert systems and AI for SMEs, an AI advisor to the people deciding where to use it, and a freelancer who builds what the research points to. Before that, nearly two years as a software engineer building AI-driven, offline-first systems.",
     "Off paper: the same kid who found school hard and decided to teach himself everything else instead. Nothing goes on this site, or into a recommendation, until it survives contact with my own life first. If it didn't hold up under me, it doesn't get taught to you.",
   ],
   /** "Now" status block — what Nathamuni is doing at present. Refresh when it changes. */
@@ -52,7 +52,7 @@ export const PROFILE = {
    */
   fullName: 'Nathamuni S R',
   alternateNames: ['Nathamuni S R', 'Nathamuni SR', 'Nathamuni Nathamuni'],
-  homeLocation: 'Chennai, Tamil Nadu, India',
+  homeLocation: 'Tamil Nadu, India',
   birthPlace: 'Tiruchirappalli, Tamil Nadu, India',
   nationality: 'Indian',
   alumniOf: 'Saranathan College of Engineering',

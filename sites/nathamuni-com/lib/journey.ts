@@ -156,7 +156,7 @@ export const DECISIONS: DecisionNode[] = [
     seq: 8,
     period: '2026',
     trigger: 'the platform needed building.',
-    decision: 'work as a software developer in Chennai and build it in the open, on the side.',
+    decision: 'work as a software developer in Chennai, then build it in the open, on the side.',
     outcome: 'nathamuni.com, live.',
     hue: 'magenta',
   },
