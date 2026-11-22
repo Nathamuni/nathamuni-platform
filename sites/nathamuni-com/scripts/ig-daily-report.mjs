@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { buildReport, renderTelegram, istToday } from './ig-report-core.mjs'
+import { renderIdeaTeaser } from './ig-ai-core.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const readJson = (rel, fallback) => {
@@ -58,7 +59,8 @@ const report = buildReport({
   history: readJson('lib/insights-history.json', []),
   today: istToday(),
 })
-const text = renderTelegram(report)
+const teaser = renderIdeaTeaser(readJson('lib/ideas.json', null))
+const text = teaser ? `${renderTelegram(report)}\n\n${teaser}` : renderTelegram(report)
 
 if (args.has('--print') || !TOKEN || !CHAT) {
   if (!args.has('--print')) console.log('(TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID not set — printing instead)\n')

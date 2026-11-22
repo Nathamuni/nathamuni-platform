@@ -25,8 +25,20 @@ import {
   renderWeekly,
   istToday,
 } from '../scripts/ig-report-core.mjs'
+import {
+  accountContext,
+  ratingPrompt,
+  renderRating,
+  renderIdeas,
+  renderIdeaTeaser,
+  RATING_SCHEMA,
+  RATE_MODEL,
+  RATE_DAILY_CAP,
+} from '../scripts/ig-ai-core.mjs'
+import { geminiJson } from '../scripts/gemini.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
+export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
 export const CRON_EVENING = '15 12 * * *' // 5:45 pm IST daily
 export const CRON_WEEKLY = '30 13 * * 0' // 7:00 pm IST Sunday
 const MUTE_KEY = 'tg:muted'
@@ -43,13 +55,14 @@ async function loadJson(name, fallback) {
 }
 
 async function loadData() {
-  const [videos, insights, history, transcripts] = await Promise.all([
+  const [videos, insights, history, transcripts, ideas] = await Promise.all([
     loadJson('videos.json', []),
     loadJson('insights.json', null),
     loadJson('insights-history.json', []),
     loadJson('transcripts.json', {}),
+    loadJson('ideas.json', null),
   ])
-  return { videos, insights, history, transcripts }
+  return { videos, insights, history, transcripts, ideas }
 }
 
 /** Pure: message text + data → reply HTML. Exported for tests. */
@@ -69,7 +82,7 @@ export function replyFor(text, data, today) {
     case '/best':
       return renderBest(videos, today, transcripts)
     case '/when':
-      return renderWhen(today)
+      return renderWhen(today, videos)
     case '/goal':
       return renderGoal(history)
     case '/boost':
@@ -80,6 +93,8 @@ export function replyFor(text, data, today) {
       return renderNext(report(), videos, today, transcripts)
     case '/week':
       return renderWeekly(videos, history, today, transcripts)
+    case '/ideas':
+      return renderIdeas(data.ideas)
     default:
       // A pasted reel link → reel details; any other plain message → "what to post next".
       if (/instagram\.com\/(reel|p)\//.test(text)) return renderReel(videos, text, transcripts, report().med)
@@ -123,6 +138,10 @@ export async function handleTelegram(request, env) {
     )
     return new Response('ok')
   }
+  if (cmd === '/idea') {
+    await send(env, msg.chat.id, await rateIdea(env, msg.text.trim().slice(rawCmdLength(msg.text)).trim()))
+    return new Response('ok')
+  }
   try {
     const data = await loadData()
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
@@ -133,17 +152,76 @@ export async function handleTelegram(request, env) {
   return new Response('ok')
 }
 
+const rawCmdLength = (text) => text.trim().split(/\s+/)[0].length
+
+/** Live AI rating of the owner's idea, capped per day so the free Gemini quota is never exceeded. */
+export async function rateIdea(env, idea) {
+  if (idea.length < 4) return 'Send your idea after the command, e.g.\n/idea gym fail compilation with Tamil voiceover'
+  if (!env.GEMINI_API_KEY) return 'AI rating is not configured yet.'
+  const today = istToday()
+  const key = `tg:ai:${today}`
+  const used = Number((await env.INBOX.get(key)) ?? 0)
+  if (used >= RATE_DAILY_CAP) return `Daily AI limit reached (${RATE_DAILY_CAP}/day, keeps you on the free tier). Resets at midnight.`
+  await env.INBOX.put(key, String(used + 1), { expirationTtl: 2 * 86400 })
+  try {
+    const { videos, history, transcripts } = await loadData()
+    const r = await geminiJson({
+      key: env.GEMINI_API_KEY,
+      model: RATE_MODEL,
+      prompt: ratingPrompt(accountContext(videos, transcripts, history, today), idea),
+      schema: RATING_SCHEMA,
+      temperature: 0.4,
+      retries: 1,
+    })
+    return `${renderRating(r, idea)}\n\n<i>${RATE_DAILY_CAP - used - 1} AI ratings left today</i>`
+  } catch (err) {
+    console.error('idea rating error:', err.message)
+    return err.quota ? 'Gemini’s free daily limit is used up. Try again tomorrow.' : 'AI is busy right now. Try again in a minute.'
+  }
+}
+
 /** Pure: which scheduled message to send for a cron, or null for none. Exported for tests. */
 export function scheduledMessage(cron, data, today) {
   const { videos, insights, history, transcripts } = data
   if (cron === CRON_EVENING) {
-    return renderEvening(buildReport({ videos, insights, history, today }), videos, today, transcripts)
+    const nudge = renderEvening(buildReport({ videos, insights, history, today }), videos, today, transcripts)
+    const teaser = renderIdeaTeaser(data.ideas)
+    return nudge && teaser ? `${nudge}\n\n${teaser}` : nudge
   }
   if (cron === CRON_WEEKLY) return renderWeekly(videos, history, today, transcripts)
   return null
 }
 
+/**
+ * Start the Instagram sync on GitHub (GitHub's own cron ran ~7.5 h late). Needs GH_DISPATCH_TOKEN:
+ * a fine-grained PAT limited to this repo with Actions read/write. On failure, tell the owner —
+ * the workflow's fallback schedule still runs later in the day.
+ */
+export async function dispatchSync(env) {
+  if (!env.GH_DISPATCH_TOKEN) return console.warn('GH_DISPATCH_TOKEN not set — relying on the fallback schedule')
+  const res = await fetch(
+    'https://api.github.com/repos/Nathamuni/nathamuni-platform/actions/workflows/instagram-sync.yml/dispatches',
+    {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${env.GH_DISPATCH_TOKEN}`,
+        accept: 'application/vnd.github+json',
+        'user-agent': 'nathamuni-site-worker',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ ref: 'main' }),
+    },
+  )
+  if (res.status !== 204) {
+    console.error('dispatch failed:', res.status, (await res.text()).slice(0, 200))
+    if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+      await send(env, env.TELEGRAM_CHAT_ID, `⚠️ Couldn't start the 8 am sync (GitHub said ${res.status}). The GitHub token may have expired; the backup run will still happen later today.`)
+    }
+  }
+}
+
 export async function handleScheduled(controller, env) {
+  if (controller.cron === CRON_MORNING) return dispatchSync(env)
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return
   if (await env.INBOX.get(MUTE_KEY)) return
   const text = scheduledMessage(controller.cron, await loadData(), istToday())

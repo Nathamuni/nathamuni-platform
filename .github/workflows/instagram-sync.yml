@@ -1,34 +1,56 @@
 name: Instagram Sync
 
+# Primary trigger: the site Worker's 8:00 am IST cron calls workflow_dispatch (GitHub's own
+# schedule ran ~7.5 h late every day in Nov 2026). The schedule below is only a fallback:
+# the gate job skips it when a dispatched run already happened today.
 on:
   schedule:
-    - cron: '30 2 * * *' # daily ~08:00 IST
+    - cron: '30 4 * * *' # fallback, ~10:00 IST (GitHub may start it hours later)
   workflow_dispatch: {}
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: instagram-sync
   cancel-in-progress: false
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          done=$(gh run list --workflow instagram-sync.yml --created ">=$(date -u +%F)" --json databaseId,event,conclusion \
+            -q "[.[] | select(.databaseId != ${{ github.run_id }} and .event == \"workflow_dispatch\" and .conclusion != \"cancelled\")] | length")
+          if [ "$done" -gt 0 ]; then echo "Already ran today via the 8 am trigger — skipping fallback."; echo "run=false" >> "$GITHUB_OUTPUT"
+          else echo "run=true" >> "$GITHUB_OUTPUT"; fi
+
   sync:
+    needs: gate
+    if: ${{ needs.gate.outputs.run == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: sites/nathamuni-com
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install ffmpeg (story poster extraction)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Pull new reels from Instagram (and cross-post to YouTube if configured)
         id: sync
@@ -58,7 +80,8 @@ jobs:
           # nothing and new reels would build with no source image.
           git add lib/videos.json lib/stories.json lib/insights.json lib/insights-history.json assets/thumbnails public/stories
           git commit -m "FEAT: auto-sync new reels from Instagram"
-          git push
+          for i in 1 2 3; do git pull --rebase -q origin main && git push && exit 0; sleep 10; done
+          exit 1
 
       - name: Fail loudly if YouTube auth is dead
         if: steps.sync.outputs.yt_auth_broken == 'true'
@@ -66,33 +89,46 @@ jobs:
           echo "::error::YouTube refresh token is expired/revoked — reels are syncing fine but YouTube cross-posting is silently broken. Re-run scripts/youtube-get-refresh-token.mjs locally and update the YOUTUBE_REFRESH_TOKEN secret."
           exit 1
 
-  # Gemini speech-to-text for new reels + the past-reel backfill (Whisper failed on Tanglish).
-  # Off until the quality test passes; switch on with repo variable TRANSCRIBE_ENABLED=true.
+  # Gemini speech-to-text for new reels + the past-reel backfill, newest first (Whisper failed on
+  # Tanglish). Switch off with repo variable TRANSCRIBE_ENABLED=false.
   transcribe:
-    needs: sync
-    if: ${{ !cancelled() && vars.TRANSCRIBE_ENABLED == 'true' }}
+    needs: [gate, sync]
+    if: ${{ !cancelled() && needs.gate.outputs.run == 'true' && vars.TRANSCRIBE_ENABLED == 'true' }}
     uses: ./.github/workflows/instagram-transcribe.yml
     with:
       limit: 15
     secrets: inherit
 
   report:
-    needs: [sync, transcribe]
-    if: ${{ !cancelled() }}
+    needs: [gate, sync, transcribe]
+    if: ${{ !cancelled() && needs.gate.outputs.run == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: sites/nathamuni-com
     steps:
       - name: Checkout latest main (synced data + transcripts)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
+
+      # 1 Gemini call/day → lib/ideas.json (read by /ideas and the report). Fail-soft.
+      - name: Generate today's reel ideas
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          node scripts/ig-ideas.mjs
+          if ! git diff --quiet -- lib/ideas.json || ! git ls-files --error-unmatch lib/ideas.json >/dev/null 2>&1; then
+            git config user.name "instagram-sync[bot]"
+            git config user.email "actions@github.com"
+            git add lib/ideas.json && git commit -qm "FEAT: daily reel ideas"
+            for i in 1 2 3; do git pull --rebase -q origin main && git push -q && break; sleep 10; done
+          fi
 
       # Sends only when TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID secrets exist; otherwise prints
       # to the log. A Telegram outage logs a warning and exits 0 (see ig-daily-report.mjs).

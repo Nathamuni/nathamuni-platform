@@ -87,3 +87,24 @@ describe('scheduledMessage', () => {
     expect(replyFor('/week', data, TODAY)).toContain('Weekly review')
   })
 })
+
+describe('dispatchSync', () => {
+  it('does nothing without a token', async () => {
+    const { dispatchSync } = await import('./telegram.mjs')
+    await expect(dispatchSync({})).resolves.toBeUndefined()
+  })
+  it('calls the GitHub dispatch API for instagram-sync.yml on main', async () => {
+    const { dispatchSync } = await import('./telegram.mjs')
+    const calls = []
+    const orig = globalThis.fetch
+    globalThis.fetch = async (url, init) => (calls.push({ url, init }), new Response(null, { status: 204 }))
+    try {
+      await dispatchSync({ GH_DISPATCH_TOKEN: 't' })
+    } finally {
+      globalThis.fetch = orig
+    }
+    expect(calls).toHaveLength(1)
+    expect(calls[0].url).toContain('/actions/workflows/instagram-sync.yml/dispatches')
+    expect(JSON.parse(calls[0].init.body)).toEqual({ ref: 'main' })
+  })
+})

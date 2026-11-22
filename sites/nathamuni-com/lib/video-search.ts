@@ -27,6 +27,8 @@ export interface Video {
   keyLessons?: string[]
   featured: boolean
   publishedDate: string
+  /** Full UTC timestamp from Instagram; absent on entries not yet backfilled. */
+  publishedAt?: string
   /** Present once the sync successfully pulls engagement fields from the Graph API. */
   likeCount?: number
   commentsCount?: number

@@ -233,6 +233,8 @@ export function renderHelp() {
     '/boost — is anything worth boosting?',
     '/reel &lt;link&gt; — stats and words of one reel',
     '/week — weekly review',
+    '/ideas — 5 AI reel ideas (fresh each morning)',
+    '/idea &lt;your idea&gt; — AI rates it + hook + caption',
     '/mute · /unmute — pause or resume reminders',
     '',
     '<i>Data refreshes daily at 8 AM.</i>',
@@ -254,18 +256,41 @@ export function renderBest(videos, today, transcripts = {}) {
   return lines.join('\n')
 }
 
-export function renderWhen(today) {
+/** Median views by IST posting window (3-hour buckets). Needs publishedAt; ignores thin buckets. */
+export function postingWindows(videos, minPosts = 4) {
+  const buckets = {}
+  for (const v of videos) {
+    if (!v.publishedAt || !Number.isFinite(v.views)) continue
+    const ist = new Date(Date.parse(v.publishedAt.replace(/\+0000$/, 'Z')) + 5.5 * 3600000)
+    if (Number.isNaN(ist.getTime())) continue
+    const start = Math.floor(ist.getUTCHours() / 3) * 3
+    ;(buckets[start] ??= []).push(v.views)
+  }
+  const label = (h) => `${((h + 11) % 12) + 1}${h < 12 ? 'am' : 'pm'}`
+  return Object.entries(buckets)
+    .filter(([, vs]) => vs.length >= minPosts)
+    .map(([h, vs]) => ({ window: `${label(+h)}–${label((+h + 3) % 24)}`, start: +h, n: vs.length, median: median(vs) }))
+    .sort((a, b) => b.median - a.median)
+}
+
+export function renderWhen(today, videos = []) {
   const dow = new Date(Date.parse(today)).getUTCDay() // 0 = Sunday
   const strong = [0, 1, 2].includes(dow)
-  return [
+  const lines = [
     '<b>⏰ When to post</b>',
     '',
-    `• Today: <b>6–9 pm IST</b>${strong ? ' (one of your 3 strongest days)' : ''}`,
+    `• Followers most active: <b>6–9 pm IST</b>${strong ? ' (today is one of your 3 strongest days)' : ''}`,
     '• Strongest days: Tue, Mon, Sun',
-    '• Post ~15 min before 6 pm so it is live as followers arrive',
-    '',
-    '<i>From your follower active-hours (Nov 19 screenshots). Per-reel posting-hour analysis is coming.</i>',
-  ].join('\n')
+  ]
+  const wins = postingWindows(videos)
+  if (wins.length >= 2) {
+    lines.push('', '<b>Your own posts, by posting time</b> (median views)')
+    for (const w of wins.slice(0, 4)) lines.push(`• ${w.window}: ${fmt(w.median)} (${w.n} posts)`)
+    lines.push('', `<i>Best so far: ${wins[0].window}. Timing is one factor — topic and hook matter more.</i>`)
+  } else {
+    lines.push('', '<i>Your own best posting hour appears here once post times are backfilled (next sync).</i>')
+  }
+  return lines.join('\n')
 }
 
 export function goalStats(history, target = 50000) {
@@ -350,7 +375,7 @@ export function renderNext(report, videos, today, transcripts = {}) {
   lines.push('<b>End:</b> a line people forward to a friend (shares drive reach)')
   const hookAlert = report.alerts.find((a) => a.kind === 'hook')
   if (hookAlert) lines.push('', `⚠ ${escapeHtml(hookAlert.text)}`)
-  lines.push('', '<i>Claude-written ideas and captions coming soon.</i>')
+  lines.push('', '💡 /ideas for 5 AI reel ideas, or /idea &lt;your idea&gt; to rate yours')
   return lines.join('\n')
 }
 
@@ -362,7 +387,7 @@ export function renderEvening(report, videos, today, transcripts = {}) {
   if (videos.some((v) => v.publishedDate === today)) return null
   const next = renderNext(report, videos, today, transcripts)
     .split('\n')
-    .filter((l) => !l.startsWith('<b>🎬 Post next') && !l.includes('coming soon'))
+    .filter((l) => !l.startsWith('<b>🎬 Post next') && !l.includes('/ideas'))
   return ['<b>⏰ Posting window opens at 6 pm</b>', 'Not posted yet today? Here’s the plan:', ...next]
     .join('\n')
     .replace(/\n{3,}/g, '\n\n')

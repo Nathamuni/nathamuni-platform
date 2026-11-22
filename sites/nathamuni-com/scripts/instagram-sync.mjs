@@ -120,6 +120,8 @@ function draftEntry(media, existingIds) {
     detailedDescription: body || title,
     featured: false,
     publishedDate: date,
+    // Full UTC timestamp (publishedDate above is date-only) — enables posting-hour analysis.
+    publishedAt: media.timestamp,
   }
   // Engagement counts are best-effort — only set when the API actually returned them.
   if (typeof media.like_count === 'number') entry.likeCount = media.like_count
@@ -308,17 +310,32 @@ if (engagementSupported) {
   }
 }
 
-if (additions.length === 0 && !engagementUpdated) {
+// Backfill the exact post time on older entries (they were saved date-only). Uses the media
+// list already fetched above — no extra API calls.
+let timesUpdated = false
+{
+  const tsByShortcode = new Map(media.map((m) => [m.permalink.replace(/\/$/, '').split('/').pop(), m.timestamp]))
+  for (const v of videos) {
+    if (v.publishedAt) continue
+    const ts = tsByShortcode.get(v.instagramUrl.replace(/\/$/, '').split('/').pop().split('?')[0])
+    if (ts) {
+      v.publishedAt = ts
+      timesUpdated = true
+    }
+  }
+}
+
+if (additions.length === 0 && !engagementUpdated && !timesUpdated) {
   console.log('Nothing new — library is in sync.')
 } else if (DRY_RUN) {
   console.log(
-    `DRY RUN: would add ${additions.length} new item(s)${engagementUpdated ? ' and refresh engagement counts' : ''}.`
+    `DRY RUN: would add ${additions.length} new item(s)${engagementUpdated ? ' and refresh engagement counts' : ''}${timesUpdated ? ' and backfill post times' : ''}.`
   )
 } else {
   mkdirSync(THUMBS_DIR, { recursive: true })
   writeFileSync(VIDEOS_JSON, JSON.stringify([...videos, ...additions], null, 2) + '\n')
   console.log(
-    `Added ${additions.length} new item(s) to videos.json${engagementUpdated ? '; refreshed engagement counts' : ''}.`
+    `Added ${additions.length} new item(s) to videos.json${engagementUpdated ? '; refreshed engagement counts' : ''}${timesUpdated ? '; backfilled post times' : ''}.`
   )
 }
 

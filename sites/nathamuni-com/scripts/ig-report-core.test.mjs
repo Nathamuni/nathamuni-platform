@@ -99,3 +99,16 @@ describe('istToday', () => {
     expect(istToday(new Date('2026-11-21T18:29:00Z'))).toBe('2026-11-21')
   })
 })
+
+describe('postingWindows', () => {
+  it('groups by IST 3-hour window and ignores thin buckets', async () => {
+    const { postingWindows } = await import('./ig-report-core.mjs')
+    // 13:00 UTC = 6:30 pm IST → 6pm–9pm bucket; 03:00 UTC = 8:30 am IST → 6am–9am bucket
+    const evening = Array.from({ length: 4 }, (_, i) => ({ publishedAt: `2026-11-0${i + 1}T13:00:00+0000`, views: 10000 }))
+    const morning = Array.from({ length: 4 }, (_, i) => ({ publishedAt: `2026-11-0${i + 1}T03:00:00+0000`, views: 2000 }))
+    const thin = [{ publishedAt: '2026-11-01T20:00:00+0000', views: 99999 }]
+    const w = postingWindows([...evening, ...morning, ...thin])
+    expect(w.map((x) => x.window)).toEqual(['6pm–9pm', '6am–9am'])
+    expect(w[0]).toMatchObject({ n: 4, median: 10000 })
+  })
+})

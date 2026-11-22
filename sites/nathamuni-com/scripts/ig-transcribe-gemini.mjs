@@ -57,7 +57,8 @@ async function gemini(audioB64) {
     const body = await res.json().catch(() => ({}))
     if (res.ok) return JSON.parse(body.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}')
     const msg = body.error?.message ?? `HTTP ${res.status}`
-    if (res.status === 429 && /per.?day|daily|PerDay/i.test(msg)) {
+    // The per-day signal lives in error.details (quotaId "...PerDay..."), not always in the message.
+    if (res.status === 429 && /per.?day|daily/i.test(JSON.stringify(body))) {
       const e = new Error(`daily quota reached: ${msg.slice(0, 120)}`)
       e.quota = true
       throw e

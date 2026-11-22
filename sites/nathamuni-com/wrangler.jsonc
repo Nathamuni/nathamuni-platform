@@ -12,9 +12,10 @@
     "not_found_handling": "404-page",
     "binding": "ASSETS"
   },
-  // Telegram reminders (UTC): 5:45 pm IST daily, 7 pm IST Sunday. Keep in sync with worker/telegram.mjs.
+  // UTC crons, keep in sync with worker/telegram.mjs: 8:00 am IST starts the GitHub sync;
+  // 5:45 pm IST daily posting nudge; 7 pm IST Sunday weekly review.
   "triggers": {
-    "crons": ["15 12 * * *", "30 13 * * 0"]
+    "crons": ["30 2 * * *", "15 12 * * *", "30 13 * * 0"]
   },
   "ai": {
     "binding": "AI"
