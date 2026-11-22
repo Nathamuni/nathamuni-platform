@@ -11,7 +11,9 @@ import json
 import os
 import sys
 import time
+import wave
 
+import numpy as np
 from faster_whisper import WhisperModel
 
 MODEL = os.environ.get("WHISPER_MODEL", "large-v3")
@@ -33,9 +35,18 @@ model = WhisperModel(MODEL, device="cpu", compute_type="int8", cpu_threads=os.cp
 print(f"Loaded {MODEL} in {time.time() - t0:.0f}s")
 
 
+def load_wav(path):
+    """16 kHz mono s16 WAV (made by ffmpeg in prep) -> float32 array.
+    Bypasses faster-whisper's PyAV decoder, which breaks on newer PyAV releases."""
+    with wave.open(path, "rb") as w:
+        assert w.getframerate() == 16000 and w.getnchannels() == 1 and w.getsampwidth() == 2
+        pcm = w.readframes(w.getnframes())
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768.0
+
+
 def run(wav, language=None):
     segs, info = model.transcribe(
-        wav, language=language, vad_filter=True, beam_size=5, condition_on_previous_text=False
+        load_wav(wav), language=language, vad_filter=True, beam_size=5, condition_on_previous_text=False
     )
     return list(segs), info
 
@@ -68,3 +79,6 @@ for item in manifest:
     json.dump(results, open(out_path, "w"), ensure_ascii=False)
 
 print(f"Done {len(results)} reels in {time.time() - t0:.0f}s")
+if results and all(r["status"] == "error" for r in results.values()):
+    print("Every reel failed: marking the job as failed so it shows red.")
+    sys.exit(1)
