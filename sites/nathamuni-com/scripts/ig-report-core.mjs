@@ -318,7 +318,9 @@ export function renderReel(videos, query, transcripts = {}, med = {}) {
     lines.push(`• Watched ${secs(v.avgWatchTimeMs)} on average`)
   } else lines.push('• No stats stored for this one (older post).')
   if (t?.status === 'ok') {
-    lines.push('', `🎙 <b>Hook:</b> “${escapeHtml(t.hook)}”`, `<i>${escapeHtml(t.text.slice(0, 600))}${t.text.length > 600 ? '…' : ''}</i>`)
+    const body = t.english || t.text
+    lines.push('', `🎙 <b>Hook:</b> “${escapeHtml(t.hook)}”`)
+    lines.push(`<b>${t.english ? 'Meaning' : 'Said'}:</b> <i>${escapeHtml(body.slice(0, 700))}${body.length > 700 ? '…' : ''}</i>`)
   } else if (t?.status === 'no-speech') lines.push('', '🎵 No speech (music/visual reel).')
   else lines.push('', '🎙 Transcript not ready yet.')
   return lines.join('\n')
