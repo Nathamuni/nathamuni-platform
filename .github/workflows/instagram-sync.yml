@@ -68,9 +68,11 @@ jobs:
 
   # Speech-to-text for new reels (and the past-reel backfill, 40 a day), on GitHub's runner.
   # Its own failure never blocks the report.
+  # PAUSED until a Tamil/Tanglish-capable method is chosen: Whisper produced unusable text on
+  # this speaker (2026-11-22 test). Re-enable by setting repo variable TRANSCRIBE_ENABLED=true.
   transcribe:
     needs: sync
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && vars.TRANSCRIBE_ENABLED == 'true' }}
     uses: ./.github/workflows/instagram-transcribe.yml
     with:
       limit: 40
