@@ -84,7 +84,7 @@ if (mode === 'merge') {
     ? JSON.parse(readFileSync(path.join(work, 'meta.json'), 'utf8'))
     : {}
   const { transcripts, added } = mergeResults(existing, results, meta, {
-    model: process.env.WHISPER_MODEL || 'large-v3',
+    model: process.env.WHISPER_MODEL || 'large-v3-turbo',
     now: new Date().toISOString(),
   })
   writeFileSync(STORE, JSON.stringify(transcripts, null, 2) + '\n')

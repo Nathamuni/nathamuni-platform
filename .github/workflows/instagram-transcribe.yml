@@ -32,7 +32,8 @@ jobs:
       run:
         working-directory: sites/nathamuni-com
     env:
-      WHISPER_MODEL: large-v3
+      WHISPER_MODEL: large-v3-turbo
+      PYTHONUNBUFFERED: '1'
       WORK: /tmp/reels
     steps:
       - name: Checkout latest main (includes this morning's sync)
@@ -70,6 +71,7 @@ jobs:
         run: node scripts/ig-transcribe.mjs prep "$WORK"
 
       - name: Transcribe with Whisper
+        timeout-minutes: 120
         run: python scripts/transcribe.py "$WORK"
 
       - name: Save transcripts

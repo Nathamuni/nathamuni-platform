@@ -16,7 +16,7 @@ import wave
 import numpy as np
 from faster_whisper import WhisperModel
 
-MODEL = os.environ.get("WHISPER_MODEL", "large-v3")
+MODEL = os.environ.get("WHISPER_MODEL", "large-v3-turbo")
 HOOK_SECONDS = 5.0  # what the viewer hears before deciding to scroll
 OK_LANGS = {"ta", "en"}  # Tanglish is detected as either; anything else is a misdetect
 
@@ -55,6 +55,7 @@ for item in manifest:
     sc, wav = item["shortcode"], item["wav"]
     t = time.time()
     try:
+        print(f"{sc}: start ({os.path.getsize(wav) / 32000:.0f}s of audio)")
         segs, info = run(wav)
         lang = info.language
         if segs and lang not in OK_LANGS:
