@@ -12,6 +12,7 @@ describe('shortcodeOf', () => {
   it('handles trailing slashes and query strings', () => {
     expect(shortcodeOf('https://www.instagram.com/reel/AbC/')).toBe('AbC')
     expect(shortcodeOf('https://www.instagram.com/p/XyZ?igsh=1')).toBe('XyZ')
+    expect(shortcodeOf('https://www.instagram.com/reel/XyZ/?igsh=1')).toBe('XyZ')
   })
 })
 

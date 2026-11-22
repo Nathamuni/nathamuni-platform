@@ -2,14 +2,14 @@ name: Instagram Transcribe
 
 # Turns what is said in each reel into text (lib/transcripts.json), on GitHub's runner.
 # Called by instagram-sync.yml after the daily sync; also runnable by hand with a small limit.
-# Up to `limit` reels per run, newest first, so the ~240 past reels backfill in ~4 daily runs.
+# Up to `limit` reels per run, newest first, so the ~240 past reels backfill in ~6 daily runs.
 
 on:
   workflow_call:
     inputs:
       limit:
         type: number
-        default: 60
+        default: 40
   workflow_dispatch:
     inputs:
       limit:

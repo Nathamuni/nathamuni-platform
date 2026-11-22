@@ -1,6 +1,6 @@
 // Pure helpers for the reel-transcription job (I/O lives in ig-transcribe.mjs).
 
-export const shortcodeOf = (permalink) => permalink.replace(/\/$/, '').split('/').pop().split('?')[0]
+export const shortcodeOf = (permalink) => permalink.split(/[?#]/)[0].replace(/\/$/, '').split('/').pop()
 
 /**
  * Video reels that still need a transcript, newest first, capped at `limit`.

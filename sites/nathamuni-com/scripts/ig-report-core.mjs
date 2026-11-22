@@ -203,3 +203,149 @@ export function renderTelegram(r) {
   )
   return lines.join('\n')
 }
+
+// ---------------------------------------------------------------------------
+// Telegram bot command replies (used by worker/telegram.mjs). All read saved
+// data only — no Instagram API calls.
+
+const sc = (url) => (url ?? '').split(/[?#]/)[0].replace(/\/$/, '').split('/').pop()
+const pct = (n) => (Number.isFinite(n) ? `${(n * 100).toFixed(2)}%` : '—')
+const secs = (ms) => (Number.isFinite(ms) ? `${Math.round(ms / 1000)}s` : '—')
+const link = (v) => `<a href="${escapeHtml(v.instagramUrl)}">${escapeHtml(v.title)}</a>`
+
+function scored(videos, today, maxAge) {
+  return videos
+    .filter((v) => v.publishedDate && Number.isFinite(v.views))
+    .map((v) => ({ ...v, age: ageDays(v.publishedDate, today) }))
+    .filter((v) => v.age >= 0 && v.age <= maxAge)
+}
+
+export function renderHelp() {
+  return [
+    '<b>🤖 Nathamuni Insta Coach</b>',
+    '',
+    'Just ask “what should I post next?”, or use:',
+    '/next — what to post next, with an example to copy',
+    '/today — today’s report',
+    '/best — top 5 reels (last 30 days)',
+    '/when — best time to post',
+    '/goal — pace to 50k',
+    '/boost — is anything worth boosting?',
+    '/reel &lt;link&gt; — stats and words of one reel',
+    '',
+    '<i>Data refreshes daily at 8 AM.</i>',
+  ].join('\n')
+}
+
+export function renderBest(videos, today, transcripts = {}) {
+  const top = scored(videos, today, 30)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5)
+  if (!top.length) return 'No reels with stats in the last 30 days yet.'
+  const lines = ['<b>🏆 Top 5 — last 30 days</b>', '']
+  top.forEach((v, i) => {
+    lines.push(`${i + 1}. ${link(v)}`)
+    lines.push(`   ${fmt(v.views)} views · ${pct(v.reach ? v.shares / v.reach : NaN)} shared · ${secs(v.avgWatchTimeMs)} watched`)
+    const hook = transcripts[sc(v.instagramUrl)]?.hook
+    if (hook) lines.push(`   🎙 “${escapeHtml(hook.slice(0, 90))}”`)
+  })
+  return lines.join('\n')
+}
+
+export function renderWhen(today) {
+  const dow = new Date(Date.parse(today)).getUTCDay() // 0 = Sunday
+  const strong = [0, 1, 2].includes(dow)
+  return [
+    '<b>⏰ When to post</b>',
+    '',
+    `• Today: <b>6–9 pm IST</b>${strong ? ' (one of your 3 strongest days)' : ''}`,
+    '• Strongest days: Tue, Mon, Sun',
+    '• Post ~15 min before 6 pm so it is live as followers arrive',
+    '',
+    '<i>From your follower active-hours (Nov 19 screenshots). Per-reel posting-hour analysis is coming.</i>',
+  ].join('\n')
+}
+
+export function goalStats(history, target = 50000) {
+  const h = [...history].sort((a, b) => a.date.localeCompare(b.date))
+  const last = h.at(-1)
+  if (!last) return null
+  const ref = [...h].reverse().find((x) => Date.parse(last.date) - Date.parse(x.date) >= 14 * 86400000) ?? h[0]
+  const days = Math.max(1, Math.round((Date.parse(last.date) - Date.parse(ref.date)) / 86400000))
+  const perDay = (last.followers - ref.followers) / days
+  const remaining = target - last.followers
+  const etaDays = perDay > 0 ? Math.ceil(remaining / perDay) : null
+  const eta = etaDays ? new Date(Date.parse(last.date) + etaDays * 86400000).toISOString().slice(0, 10) : null
+  return { now: last.followers, perDay, remaining, etaDays, eta, window: days }
+}
+
+export function renderGoal(history) {
+  const g = goalStats(history)
+  if (!g) return 'No follower history yet.'
+  return [
+    '<b>🎯 Road to 50k</b>',
+    '',
+    `• Now: <b>${g.now.toLocaleString('en-IN')}</b> (${((g.now / 50000) * 100).toFixed(1)}%)`,
+    `• Pace: ${g.perDay >= 0 ? '+' : ''}${g.perDay.toFixed(0)}/day (last ${g.window} days)`,
+    `• To go: ${g.remaining.toLocaleString('en-IN')}`,
+    g.eta ? `• At this pace: <b>${g.eta}</b> (~${Math.round(g.etaDays / 30)} months)` : '• Pace is flat — need a spike reel',
+    '',
+    '<i>One viral reel moves this a lot: Nov 7–9 added ~2,200 in 2 days.</i>',
+  ].join('\n')
+}
+
+export function renderBoost(report) {
+  const boosts = report.alerts.filter((a) => a.kind === 'boost')
+  if (boosts.length) return ['<b>💸 Boost</b>', '', ...boosts.map((a) => `• ${escapeHtml(a.text)}`)].join('\n')
+  return [
+    '<b>💸 Boost</b>',
+    '',
+    `Nothing qualifies right now. Rule: a reel ≤2 days old reaching ${RULES.boostReachMultiple}× your median reach (${fmt(report.med.reach)} → ${fmt(report.med.reach * RULES.boostReachMultiple)}).`,
+    '',
+    'Don’t boost an average reel — boost money follows what is already working.',
+  ].join('\n')
+}
+
+export function renderReel(videos, query, transcripts = {}, med = {}) {
+  const code = sc(query.trim())
+  const v = videos.find((x) => sc(x.instagramUrl) === code)
+  if (!code || !v) return 'Send /reel followed by the reel link, e.g. /reel https://www.instagram.com/reel/ABC123/'
+  const t = transcripts[code]
+  const lines = [`<b>🎬 ${escapeHtml(v.title)}</b>`, `${v.publishedDate} · ${escapeHtml(v.category ?? '')}`, '']
+  if (Number.isFinite(v.views)) {
+    lines.push(`• Views ${fmt(v.views)}${med.views ? ` (${(v.views / med.views).toFixed(1)}× median)` : ''}`)
+    lines.push(`• Reach ${fmt(v.reach)} · shared ${pct(v.reach ? v.shares / v.reach : NaN)} · saved ${fmt(v.saved)}`)
+    lines.push(`• Watched ${secs(v.avgWatchTimeMs)} on average`)
+  } else lines.push('• No stats stored for this one (older post).')
+  if (t?.status === 'ok') {
+    lines.push('', `🎙 <b>Hook:</b> “${escapeHtml(t.hook)}”`, `<i>${escapeHtml(t.text.slice(0, 600))}${t.text.length > 600 ? '…' : ''}</i>`)
+  } else if (t?.status === 'no-speech') lines.push('', '🎵 No speech (music/visual reel).')
+  else lines.push('', '🎙 Transcript not ready yet.')
+  return lines.join('\n')
+}
+
+/** "What should I post next?" — rule-based until the Claude step is switched on. */
+export function renderNext(report, videos, today, transcripts = {}) {
+  const lines = ['<b>🎬 Post next</b>', '']
+  const part2 = report.alerts.find((a) => a.kind === 'part2')
+  if (part2) lines.push(`🔥 <b>First:</b> ${escapeHtml(part2.text)}`, '')
+
+  const cat = report.pick.cat
+  lines.push(`<b>Topic:</b> ${escapeHtml(cat)} (${report.pick.have} of ${report.pick.target} this week)`)
+  const model = scored(videos, today, 120)
+    .filter((v) => v.category === cat)
+    .sort((a, b) => (b.reach ? b.shares / b.reach : 0) - (a.reach ? a.shares / a.reach : 0) || b.views - a.views)[0]
+  if (model) {
+    lines.push(`<b>Copy the shape of:</b> ${link(model)}`)
+    lines.push(`   ${fmt(model.views)} views · ${pct(model.reach ? model.shares / model.reach : NaN)} shared`)
+    const hook = transcripts[sc(model.instagramUrl)]?.hook
+    if (hook) lines.push(`   It opened with: “${escapeHtml(hook.slice(0, 100))}”`)
+  }
+  lines.push(`<b>When:</b> ${escapeHtml(BEST_TIME)}`)
+  lines.push('<b>Hook:</b> say the payoff in the first 2 seconds, in Tamil')
+  lines.push('<b>End:</b> a line people forward to a friend (shares drive reach)')
+  const hookAlert = report.alerts.find((a) => a.kind === 'hook')
+  if (hookAlert) lines.push('', `⚠ ${escapeHtml(hookAlert.text)}`)
+  lines.push('', '<i>Claude-written ideas and captions coming soon.</i>')
+  return lines.join('\n')
+}
