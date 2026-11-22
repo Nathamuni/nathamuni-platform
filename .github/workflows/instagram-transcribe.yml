@@ -1,0 +1,94 @@
+name: Instagram Transcribe
+
+# Turns what is said in each reel into text (lib/transcripts.json), on GitHub's runner.
+# Called by instagram-sync.yml after the daily sync; also runnable by hand with a small limit.
+# Up to `limit` reels per run, newest first, so the ~240 past reels backfill in ~4 daily runs.
+
+on:
+  workflow_call:
+    inputs:
+      limit:
+        type: number
+        default: 60
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max reels to transcribe this run'
+        type: number
+        default: 3
+
+permissions:
+  contents: write
+
+concurrency:
+  group: instagram-transcribe
+  cancel-in-progress: false
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    defaults:
+      run:
+        working-directory: sites/nathamuni-com
+    env:
+      WHISPER_MODEL: large-v3
+      WORK: ${{ runner.temp }}/reels
+    steps:
+      - name: Checkout latest main (includes this morning's sync)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: sites/nathamuni-com/scripts/requirements-transcribe.txt
+
+      - name: Cache Whisper model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: whisper-${{ env.WHISPER_MODEL }}-v1
+
+      - name: Install ffmpeg and faster-whisper
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install -q -r scripts/requirements-transcribe.txt
+
+      - name: Fetch audio for reels without a transcript
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          TRANSCRIBE_LIMIT: ${{ inputs.limit }}
+        run: node scripts/ig-transcribe.mjs prep "$WORK"
+
+      - name: Transcribe with Whisper
+        run: python scripts/transcribe.py "$WORK"
+
+      - name: Save transcripts
+        if: ${{ !cancelled() }}
+        run: node scripts/ig-transcribe.mjs merge "$WORK"
+
+      - name: Commit and push
+        if: ${{ !cancelled() }}
+        run: |
+          if git diff --quiet -- lib/transcripts.json && git ls-files --error-unmatch lib/transcripts.json >/dev/null 2>&1; then
+            echo "No new transcripts."
+            exit 0
+          fi
+          git config user.name "instagram-sync[bot]"
+          git config user.email "actions@github.com"
+          git add lib/transcripts.json
+          git commit -m "FEAT: transcribe reels"
+          for i in 1 2 3; do
+            git pull --rebase -q origin main && git push && exit 0
+            sleep 10
+          done
+          exit 1
