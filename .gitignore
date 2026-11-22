@@ -33,3 +33,7 @@ coverage/
 
 # Local harness (not committed)
 explanations/
+
+# Private Instagram research (audience stats, ad payments) — repo is public
+research/ig-screens/
+research/2026-11-19-ig-active-hours.md
