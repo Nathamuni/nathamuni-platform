@@ -33,7 +33,7 @@ jobs:
         working-directory: sites/nathamuni-com
     env:
       WHISPER_MODEL: large-v3
-      WORK: ${{ runner.temp }}/reels
+      WORK: /tmp/reels
     steps:
       - name: Checkout latest main (includes this morning's sync)
         uses: actions/checkout@v4
