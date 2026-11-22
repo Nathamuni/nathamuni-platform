@@ -232,6 +232,8 @@ export function renderHelp() {
     '/goal — pace to 50k',
     '/boost — is anything worth boosting?',
     '/reel &lt;link&gt; — stats and words of one reel',
+    '/week — weekly review',
+    '/mute · /unmute — pause or resume reminders',
     '',
     '<i>Data refreshes daily at 8 AM.</i>',
   ].join('\n')
@@ -349,5 +351,81 @@ export function renderNext(report, videos, today, transcripts = {}) {
   const hookAlert = report.alerts.find((a) => a.kind === 'hook')
   if (hookAlert) lines.push('', `⚠ ${escapeHtml(hookAlert.text)}`)
   lines.push('', '<i>Claude-written ideas and captions coming soon.</i>')
+  return lines.join('\n')
+}
+
+// ---------------------------------------------------------------------------
+// Scheduled push notifications (worker cron). Rule-based, no AI, no Instagram calls.
+
+/** 5:45 PM nudge. Returns null when a post already went out today (nothing to nag about). */
+export function renderEvening(report, videos, today, transcripts = {}) {
+  if (videos.some((v) => v.publishedDate === today)) return null
+  const next = renderNext(report, videos, today, transcripts)
+    .split('\n')
+    .filter((l) => !l.startsWith('<b>🎬 Post next') && !l.includes('coming soon'))
+  return ['<b>⏰ Posting window opens at 6 pm</b>', 'Not posted yet today? Here’s the plan:', ...next]
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+function weekStats(videos, today, fromAge, toAge) {
+  return videos
+    .filter((v) => v.publishedDate)
+    .map((v) => ({ ...v, age: ageDays(v.publishedDate, today) }))
+    .filter((v) => v.age >= fromAge && v.age < toAge)
+}
+
+export function renderWeekly(videos, history, today, transcripts = {}) {
+  const thisWeek = weekStats(videos, today, 0, 7)
+  const lastWeek = weekStats(videos, today, 7, 14)
+  const h = [...history].sort((a, b) => a.date.localeCompare(b.date))
+  const at = (daysAgo) => {
+    const target = new Date(Date.parse(today) - daysAgo * 86400000).toISOString().slice(0, 10)
+    return [...h].reverse().find((x) => x.date <= target)?.followers ?? null
+  }
+  const f0 = at(0)
+  const f7 = at(7)
+  const f14 = at(14)
+  const gainThis = f0 !== null && f7 !== null ? f0 - f7 : null
+  const gainLast = f7 !== null && f14 !== null ? f7 - f14 : null
+
+  const lines = ['<b>📅 Weekly review</b>', '']
+  lines.push(
+    `• Followers: <b>${gainThis === null ? '—' : (gainThis >= 0 ? '+' : '') + gainThis.toLocaleString('en-IN')}</b> this week` +
+      (gainLast !== null ? ` (last week ${(gainLast >= 0 ? '+' : '') + gainLast.toLocaleString('en-IN')})` : ''),
+  )
+  lines.push(`• Posts: ${thisWeek.length} (last week ${lastWeek.length})`)
+
+  const withStats = thisWeek.filter((v) => Number.isFinite(v.views)).sort((a, b) => b.views - a.views)
+  if (withStats.length) {
+    const best = withStats[0]
+    lines.push('', `🏆 <b>Best:</b> ${link(best)} — ${fmt(best.views)} views, ${pct(best.reach ? best.shares / best.reach : NaN)} shared`)
+    const hook = transcripts[sc(best.instagramUrl)]?.hook
+    if (hook) lines.push(`   Opened with: “${escapeHtml(hook.slice(0, 100))}”`)
+    if (withStats.length > 1) {
+      const worst = withStats.at(-1)
+      lines.push(`📉 <b>Weakest:</b> ${link(worst)} — ${fmt(worst.views)} views`)
+    }
+  }
+
+  // Category scoreboard for the week vs the weekly mix target.
+  const counts = {}
+  for (const v of thisWeek) counts[v.category] = (counts[v.category] ?? 0) + 1
+  lines.push('', '<b>Mix this week</b> (posted / target)')
+  for (const [cat, target] of Object.entries(WEEKLY_MIX)) {
+    const have = counts[cat] ?? 0
+    lines.push(`• ${escapeHtml(cat)}: ${have} / ${target}${have < target ? '' : ' ✅'}`)
+  }
+
+  // One change for next week: the category furthest below target, plus the best-shared one to double down on.
+  const gap = Object.entries(WEEKLY_MIX)
+    .map(([cat, target]) => ({ cat, d: target - (counts[cat] ?? 0) }))
+    .sort((a, b) => b.d - a.d)[0]
+  const byShare = withStats.filter((v) => v.reach > 0).sort((a, b) => b.shares / b.reach - a.shares / a.reach)[0]
+  lines.push('', '<b>Next week</b>')
+  if (gap && gap.d > 0) lines.push(`• Add more ${escapeHtml(gap.cat)} (${gap.d} short of target)`)
+  if (byShare) lines.push(`• Most shared was ${escapeHtml(byShare.category ?? 'it')} — make one more like “${escapeHtml(byShare.title)}”`)
+  if (!thisWeek.length) lines.push('• No posts this week — aim for 1 a day, 6–9 pm')
   return lines.join('\n')
 }

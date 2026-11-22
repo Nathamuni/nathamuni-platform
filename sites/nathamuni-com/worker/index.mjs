@@ -13,7 +13,7 @@
  */
 
 import { handleAuth } from './auth.mjs'
-import { handleTelegram } from './telegram.mjs'
+import { handleTelegram, handleScheduled } from './telegram.mjs'
 
 const MODEL = '@cf/baai/bge-m3'
 const TOP_K = 12
@@ -744,6 +744,10 @@ const worker = {
       }
     }
     return env.ASSETS.fetch(request)
+  },
+  // Telegram push reminders (crons in wrangler.jsonc).
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(handleScheduled(controller, env))
   },
 }
 

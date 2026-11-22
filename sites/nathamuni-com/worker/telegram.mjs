@@ -21,8 +21,15 @@ import {
   renderBoost,
   renderReel,
   renderNext,
+  renderEvening,
+  renderWeekly,
   istToday,
 } from '../scripts/ig-report-core.mjs'
+
+// Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
+export const CRON_EVENING = '15 12 * * *' // 5:45 pm IST daily
+export const CRON_WEEKLY = '30 13 * * 0' // 7:00 pm IST Sunday
+const MUTE_KEY = 'tg:muted'
 
 const RAW = 'https://raw.githubusercontent.com/Nathamuni/nathamuni-platform/main/sites/nathamuni-com/lib'
 
@@ -71,6 +78,8 @@ export function replyFor(text, data, today) {
       return renderReel(videos, arg, transcripts, report().med)
     case '/next':
       return renderNext(report(), videos, today, transcripts)
+    case '/week':
+      return renderWeekly(videos, history, today, transcripts)
     default:
       // A pasted reel link → reel details; any other plain message → "what to post next".
       if (/instagram\.com\/(reel|p)\//.test(text)) return renderReel(videos, text, transcripts, report().med)
@@ -101,6 +110,19 @@ export async function handleTelegram(request, env) {
     await send(env, msg.chat.id, 'This is a private bot.')
     return new Response('ok')
   }
+  const cmd = msg.text.trim().split(/\s+/)[0].toLowerCase().replace(/@\w+$/, '')
+  if (cmd === '/mute' || cmd === '/unmute') {
+    if (cmd === '/mute') await env.INBOX.put(MUTE_KEY, '1')
+    else await env.INBOX.delete(MUTE_KEY)
+    await send(
+      env,
+      msg.chat.id,
+      cmd === '/mute'
+        ? '🔕 Reminders paused (5:45 pm + Sunday review). The 8 am report and commands still work. /unmute to resume.'
+        : '🔔 Reminders back on: 5:45 pm posting nudge + Sunday 7 pm review.',
+    )
+    return new Response('ok')
+  }
   try {
     const data = await loadData()
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
@@ -109,4 +131,21 @@ export async function handleTelegram(request, env) {
     await send(env, msg.chat.id, 'Something went wrong reading the data. Try again in a minute.')
   }
   return new Response('ok')
+}
+
+/** Pure: which scheduled message to send for a cron, or null for none. Exported for tests. */
+export function scheduledMessage(cron, data, today) {
+  const { videos, insights, history, transcripts } = data
+  if (cron === CRON_EVENING) {
+    return renderEvening(buildReport({ videos, insights, history, today }), videos, today, transcripts)
+  }
+  if (cron === CRON_WEEKLY) return renderWeekly(videos, history, today, transcripts)
+  return null
+}
+
+export async function handleScheduled(controller, env) {
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return
+  if (await env.INBOX.get(MUTE_KEY)) return
+  const text = scheduledMessage(controller.cron, await loadData(), istToday())
+  if (text) await send(env, env.TELEGRAM_CHAT_ID, text)
 }

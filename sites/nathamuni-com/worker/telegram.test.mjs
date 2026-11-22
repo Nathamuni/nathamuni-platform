@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { replyFor, handleTelegram } from './telegram.mjs'
+import { replyFor, handleTelegram, scheduledMessage, CRON_EVENING, CRON_WEEKLY } from './telegram.mjs'
 
 const TODAY = '2026-11-22'
 const v = (o) => ({
@@ -64,5 +64,26 @@ describe('handleTelegram', () => {
       body: '{}',
     })
     expect((await handleTelegram(req, {})).status).toBe(403)
+  })
+})
+
+describe('scheduledMessage', () => {
+  it('sends the evening nudge when nothing was posted today', () => {
+    expect(scheduledMessage(CRON_EVENING, data, TODAY)).toContain('Posting window opens at 6 pm')
+  })
+  it('skips the evening nudge when a post already went out today', () => {
+    const posted = { ...data, videos: [...data.videos, v({ publishedDate: TODAY, instagramUrl: 'https://www.instagram.com/reel/NEW/' })] }
+    expect(scheduledMessage(CRON_EVENING, posted, TODAY)).toBeNull()
+  })
+  it('builds the Sunday review with follower gain and the mix', () => {
+    const text = scheduledMessage(CRON_WEEKLY, data, TODAY)
+    expect(text).toContain('Weekly review')
+    expect(text).toContain('Mix this week')
+  })
+  it('ignores unknown crons', () => {
+    expect(scheduledMessage('0 0 * * *', data, TODAY)).toBeNull()
+  })
+  it('/week replies with the review on demand', () => {
+    expect(replyFor('/week', data, TODAY)).toContain('Weekly review')
   })
 })
