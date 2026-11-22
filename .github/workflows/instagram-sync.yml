@@ -66,16 +66,14 @@ jobs:
           echo "::error::YouTube refresh token is expired/revoked — reels are syncing fine but YouTube cross-posting is silently broken. Re-run scripts/youtube-get-refresh-token.mjs locally and update the YOUTUBE_REFRESH_TOKEN secret."
           exit 1
 
-  # Speech-to-text for new reels (and the past-reel backfill, 40 a day), on GitHub's runner.
-  # Its own failure never blocks the report.
-  # PAUSED until a Tamil/Tanglish-capable method is chosen: Whisper produced unusable text on
-  # this speaker (2026-11-22 test). Re-enable by setting repo variable TRANSCRIBE_ENABLED=true.
+  # Gemini speech-to-text for new reels + the past-reel backfill (Whisper failed on Tanglish).
+  # Off until the quality test passes; switch on with repo variable TRANSCRIBE_ENABLED=true.
   transcribe:
     needs: sync
     if: ${{ !cancelled() && vars.TRANSCRIBE_ENABLED == 'true' }}
     uses: ./.github/workflows/instagram-transcribe.yml
     with:
-      limit: 40
+      limit: 15
     secrets: inherit
 
   report:

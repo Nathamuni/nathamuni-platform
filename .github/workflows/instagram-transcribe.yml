@@ -1,15 +1,16 @@
 name: Instagram Transcribe
 
-# Turns what is said in each reel into text (lib/transcripts.json), on GitHub's runner.
+# Turns what is said in each reel into text (lib/transcripts.json) with Gemini, on GitHub's runner.
 # Called by instagram-sync.yml after the daily sync; also runnable by hand with a small limit.
-# Up to `limit` reels per run, newest first, so the ~240 past reels backfill in ~6 daily runs.
+# Up to `limit` reels per run, newest first. Gemini's free tier is small (~20 requests/day per
+# project), so the ~240 past reels backfill over ~2 weeks; a daily-quota stop is not a failure.
 
 on:
   workflow_call:
     inputs:
       limit:
         type: number
-        default: 40
+        default: 15
   workflow_dispatch:
     inputs:
       limit:
@@ -27,13 +28,12 @@ concurrency:
 jobs:
   transcribe:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: sites/nathamuni-com
     env:
-      WHISPER_MODEL: large-v3-turbo
-      PYTHONUNBUFFERED: '1'
+      TRANSCRIBE_MODEL: gemini-3.5-flash
       WORK: /tmp/reels
     steps:
       - name: Checkout latest main (includes this morning's sync)
@@ -46,23 +46,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-          cache-dependency-path: sites/nathamuni-com/scripts/requirements-transcribe.txt
-
-      - name: Cache Whisper model
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/huggingface
-          key: whisper-${{ env.WHISPER_MODEL }}-v1
-
-      - name: Install ffmpeg and faster-whisper
-        run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-          pip install -q -r scripts/requirements-transcribe.txt
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
       - name: Fetch audio for reels without a transcript
         env:
@@ -70,9 +55,11 @@ jobs:
           TRANSCRIBE_LIMIT: ${{ inputs.limit }}
         run: node scripts/ig-transcribe.mjs prep "$WORK"
 
-      - name: Transcribe with Whisper
-        timeout-minutes: 120
-        run: python scripts/transcribe.py "$WORK"
+      - name: Transcribe with Gemini
+        timeout-minutes: 40
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/ig-transcribe-gemini.mjs "$WORK"
 
       - name: Save transcripts
         if: ${{ !cancelled() }}
