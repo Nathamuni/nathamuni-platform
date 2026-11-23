@@ -19,9 +19,12 @@ Code: `worker/commentdm.mjs` (tests beside it). Rules live in KV (`ig:rules`), e
 6. Test from a second Instagram account added as an app tester first.
 
 ## Telegram
-`/dm` lists rules; `/dm add keywords | message | reel link`; `/dm reply 1 | wording`; `/dm on|off [n]`;
-`/dm del n`; `/dm log`. A reel link limits a rule to that reel; the Worker looks up each comment's
-reel once and caches it in KV (`ig:media:<id>`). Reel-specific rules beat catch-all rules.
+`/dm` opens a button menu (Create a DM, My DMs, Turn ALL OFF/ON, Recent activity). Create asks one question at a
+time: video (5 newest with thumbnails, paging, All videos, or paste any link) → keyword → DM text → public reply
+(auto / none / own wording) → Save. My DMs shows one card per rule (thumbnail, Pause/Resume, Delete with confirm).
+Typed shortcuts still work: `/dm add keywords | message | reel link`, `/dm off 2`, `/dm del 2`, `/dm log`.
+UI code: `worker/dmui.mjs`; state machine and rules: `worker/commentdm.mjs`; `/menu` re-registers the "/" list.
+Only `TELEGRAM_CHAT_ID` is served. A reel link limits a rule to that reel (media id resolved once, cached in KV).
 
 ## Limits to remember
 - One DM per comment, within 7 days; DM text max 1000 UTF-8 bytes (Tamil = 3 bytes/char).

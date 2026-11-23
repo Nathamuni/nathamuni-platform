@@ -36,7 +36,8 @@ import {
   RATE_DAILY_CAP,
 } from '../scripts/ig-ai-core.mjs'
 import { geminiJson } from '../scripts/gemini.mjs'
-import { dmCommand, dmWizardTurn } from './commentdm.mjs'
+import { dmCommand } from './commentdm.mjs'
+import { dmHandle } from './dmui.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
 export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
@@ -116,7 +117,7 @@ export const MENU_COMMANDS = [
   { command: 'week', description: 'Weekly review' },
   { command: 'ideas', description: '5 AI reel ideas' },
   { command: 'idea', description: 'AI rates your idea' },
-  { command: 'dm', description: 'Comment → DM rules' },
+  { command: 'dm', description: 'Comment → DM: create, pause, delete' },
   { command: 'cancel', description: 'Stop a guided setup' },
   { command: 'mute', description: 'Pause reminders' },
   { command: 'unmute', description: 'Resume reminders' },
@@ -131,6 +132,55 @@ export async function setMenu(env) {
     body: JSON.stringify({ commands: MENU_COMMANDS }),
   })
   return res.ok
+}
+
+async function tg(env, method, body) {
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  return res.ok
+}
+
+const markup = (buttons) =>
+  buttons?.length ? { inline_keyboard: buttons.map((row) => row.map((x) => ({ text: x.t, callback_data: x.d }))) } : undefined
+
+/** Send an outbox from dmui.mjs: optional thumbnail album, optional photo card, text with buttons. */
+export async function playOutbox(env, chatId, outbox) {
+  for (const m of outbox) {
+    if (m.album?.length >= 2) {
+      // A dead thumbnail link fails the whole album; the numbered text list still works without it.
+      await tg(env, 'sendMediaGroup', { chat_id: chatId, media: m.album.map((a) => ({ type: 'photo', media: a.url, caption: a.caption })) }).catch(() => false)
+      if (!m.text) continue
+    }
+    if (m.photo) {
+      const ok = await tg(env, 'sendPhoto', { chat_id: chatId, photo: m.photo, caption: m.text, parse_mode: 'HTML', reply_markup: markup(m.buttons) }).catch(() => false)
+      if (ok) continue
+    }
+    if (m.text) {
+      await tg(env, 'sendMessage', { chat_id: chatId, text: m.text, parse_mode: 'HTML', link_preview_options: { is_disabled: true }, reply_markup: markup(m.buttons) })
+    }
+  }
+}
+
+async function loadVideos() {
+  return (await loadData()).videos
+}
+
+async function handleCallback(env, cb) {
+  await tg(env, 'answerCallbackQuery', { callback_query_id: cb.id }).catch(() => false)
+  const chatId = cb.message?.chat?.id
+  if (String(chatId) !== String(env.TELEGRAM_CHAT_ID) || !String(cb.data || '').startsWith('dm:')) return
+  // Remove the buttons that were tapped so a second tap cannot repeat the action.
+  await tg(env, 'editMessageReplyMarkup', { chat_id: chatId, message_id: cb.message.message_id, reply_markup: { inline_keyboard: [] } }).catch(() => false)
+  try {
+    const out = await dmHandle(env, { kind: 'button', data: cb.data }, loadVideos)
+    if (out) await playOutbox(env, chatId, out)
+  } catch (err) {
+    console.error('telegram dm button error:', err.message)
+    await send(env, chatId, 'Something went wrong. Send /dm to start again.')
+  }
 }
 
 async function send(env, chatId, text) {
@@ -148,6 +198,10 @@ export async function handleTelegram(request, env) {
     return new Response('forbidden', { status: 403 })
   }
   const update = await request.json().catch(() => null)
+  if (update?.callback_query) {
+    await handleCallback(env, update.callback_query)
+    return new Response('ok')
+  }
   const msg = update?.message
   // Always 200 so Telegram does not retry; ignore non-text and other people's chats.
   if (!msg?.text) return new Response('ok')
@@ -155,9 +209,15 @@ export async function handleTelegram(request, env) {
     await send(env, msg.chat.id, 'This is a private bot.')
     return new Response('ok')
   }
-  const guided = await dmWizardTurn(env, msg.text)
-  if (guided !== null) {
-    await send(env, msg.chat.id, guided)
+  try {
+    const guided = await dmHandle(env, { kind: 'text', text: msg.text }, loadVideos)
+    if (guided !== null) {
+      await playOutbox(env, msg.chat.id, guided)
+      return new Response('ok')
+    }
+  } catch (err) {
+    console.error('telegram dm error:', err.message)
+    await send(env, msg.chat.id, 'Something went wrong with /dm. Try again in a minute.')
     return new Response('ok')
   }
   const cmd = msg.text.trim().split(/\s+/)[0].toLowerCase().replace(/@\w+$/, '')

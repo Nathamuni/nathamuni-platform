@@ -443,10 +443,13 @@ const esc = (x) => String(x).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&l
 
 export const DM_HELP = [
   '<b>💬 Comment → DM</b>',
-  '/dm — list your rules',
-  '/dm new — I ask you step by step (keyword, message, reel, reply)',
-  '/cancel — stop a guided setup',
-  'Quick one-liner: /dm add keywords | message | reel link (link optional)',
+  '/dm — the menu (create, pause, delete, turn all off)',
+  '/dm new — create a DM, step by step',
+  '/dm list — your DMs as cards',
+  '/cancel — stop a setup',
+  '',
+  '<i>Typed shortcuts:</i>',
+  '/dm add keywords | message | reel link (link optional)',
   'Every comment gets the DM <i>and</i> a public reply (“Check your DM”) automatically.',
   '/dm reply 2 | wording — use your own wording instead (add several)',
   '/dm reply 2 clear — back to the automatic wording',
@@ -489,6 +492,7 @@ export function applyDmCommand(settings, argText) {
 
   try {
     if (sub === 'list') return { settings: s, changed: false, reply: renderRules(s) }
+    if (sub === 'help') return { settings: s, changed: false, reply: DM_HELP }
     if (sub === 'add') {
       const [keywords = '', dm = '', reelUrl = ''] = rest.split('|').map((x) => x.trim())
       const next = sanitizeSettings({ ...s, rules: [...s.rules, { keywords, dm, reelUrl }] })
@@ -532,126 +536,103 @@ export function applyDmCommand(settings, argText) {
 }
 
 /** Telegram entry point: load rules, apply the command, save if changed, return the reply. */
-export async function dmCommand(env, argText) {
-  if (/^\s*log\b/i.test(argText || '')) {
-    let log = []
-    try {
-      log = JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
-    } catch {
-      /* empty */
-    }
-    if (!log.length) return 'No comment → DM events yet.'
-    return ['<b>Last events</b>', '', ...log.slice(0, 5).map((e) => `• @${esc(e.user)} — “${esc(e.comment)}” → DM ${esc(e.dm)}, reply ${esc(e.reply)}`)].join('\n').slice(0, 3800)
+/** Last 5 events as Telegram HTML. */
+export async function dmLog(env) {
+  let log = []
+  try {
+    log = JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
+  } catch {
+    /* empty */
   }
+  if (!log.length) return 'No comment → DM events yet.'
+  return ['<b>Last events</b>', '', ...log.slice(0, 5).map((e) => `• @${esc(e.user)} — “${esc(e.comment)}” → DM ${esc(e.dm)}, reply ${esc(e.reply)}`)].join('\n').slice(0, 3800)
+}
+
+/** Telegram entry point for typed one-liners: load rules, apply the command, save if changed. */
+export async function dmCommand(env, argText) {
+  if (/^\s*log\b/i.test(argText || '')) return dmLog(env)
   const { settings, reply, changed } = applyDmCommand(await loadSettings(env), argText)
   if (changed) await env.INBOX.put(RULES_KEY, JSON.stringify(settings))
   return reply
 }
 
-// ── Telegram: guided setup ("/dm new" asks one question at a time) ──────────
+// ── Telegram: guided setup (state machine; the buttons and messages live in dmui.mjs) ──
 
 const FLOW_KEY = 'tg:dm:flow'
 const FLOW_TTL = 1800 // a half-finished setup is forgotten after 30 minutes
+const SHARE_MSG = 'That is an Instagram “share” link, which I cannot match to a reel. Open the reel, tap ⋯ → <b>Copy link</b>, and paste that one (it looks like instagram.com/reel/…).'
 
-const Q = {
-  keywords: '<b>Step 1/4 — Keyword</b>\nWhich word should people comment to get the DM?\nSeveral are fine, separated by commas. Example: <code>link, guide</code>',
-  dm: '<b>Step 2/4 — The DM</b>\nSend the exact message people will receive. Put your link inside it.\n<i>Max 1000 bytes (a Tamil letter counts as 3).</i>',
-  reel: '<b>Step 3/4 — Which reel?</b>\nPaste the reel or post link, or send <code>all</code> to use it on every reel and post.',
-  reply: '<b>Step 4/4 — Public reply</b>\nWhat should I reply under their comment?\n• <code>auto</code> — “Check your DM 📩” (varies a little)\n• <code>none</code> — no public reply, DM only\n• or type your own wording',
+export { esc }
+
+export async function flowGet(env) {
+  try {
+    return JSON.parse((await env.INBOX.get(FLOW_KEY)) || 'null')
+  } catch {
+    return null
+  }
 }
+export const flowPut = (env, flow) => env.INBOX.put(FLOW_KEY, JSON.stringify(flow), { expirationTtl: FLOW_TTL })
+export const flowDel = (env) => env.INBOX.delete(FLOW_KEY)
+export const newFlow = () => ({ step: 'reel', draft: {} })
 
-function summary(d) {
-  const where = d.reelUrl ? esc(d.reelUrl) : 'every reel and post'
-  const reply = d.noReply ? 'none (DM only)' : d.publicReplies?.length ? `“${esc(d.publicReplies[0])}”` : 'automatic “Check your DM”'
-  return [
-    '<b>Ready to save?</b>',
-    '',
-    `Keyword: <b>${esc(d.keywords)}</b>`,
-    `Where: ${where}`,
-    `Public reply: ${reply}`,
-    `DM:\n${esc(d.dm)}`,
-    '',
-    'Send <code>yes</code> to save, <code>no</code> to cancel.',
-  ].join('\n')
+export async function saveSettings(env, settings) {
+  const clean = sanitizeSettings(settings)
+  await env.INBOX.put(RULES_KEY, JSON.stringify(clean))
+  return clean
 }
+export const toggleRule = (s, id) => ({ ...s, rules: s.rules.map((r) => (r.id === id ? { ...r, enabled: r.enabled === false } : r)) })
+export const deleteRule = (s, id) => ({ ...s, rules: s.rules.filter((r) => r.id !== id) })
 
-/** Pure: one answer moves the guided setup forward. Returns { flow, reply, save? }. */
-export function advanceDm(flow, input) {
-  const text = String(input || '').trim()
-  const d = { ...flow.draft }
-  const stay = (reply) => ({ flow, reply })
-  switch (flow.step) {
-    case 'keywords':
-      if (!tokens(text).length) return stay('Send at least one word, for example: link')
-      d.keywords = text.slice(0, 200)
-      return { flow: { step: 'dm', draft: d }, reply: Q.dm }
-    case 'dm': {
-      const n = enc.encode(text).length
-      if (!text) return stay('The message is empty. Send the DM text.')
-      if (n > MAX_DM_BYTES) return stay(`That is ${n} bytes and the limit is ${MAX_DM_BYTES} (a Tamil letter counts as 3). Send a shorter message.`)
-      d.dm = text
-      return { flow: { step: 'reel', draft: d }, reply: Q.reel }
-    }
-    case 'reel': {
-      const url = extractInstagramUrl(text)
-      if (url && shortcodeOf(url)) d.reelUrl = url
-      else if (/instagram\.com\/share\//i.test(text)) return stay('That is an Instagram “share” link, which I cannot match to a reel. Open the reel, tap ⋯ → <b>Copy link</b>, and paste that one (it looks like instagram.com/reel/…).')
-      else if (/^(all|any|every)\b/i.test(text)) d.reelUrl = ''
-      else return stay('I could not find a reel link in that. Paste the link (instagram.com/reel/…), or send: all')
-      return { flow: { step: 'reply', draft: d }, reply: Q.reply }
-    }
-    case 'reply':
-      if (!text) return stay('Send auto, none, or your own wording.')
-      if (/^auto$/i.test(text)) Object.assign(d, { publicReplies: [], noReply: false })
-      else if (/^none$/i.test(text)) Object.assign(d, { publicReplies: [], noReply: true })
-      else Object.assign(d, { publicReplies: [text.slice(0, MAX_PUBLIC_REPLY)], noReply: false })
-      return { flow: { step: 'confirm', draft: d }, reply: summary(d) }
-    case 'confirm':
-      if (/^(yes|y|ok|save)$/i.test(text)) return { flow: null, save: d, reply: '' }
-      if (/^(no|n|cancel)$/i.test(text)) return { flow: null, reply: 'Cancelled. Nothing was saved.' }
-      return stay('Send <code>yes</code> to save or <code>no</code> to cancel.')
-    default:
-      return { flow: null, reply: 'Setup reset. Send /dm new to start again.' }
+export async function saveRule(env, draft) {
+  try {
+    const cur = await loadSettings(env)
+    const next = await saveSettings(env, { ...cur, rules: [...(cur.rules || []), draft] })
+    return { ok: true, n: next.rules.length }
+  } catch (err) {
+    return { ok: false, error: err.message }
   }
 }
 
 /**
- * Telegram hook, called for every owner message before normal commands. Returns the reply to
- * send, or null when this message is not part of a guided setup.
+ * Pure: one answer moves the setup forward. Order: video → keyword → DM → public reply → confirm.
+ * Returns { flow } to continue, { error } to re-ask, { flow: null, save } or { flow: null, cancel }.
  */
-export async function dmWizardTurn(env, text) {
-  const t = String(text || '').trim()
-  if (/^\/dm(@\w+)?\s+(new|add)\s*$/i.test(t)) {
-    await env.INBOX.put(FLOW_KEY, JSON.stringify({ step: 'keywords', draft: {} }), { expirationTtl: FLOW_TTL })
-    return `Let's set up a comment → DM rule. Send /cancel any time to stop.\n\n${Q.keywords}`
-  }
-  let flow = null
-  try {
-    flow = JSON.parse((await env.INBOX.get(FLOW_KEY)) || 'null')
-  } catch {
-    /* treat as none */
-  }
-  if (!flow) return null
-  if (/^\/cancel(@\w+)?$/i.test(t)) {
-    await env.INBOX.delete(FLOW_KEY)
-    return 'Cancelled. Nothing was saved.'
-  }
-  if (t.startsWith('/')) return null // other commands keep working; the setup waits
-
-  const out = advanceDm(flow, t)
-  if (!out.flow) await env.INBOX.delete(FLOW_KEY)
-  else await env.INBOX.put(FLOW_KEY, JSON.stringify(out.flow), { expirationTtl: FLOW_TTL })
-
-  if (out.save) {
-    try {
-      const current = await loadSettings(env)
-      const next = sanitizeSettings({ ...current, rules: [...(current.rules || []), out.save] })
-      await env.INBOX.put(RULES_KEY, JSON.stringify(next))
-      const n = next.rules.length
-      return `✅ Saved as rule ${n}. Anyone who comments <b>${esc(out.save.keywords)}</b> now gets the DM${out.save.noReply ? '' : ' and a public reply'}.\n\n/dm — see all rules · /dm off ${n} — pause this one`
-    } catch (err) {
-      return `⚠️ Could not save: ${esc(err.message)}. Send /dm new to try again.`
+export function advanceDm(flow, input) {
+  const text = String(input || '').trim()
+  const d = { ...flow.draft }
+  const err = (error) => ({ flow, error })
+  switch (flow.step) {
+    case 'reel': {
+      const url = extractInstagramUrl(text)
+      if (url && shortcodeOf(url)) d.reelUrl = url
+      else if (/instagram\.com\/share\//i.test(text)) return err(SHARE_MSG)
+      else if (/^(all|any|every)\b/i.test(text)) d.reelUrl = ''
+      else return err('I could not find a reel link in that. Tap a video, paste its link (instagram.com/reel/…), or tap <b>All videos</b>.')
+      return { flow: { step: 'keywords', draft: d } }
     }
+    case 'keywords':
+      if (!tokens(text).length) return err('Send at least one word, for example: link')
+      d.keywords = text.slice(0, 200)
+      return { flow: { step: 'dm', draft: d } }
+    case 'dm': {
+      const n = enc.encode(text).length
+      if (!text) return err('The message is empty. Send the DM text.')
+      if (n > MAX_DM_BYTES) return err(`That is ${n} bytes and the limit is ${MAX_DM_BYTES} (a Tamil letter counts as 3). Send a shorter message.`)
+      d.dm = text
+      return { flow: { step: 'reply', draft: d } }
+    }
+    case 'reply':
+    case 'replytext':
+      if (!text) return err('Send the wording, or tap a button.')
+      if (flow.step === 'reply' && /^auto$/i.test(text)) Object.assign(d, { publicReplies: [], noReply: false })
+      else if (flow.step === 'reply' && /^none$/i.test(text)) Object.assign(d, { publicReplies: [], noReply: true })
+      else Object.assign(d, { publicReplies: [text.slice(0, MAX_PUBLIC_REPLY)], noReply: false })
+      return { flow: { step: 'confirm', draft: d } }
+    case 'confirm':
+      if (/^(yes|y|ok|save)$/i.test(text)) return { flow: null, save: d }
+      if (/^(no|n|cancel)$/i.test(text)) return { flow: null, cancel: true }
+      return err('Tap <b>Save</b> or <b>Cancel</b>.')
+    default:
+      return { flow: null, cancel: true }
   }
-  return out.reply
 }
