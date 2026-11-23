@@ -126,12 +126,19 @@ export const MENU_COMMANDS = [
 
 export async function setMenu(env) {
   if (!env.TELEGRAM_BOT_TOKEN) return false
-  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/setMyCommands`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ commands: MENU_COMMANDS }),
-  })
-  return res.ok
+  const call = async (scope) => {
+    const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ commands: MENU_COMMANDS, ...(scope ? { scope } : {}) }),
+    })
+    if (!res.ok) console.error('setMyCommands failed:', res.status, (await res.text().catch(() => '')).slice(0, 200))
+    return res.ok
+  }
+  const everyone = await call()
+  // A list set for this one chat (by BotFather or an older setup) overrides the default, so set both.
+  if (env.TELEGRAM_CHAT_ID) await call({ type: 'chat', chat_id: Number(env.TELEGRAM_CHAT_ID) }).catch(() => false)
+  return everyone
 }
 
 /**
