@@ -238,6 +238,17 @@ export async function handleTelegram(request, env) {
     await send(env, msg.chat.id, 'This is a private bot.')
     return new Response('ok')
   }
+  // Self-heal: the "/" menu and button delivery are re-registered at most once an hour, whenever
+  // the owner sends any message, so nothing depends on remembering to run /menu.
+  try {
+    if (!(await env.INBOX.get('tg:setup'))) {
+      await env.INBOX.put('tg:setup', '1', { expirationTtl: 3600 })
+      await setMenu(env).catch(() => false)
+      await ensureWebhook(env).catch(() => false)
+    }
+  } catch {
+    /* never block a reply */
+  }
   try {
     const guided = await dmHandle(env, { kind: 'text', text: msg.text }, loadVideos)
     if (guided !== null) {
