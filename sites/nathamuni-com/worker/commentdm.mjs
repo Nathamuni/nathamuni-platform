@@ -213,7 +213,13 @@ export async function handleWebhook(request, env, ctx) {
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 })
 
   const raw = await request.text()
-  if (!(await verifySignature(raw, request.headers.get('x-hub-signature-256'), env.IG_APP_SECRET))) {
+  // IG_APP_SECRET may hold two comma-separated secrets (the Instagram app secret and the Meta
+  // app secret): which one signs the webhook depends on the app type, so accept either.
+  const sigHeader = request.headers.get('x-hub-signature-256')
+  const secrets = String(env.IG_APP_SECRET || '').split(',').map((x) => x.trim()).filter(Boolean)
+  let signed = false
+  for (const secret of secrets) if (await verifySignature(raw, sigHeader, secret)) signed = true
+  if (!signed) {
     return new Response('Bad signature', { status: 401 })
   }
   let payload
