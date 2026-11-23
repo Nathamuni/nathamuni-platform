@@ -108,3 +108,22 @@ describe('dispatchSync', () => {
     expect(JSON.parse(calls[0].init.body)).toEqual({ ref: 'main' })
   })
 })
+
+describe('setMenu', () => {
+  it('registers the / menu including /dm, and does nothing without a token', async () => {
+    const { setMenu, MENU_COMMANDS } = await import('./telegram.mjs')
+    expect(await setMenu({})).toBe(false)
+    const calls = []
+    const orig = globalThis.fetch
+    globalThis.fetch = async (url, init) => (calls.push({ url, init }), new Response('{}', { status: 200 }))
+    try {
+      expect(await setMenu({ TELEGRAM_BOT_TOKEN: 'T' })).toBe(true)
+    } finally {
+      globalThis.fetch = orig
+    }
+    expect(calls[0].url).toContain('/botT/setMyCommands')
+    const names = JSON.parse(calls[0].init.body).commands.map((c) => c.command)
+    expect(names).toEqual(expect.arrayContaining(['dm', 'cancel', 'next']))
+    expect(MENU_COMMANDS.every((c) => /^[a-z0-9_]{1,32}$/.test(c.command) && c.description.length <= 256)).toBe(true)
+  })
+})

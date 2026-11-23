@@ -104,6 +104,35 @@ export function replyFor(text, data, today) {
   }
 }
 
+/** The "/" menu inside Telegram. Registered by /menu and on every 8 am run so it never goes stale. */
+export const MENU_COMMANDS = [
+  { command: 'next', description: 'What to post next' },
+  { command: 'today', description: 'Today’s report' },
+  { command: 'best', description: 'Top 5 reels, last 30 days' },
+  { command: 'when', description: 'Best time to post' },
+  { command: 'goal', description: 'Pace to 50k' },
+  { command: 'boost', description: 'Is anything worth boosting?' },
+  { command: 'reel', description: 'Stats for one reel (send the link)' },
+  { command: 'week', description: 'Weekly review' },
+  { command: 'ideas', description: '5 AI reel ideas' },
+  { command: 'idea', description: 'AI rates your idea' },
+  { command: 'dm', description: 'Comment → DM rules' },
+  { command: 'cancel', description: 'Stop a guided setup' },
+  { command: 'mute', description: 'Pause reminders' },
+  { command: 'unmute', description: 'Resume reminders' },
+  { command: 'help', description: 'All commands' },
+]
+
+export async function setMenu(env) {
+  if (!env.TELEGRAM_BOT_TOKEN) return false
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ commands: MENU_COMMANDS }),
+  })
+  return res.ok
+}
+
 async function send(env, chatId, text) {
   await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
@@ -142,6 +171,10 @@ export async function handleTelegram(request, env) {
         ? '🔕 Reminders paused (5:45 pm + Sunday review). The 8 am report and commands still work. /unmute to resume.'
         : '🔔 Reminders back on: 5:45 pm posting nudge + Sunday 7 pm review.',
     )
+    return new Response('ok')
+  }
+  if (cmd === '/menu') {
+    await send(env, msg.chat.id, (await setMenu(env)) ? '✅ Command menu updated. Close and reopen the chat if the “/” list looks old.' : '⚠️ Could not update the menu.')
     return new Response('ok')
   }
   if (cmd === '/dm') {
@@ -231,7 +264,10 @@ export async function dispatchSync(env) {
 }
 
 export async function handleScheduled(controller, env) {
-  if (controller.cron === CRON_MORNING) return dispatchSync(env)
+  if (controller.cron === CRON_MORNING) {
+    await setMenu(env).catch(() => {})
+    return dispatchSync(env)
+  }
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return
   if (await env.INBOX.get(MUTE_KEY)) return
   const text = scheduledMessage(controller.cron, await loadData(), istToday())
