@@ -41,7 +41,7 @@ import { dmCommand } from './commentdm.mjs'
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
 export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
 export const CRON_EVENING = '15 12 * * *' // 5:45 pm IST daily
-export const CRON_WEEKLY = '30 13 * * 0' // 7:00 pm IST Sunday
+export const CRON_WEEKLY = '30 13 * * SUN' // 7:00 pm IST Sunday
 const MUTE_KEY = 'tg:muted'
 
 const RAW = 'https://raw.githubusercontent.com/Nathamuni/nathamuni-platform/main/sites/nathamuni-com/lib'
