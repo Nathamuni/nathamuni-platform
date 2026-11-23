@@ -12,7 +12,16 @@ Code: `worker/commentdm.mjs` (tests beside it). Rules live in KV (`ig:rules`), e
 4. **Cloudflare Access** (Zero Trust, free): self-hosted app covering `nathamuni.com/admin/*` **and**
    `nathamuni.com/api/admin/*`, policy = allow only your email (one-time PIN). Copy its AUD tag.
    Without this the admin routes return 403 (fail closed).
-5. Test from a second Instagram account added as an app tester (Development mode only serves app roles).
+5. **Go Live.** While the app is Unpublished, Meta only sends comment webhooks for people with a role
+   on the app (you + testers). Real followers need the app set to Live (Publish). Needs a privacy
+   policy URL (`https://nathamuni.com/privacy`) and may need Advanced Access for the comments
+   permission; reports conflict, so try Live + Standard Access first.
+6. Test from a second Instagram account added as an app tester first.
+
+## Telegram
+`/dm` lists rules; `/dm add keywords | message | reel link`; `/dm reply 1 | wording`; `/dm on|off [n]`;
+`/dm del n`; `/dm log`. A reel link limits a rule to that reel; the Worker looks up each comment's
+reel once and caches it in KV (`ig:media:<id>`). Reel-specific rules beat catch-all rules.
 
 ## Limits to remember
 - One DM per comment, within 7 days; DM text max 1000 UTF-8 bytes (Tamil = 3 bytes/char).

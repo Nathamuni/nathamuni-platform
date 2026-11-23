@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   matchesKeyword,
-  findRule,
+  matchingRules,
+  shortcodeOf,
+  applyDmCommand,
+  dmCommand,
   sanitizeSettings,
   verifySignature,
   extractComments,
@@ -40,10 +43,20 @@ describe('matching', () => {
   })
   it('respects off switches and the media filter', () => {
     const s = { enabled: true, rules: [{ ...rule, mediaId: '999999' }] }
-    expect(findRule(s, 'link', '555555')).toBeNull()
-    expect(findRule(s, 'link', '999999')).toBeTruthy()
-    expect(findRule({ ...s, enabled: false }, 'link', '999999')).toBeNull()
-    expect(findRule({ enabled: true, rules: [{ ...rule, enabled: false }] }, 'link', '1')).toBeNull()
+    expect(matchingRules(s, 'link', '555555')).toHaveLength(0)
+    expect(matchingRules(s, 'link', '999999')).toHaveLength(1)
+    expect(matchingRules({ ...s, enabled: false }, 'link', '999999')).toHaveLength(0)
+    expect(matchingRules({ enabled: true, rules: [{ ...rule, enabled: false }] }, 'link', '1')).toHaveLength(0)
+  })
+  it('puts a reel-specific rule ahead of the catch-all', () => {
+    const s = { enabled: true, rules: [{ ...rule, id: 'all' }, { ...rule, id: 'one', reel: 'ABC123' }] }
+    expect(matchingRules(s, 'link', '1').map((r) => r.id)).toEqual(['one', 'all'])
+  })
+  it('reads shortcodes from reel, post and profile-prefixed links', () => {
+    expect(shortcodeOf('https://www.instagram.com/reel/DaczeEJRhpZ/?igsh=x')).toBe('DaczeEJRhpZ')
+    expect(shortcodeOf('https://www.instagram.com/nathamuni_/reel/ABC_1-x/')).toBe('ABC_1-x')
+    expect(shortcodeOf('https://www.instagram.com/p/XYZ9/')).toBe('XYZ9')
+    expect(shortcodeOf('https://example.com/reel/ABC')).toBe('')
   })
 })
 
@@ -53,6 +66,11 @@ describe('sanitizeSettings', () => {
     expect(() => sanitizeSettings({ rules: [{ keywords: 'a', dm: '' }] })).toThrow(/empty/)
     expect(() => sanitizeSettings({ rules: [{ keywords: 'a', dm: 'த'.repeat(400) }] })).toThrow(/1000 bytes/)
     expect(() => sanitizeSettings({ rules: [{ keywords: 'a', dm: 'x', mediaId: 'abc' }] })).toThrow(/media ID/)
+  })
+  it('turns a reel link into a shortcode and rejects other links', () => {
+    const out = sanitizeSettings({ rules: [{ keywords: 'a', dm: 'x', reelUrl: 'https://www.instagram.com/reel/ABC123/' }] })
+    expect(out.rules[0].reel).toBe('ABC123')
+    expect(() => sanitizeSettings({ rules: [{ keywords: 'a', dm: 'x', reelUrl: 'https://example.com' }] })).toThrow(/reel or post link/)
   })
   it('cleans and keeps valid rules', () => {
     const out = sanitizeSettings({ rules: [{ keywords: ' link ', dm: ' hi ', publicReplies: [' a ', ''] }] })
@@ -149,5 +167,59 @@ describe('admin gate', () => {
     expect(await run({ ...good, exp: 500 })).toBeNull()
     const other = await crypto.subtle.generateKey({ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' }, true, ['sign', 'verify'])
     expect(await run(good, other.privateKey)).toBeNull()
+  })
+})
+
+describe('reel-specific rules', () => {
+  const reelRule = { ...rule, keywords: 'link', dm: 'Reel DM', reel: 'ABC123', publicReplies: [] }
+  const generic = { ...rule, id: 'g', keywords: 'link', dm: 'Generic DM', publicReplies: [] }
+  const run = async (permalink, text = 'link') => {
+    const INBOX = kv()
+    await INBOX.put('ig:rules', JSON.stringify({ enabled: true, rules: [generic, reelRule] }))
+    const f = vi.fn(async (url) => (String(url).includes('fields=permalink') ? Response.json({ permalink }) : Response.json({ ok: true })))
+    vi.stubGlobal('fetch', f)
+    await processComment({ INBOX, IG_ACCESS_TOKEN: 'T' }, { commentId: 'C9', text, mediaId: '777777', userId: 'U', username: 'fan', parentId: '' })
+    const sent = f.mock.calls.find(([u]) => String(u).includes('/messages'))
+    return { f, text: sent ? JSON.parse(sent[1].body).message.text : null, INBOX }
+  }
+  it('sends the reel DM on that reel and caches the lookup', async () => {
+    const r = await run('https://www.instagram.com/reel/ABC123/')
+    expect(r.text).toBe('Reel DM')
+    expect(await r.INBOX.get('ig:media:777777')).toBe('ABC123')
+  })
+  it('falls back to the catch-all on any other reel', async () => {
+    expect((await run('https://www.instagram.com/reel/OTHER/')).text).toBe('Generic DM')
+  })
+})
+
+describe('/dm Telegram command', () => {
+  const empty = { enabled: true, rules: [] }
+  it('adds a rule with a reel link, then lists it', () => {
+    const a = applyDmCommand(empty, 'add link, guide | Here you go https://x.test | https://www.instagram.com/reel/ABC123/')
+    expect(a.changed).toBe(true)
+    expect(a.settings.rules[0]).toMatchObject({ keywords: 'link, guide', dm: 'Here you go https://x.test', reel: 'ABC123' })
+    expect(applyDmCommand(a.settings, '').reply).toContain('reel ABC123')
+  })
+  it('explains mistakes instead of saving them', () => {
+    const r = applyDmCommand(empty, 'add link')
+    expect(r.changed).toBe(false)
+    expect(r.reply).toContain('DM message is empty')
+    expect(applyDmCommand(empty, 'del 3').reply).toContain('no rule 3')
+  })
+  it('adds and clears public replies, switches rules and deletes', () => {
+    let s = applyDmCommand(empty, 'add link | hi').settings
+    s = applyDmCommand(s, 'reply 1 | Sent you a DM!').settings
+    expect(s.rules[0].publicReplies).toEqual(['Sent you a DM!'])
+    s = applyDmCommand(s, 'reply 1 clear').settings
+    expect(s.rules[0].publicReplies).toEqual([])
+    expect(applyDmCommand(s, 'off 1').settings.rules[0].enabled).toBe(false)
+    expect(applyDmCommand(s, 'off').settings.enabled).toBe(false)
+    expect(applyDmCommand(s, 'del 1').settings.rules).toHaveLength(0)
+  })
+  it('escapes user text in replies and saves through KV', async () => {
+    const INBOX = kv()
+    const reply = await dmCommand({ INBOX }, 'add <b>x</b> | y')
+    expect(reply).toContain('&lt;b&gt;x')
+    expect(JSON.parse(await INBOX.get('ig:rules')).rules).toHaveLength(1)
   })
 })

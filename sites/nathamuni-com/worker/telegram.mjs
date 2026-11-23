@@ -36,6 +36,7 @@ import {
   RATE_DAILY_CAP,
 } from '../scripts/ig-ai-core.mjs'
 import { geminiJson } from '../scripts/gemini.mjs'
+import { dmCommand } from './commentdm.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
 export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
@@ -136,6 +137,10 @@ export async function handleTelegram(request, env) {
         ? '🔕 Reminders paused (5:45 pm + Sunday review). The 8 am report and commands still work. /unmute to resume.'
         : '🔔 Reminders back on: 5:45 pm posting nudge + Sunday 7 pm review.',
     )
+    return new Response('ok')
+  }
+  if (cmd === '/dm') {
+    await send(env, msg.chat.id, await dmCommand(env, msg.text.trim().slice(rawCmdLength(msg.text))))
     return new Response('ok')
   }
   if (cmd === '/idea') {

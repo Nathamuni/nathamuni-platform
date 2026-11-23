@@ -55,16 +55,26 @@ export function matchesKeyword(comment, keyword) {
   return ` ${tokens(comment).join(' ')} `.includes(` ${k} `)
 }
 
-/** First enabled rule whose keyword matches and whose media filter (if any) fits. */
-export function findRule(settings, text, mediaId) {
-  if (!settings || settings.enabled === false) return null
+/** Instagram reel/post link → shortcode ("DaczeEJRhpZ"), or "". Handles /<user>/reel/<code> too. */
+export function shortcodeOf(url) {
+  const m = String(url || '').match(/instagram\.com\/(?:[^/\s]+\/)?(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/)
+  return m ? m[1] : ''
+}
+
+/**
+ * Enabled rules whose keyword matches, most specific first, so a rule aimed at one reel beats
+ * the catch-all. The reel (link) check needs an API lookup, so processComment does that part.
+ */
+export function matchingRules(settings, text, mediaId) {
+  if (!settings || settings.enabled === false) return []
+  const hits = []
   for (const rule of settings.rules || []) {
     if (rule.enabled === false) continue
     if (rule.mediaId && rule.mediaId !== String(mediaId)) continue
-    const keywords = String(rule.keywords || '').split(',')
-    if (keywords.some((k) => matchesKeyword(text, k))) return rule
+    if (String(rule.keywords || '').split(',').some((k) => matchesKeyword(text, k))) hits.push(rule)
   }
-  return null
+  const specific = (r) => Number(Boolean(r.reel || r.mediaId))
+  return hits.sort((a, b) => specific(b) - specific(a))
 }
 
 const pick = (list) => (list.length ? list[Math.floor(Math.random() * list.length)] : '')
@@ -86,11 +96,16 @@ export function sanitizeSettings(input) {
       .slice(0, 8)
     const mediaId = String(r.mediaId ?? '').trim()
     if (mediaId && !/^\d{5,30}$/.test(mediaId)) throw new Error(`Rule ${i + 1}: media ID must be digits only`)
+    const reelUrl = String(r.reelUrl ?? '').trim().slice(0, 200)
+    const reel = reelUrl ? shortcodeOf(reelUrl) : ''
+    if (reelUrl && !reel) throw new Error(`Rule ${i + 1}: that is not an Instagram reel or post link`)
     return {
       id: String(r.id || crypto.randomUUID()).slice(0, 64),
       enabled: r.enabled !== false,
       keywords,
       mediaId,
+      reelUrl,
+      reel,
       dm,
       publicReplies,
     }
@@ -152,6 +167,29 @@ async function graphPost(env, path, body) {
   return data
 }
 
+async function graphGet(env, path) {
+  const res = await fetch(`${GRAPH}${path}`, { headers: { authorization: `Bearer ${await getToken(env)}` } })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(data?.error?.message || `Graph ${res.status}`)
+  return data
+}
+
+/** Which reel/post a comment is on, as a shortcode. Cached in KV: one lookup per video, ever. */
+export async function resolveShortcode(env, mediaId) {
+  if (!mediaId) return ''
+  const key = `ig:media:${mediaId}`
+  const hit = await env.INBOX.get(key)
+  if (hit) return hit
+  try {
+    const sc = shortcodeOf((await graphGet(env, `/${mediaId}?fields=permalink`)).permalink)
+    if (sc) await env.INBOX.put(key, sc, { expirationTtl: 30 * 86400 })
+    return sc
+  } catch (err) {
+    console.error('media lookup failed:', err.message)
+    return ''
+  }
+}
+
 async function appendLog(env, entry) {
   let log = []
   try {
@@ -175,7 +213,16 @@ export async function loadSettings(env) {
 export async function processComment(env, c) {
   try {
     if (c.parentId) return // replies inside a thread are not triggers
-    const rule = findRule(await loadSettings(env), c.text, c.mediaId)
+    let rule = null
+    let sc // looked up at most once, and only if a reel-specific rule is in play
+    for (const r of matchingRules(await loadSettings(env), c.text, c.mediaId)) {
+      if (r.reel) {
+        sc ??= await resolveShortcode(env, c.mediaId)
+        if (sc !== r.reel) continue
+      }
+      rule = r
+      break
+    }
     if (!rule) return
     const seenKey = `ig:seen:${c.commentId}`
     if (await env.INBOX.get(seenKey)) return // Meta retries webhooks
@@ -356,20 +403,123 @@ function render(){
     dm.oninput=()=>{r.dm=dm.value;upd()};upd();
     const pr=document.createElement('textarea');pr.value=(r.publicReplies||[]).join('\\n');pr.placeholder='One variant per line, e.g. Sent you a DM!';
     pr.oninput=()=>r.publicReplies=pr.value.split('\\n');
-    const md=document.createElement('input');md.type='text';md.value=r.mediaId||'';md.placeholder='Leave empty for every post';md.oninput=()=>r.mediaId=md.value;
+    const md=document.createElement('input');md.type='text';md.value=r.reelUrl||'';md.placeholder='https://www.instagram.com/reel/… (empty = every reel and post)';md.oninput=()=>r.reelUrl=md.value;
     const en=document.createElement('input');en.type='checkbox';en.checked=r.enabled!==false;en.onchange=()=>r.enabled=en.checked;
     const enl=document.createElement('label');enl.append(en,' Rule on');
     const del=document.createElement('button');del.className='d';del.textContent='Delete rule';del.onclick=()=>{settings.rules.splice(i,1);render()};
-    c.append(field('Keywords (comma separated)',kw),field('DM message (the link goes here)',dm),by,field('Public reply variants (optional)',pr),field('Only this media ID (optional)',md),enl,del);
+    c.append(field('Keywords (comma separated)',kw),field('DM message (the link goes here)',dm),by,field('Public reply variants (optional)',pr),field('Only this reel or post link (optional)',md),enl,del);
     box.appendChild(c)})
 }
 function renderLog(log){const b=$('log');b.textContent='';(log||[]).forEach(e=>{const tr=document.createElement('tr');[new Date(e.at).toLocaleString(),e.user,e.rule,e.dm,e.reply].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});b.appendChild(tr)})}
 async function load(){const r=await fetch('/api/admin/ig-rules');if(!r.ok){msg('Could not load ('+r.status+')',true);return}const d=await r.json();settings=d.settings;render();renderLog(d.log)}
 $('on').onchange=()=>settings.enabled=$('on').checked;
-$('add').onclick=()=>{settings.rules.push({keywords:'',dm:'',publicReplies:[],mediaId:'',enabled:true});render()};
+$('add').onclick=()=>{settings.rules.push({keywords:'',dm:'',publicReplies:[],reelUrl:'',enabled:true});render()};
 $('save').onclick=async()=>{
   const body={enabled:settings.enabled,rules:settings.rules.map(r=>({...r,publicReplies:(r.publicReplies||[]).map(x=>x.trim()).filter(Boolean)}))};
   const r=await fetch('/api/admin/ig-rules',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
   const d=await r.json();if(!r.ok){msg(d.error||'Save failed',true);return}settings=d.settings;render();msg('Saved ✓')};
 load();
 </script></main></body></html>`
+
+// ── Telegram: /dm command (owner chat only; gated in telegram.mjs) ──────────
+
+const esc = (x) => String(x).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[ch])
+
+export const DM_HELP = [
+  '<b>💬 Comment → DM</b>',
+  '/dm — list your rules',
+  '/dm add keywords | message | reel link (link optional)',
+  '/dm reply 2 | Sent you a DM! — add a public-reply wording to rule 2',
+  '/dm reply 2 clear — remove them',
+  '/dm off 2 · /dm on 2 — switch one rule',
+  '/dm off · /dm on — switch everything',
+  '/dm del 2 — delete rule 2',
+  '/dm log — last 5 events',
+  '',
+  '<i>Example:</i>',
+  '/dm add link, guide | Here is the guide 👉 https://drive.google.com/… | https://www.instagram.com/reel/ABC123/',
+].join('\n')
+
+export function renderRules(s) {
+  const head = `<b>💬 Comment → DM</b> — ${s.enabled === false ? 'OFF 🔴' : 'ON 🟢'}`
+  if (!s.rules.length) return `${head}\n\nNo rules yet.\n\n${DM_HELP}`
+  const lines = [head, '']
+  s.rules.forEach((r, i) => {
+    const where = r.reel ? `reel ${esc(r.reel)}` : r.mediaId ? `media ${esc(r.mediaId)}` : 'every reel and post'
+    const dm = r.dm.length > 70 ? `${r.dm.slice(0, 70)}…` : r.dm
+    lines.push(`${i + 1}. <b>${esc(r.keywords)}</b> → ${where}${r.enabled === false ? ' (off)' : ''}`)
+    lines.push(`   “${esc(dm)}”`)
+    lines.push(`   ${r.publicReplies?.length || 0} public reply wording(s)`)
+  })
+  return lines.join('\n').slice(0, 3800)
+}
+
+/** Pure: apply one /dm sub-command to the settings. Returns the new settings and the reply. */
+export function applyDmCommand(settings, argText) {
+  const s = { enabled: settings?.enabled !== false, rules: [...(settings?.rules || [])] }
+  const m = String(argText || '').trim().match(/^(\S+)\s*([\s\S]*)$/)
+  const sub = (m?.[1] || 'list').toLowerCase()
+  const rest = (m?.[2] || '').trim()
+  const idx = (x) => {
+    const n = Number(x)
+    return Number.isInteger(n) && n >= 1 && n <= s.rules.length ? n - 1 : -1
+  }
+  const fail = (why) => ({ settings: s, changed: false, reply: `⚠️ ${esc(why)}\n\n${DM_HELP}` })
+  const ok = (next, reply) => ({ settings: next, changed: true, reply })
+
+  try {
+    if (sub === 'list') return { settings: s, changed: false, reply: renderRules(s) }
+    if (sub === 'add') {
+      const [keywords = '', dm = '', reelUrl = ''] = rest.split('|').map((x) => x.trim())
+      const next = sanitizeSettings({ ...s, rules: [...s.rules, { keywords, dm, reelUrl }] })
+      const r = next.rules[next.rules.length - 1]
+      return ok(next, `✅ Rule ${next.rules.length} added: <b>${esc(r.keywords)}</b> → ${r.reel ? `reel ${esc(r.reel)}` : 'every reel and post'}\nAdd public replies with /dm reply ${next.rules.length} | wording`)
+    }
+    if (sub === 'on' || sub === 'off') {
+      if (!rest) return ok(sanitizeSettings({ ...s, enabled: sub === 'on' }), sub === 'on' ? '🟢 Comment → DM is ON.' : '🔴 Comment → DM is OFF. No DMs or replies will be sent.')
+      const i = idx(rest)
+      if (i < 0) return fail(`There is no rule ${rest}.`)
+      s.rules[i] = { ...s.rules[i], enabled: sub === 'on' }
+      return ok(sanitizeSettings(s), `Rule ${i + 1} is ${sub === 'on' ? 'on 🟢' : 'off 🔴'}.`)
+    }
+    if (sub === 'del') {
+      const i = idx(rest)
+      if (i < 0) return fail(`There is no rule ${rest}.`)
+      s.rules.splice(i, 1)
+      return ok(sanitizeSettings(s), `🗑 Rule ${i + 1} deleted.`)
+    }
+    if (sub === 'reply') {
+      const i = idx(rest.split(/[\s|]/)[0])
+      if (i < 0) return fail('Say which rule, e.g. /dm reply 1 | Sent you a DM!')
+      const body = rest.replace(/^\S+\s*\|?\s*/, '').trim()
+      if (/^clear$/i.test(body)) {
+        s.rules[i] = { ...s.rules[i], publicReplies: [] }
+        return ok(sanitizeSettings(s), `Rule ${i + 1} will not reply publicly.`)
+      }
+      if (!body) return fail('Write the wording after the |.')
+      s.rules[i] = { ...s.rules[i], publicReplies: [...(s.rules[i].publicReplies || []), body] }
+      const n = sanitizeSettings(s).rules[i].publicReplies.length
+      return ok(sanitizeSettings(s), `✅ Rule ${i + 1} now has ${n} public reply wording(s). One is picked at random.`)
+    }
+  } catch (err) {
+    return fail(err.message)
+  }
+  return fail(`Unknown /dm option "${sub}".`)
+}
+
+/** Telegram entry point: load rules, apply the command, save if changed, return the reply. */
+export async function dmCommand(env, argText) {
+  if (/^\s*log\b/i.test(argText || '')) {
+    let log = []
+    try {
+      log = JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
+    } catch {
+      /* empty */
+    }
+    if (!log.length) return 'No comment → DM events yet.'
+    return ['<b>Last events</b>', '', ...log.slice(0, 5).map((e) => `• @${esc(e.user)} — “${esc(e.comment)}” → DM ${esc(e.dm)}, reply ${esc(e.reply)}`)].join('\n').slice(0, 3800)
+  }
+  const { settings, reply, changed } = applyDmCommand(await loadSettings(env), argText)
+  if (changed) await env.INBOX.put(RULES_KEY, JSON.stringify(settings))
+  return reply
+}
