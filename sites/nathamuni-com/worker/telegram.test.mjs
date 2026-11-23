@@ -108,3 +108,86 @@ describe('dispatchSync', () => {
     expect(JSON.parse(calls[0].init.body)).toEqual({ ref: 'main' })
   })
 })
+
+describe('setMenu', () => {
+  it('registers the / menu including /dm, and does nothing without a token', async () => {
+    const { setMenu, MENU_COMMANDS } = await import('./telegram.mjs')
+    expect(await setMenu({})).toBe(false)
+    const calls = []
+    const orig = globalThis.fetch
+    globalThis.fetch = async (url, init) => (calls.push({ url, init }), new Response('{}', { status: 200 }))
+    try {
+      expect(await setMenu({ TELEGRAM_BOT_TOKEN: 'T' })).toBe(true)
+    } finally {
+      globalThis.fetch = orig
+    }
+    expect(calls[0].url).toContain('/botT/setMyCommands')
+    const names = JSON.parse(calls[0].init.body).commands.map((c) => c.command)
+    expect(names).toEqual(expect.arrayContaining(['dm', 'cancel', 'next']))
+    expect(MENU_COMMANDS.every((c) => /^[a-z0-9_]{1,32}$/.test(c.command) && c.description.length <= 256)).toBe(true)
+  })
+})
+
+describe('/dm over Telegram (buttons)', () => {
+  const mkEnv = () => {
+    const m = new Map()
+    return {
+      TELEGRAM_WEBHOOK_SECRET: 's',
+      TELEGRAM_CHAT_ID: '42',
+      TELEGRAM_BOT_TOKEN: 'T',
+      INBOX: { get: async (k) => m.get(k) ?? null, put: async (k, v) => void m.set(k, v), delete: async (k) => void m.delete(k) },
+    }
+  }
+  const post = (env, body) =>
+    handleTelegram(new Request('https://x/api/telegram', { method: 'POST', headers: { 'x-telegram-bot-api-secret-token': 's' }, body: JSON.stringify(body) }), env)
+  const withFetch = async (fn) => {
+    const calls = []
+    const orig = globalThis.fetch
+    globalThis.fetch = async (url, init) => {
+      calls.push({ url: String(url), body: init?.body ? JSON.parse(init.body) : null })
+      return String(url).includes('api.telegram.org') ? new Response('{"ok":true}') : Response.json([])
+    }
+    try {
+      await fn()
+    } finally {
+      globalThis.fetch = orig
+    }
+    return calls
+  }
+  it('/dm answers with the button menu', async () => {
+    const calls = await withFetch(() => post(mkEnv(), { message: { text: '/dm', chat: { id: 42 } } }))
+    const sent = calls.find((c) => c.url.endsWith('/sendMessage'))
+    expect(sent.body.text).toContain('What do you want to do?')
+    expect(JSON.stringify(sent.body.reply_markup)).toContain('dm:new')
+  })
+  it('a button tap from the owner answers the tap, removes the old buttons and replies', async () => {
+    const cb = { id: 'cb1', data: 'dm:home', message: { message_id: 7, chat: { id: 42 } } }
+    const calls = await withFetch(() => post(mkEnv(), { callback_query: cb }))
+    const methods = calls.map((c) => c.url.split('/').pop())
+    expect(methods).toEqual(expect.arrayContaining(['answerCallbackQuery', 'editMessageReplyMarkup', 'sendMessage']))
+  })
+  it('ignores button taps from any other chat', async () => {
+    const cb = { id: 'cb2', data: 'dm:g', message: { message_id: 7, chat: { id: 999 } } }
+    const env = mkEnv()
+    const calls = await withFetch(() => post(env, { callback_query: cb }))
+    expect(calls.map((c) => c.url.split('/').pop())).toEqual(['answerCallbackQuery'])
+    expect(await env.INBOX.get('ig:rules')).toBeNull()
+  })
+})
+
+describe('ensureWebhook', () => {
+  it('re-registers the webhook so button taps are delivered', async () => {
+    const { ensureWebhook } = await import('./telegram.mjs')
+    const calls = []
+    vi.stubGlobal('fetch', async (u, o) => {
+      calls.push([String(u).split('/').pop(), o?.body])
+      return new Response(JSON.stringify({ ok: true, result: { url: 'https://nathamuni.com/api/telegram', allowed_updates: ['message'] } }))
+    })
+    const r = await ensureWebhook({ TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_WEBHOOK_SECRET: 's' })
+    expect(r.ok).toBe(true)
+    expect(r.before).toBe('message')
+    const set = calls.find((c) => c[0] === 'setWebhook')
+    expect(JSON.parse(set[1])).toMatchObject({ url: 'https://nathamuni.com/api/telegram', secret_token: 's', allowed_updates: ['message', 'callback_query'] })
+    vi.unstubAllGlobals()
+  })
+})

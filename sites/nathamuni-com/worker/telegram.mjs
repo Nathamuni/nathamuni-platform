@@ -36,11 +36,13 @@ import {
   RATE_DAILY_CAP,
 } from '../scripts/ig-ai-core.mjs'
 import { geminiJson } from '../scripts/gemini.mjs'
+import { dmCommand, esc } from './commentdm.mjs'
+import { dmHandle } from './dmui.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
 export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
 export const CRON_EVENING = '15 12 * * *' // 5:45 pm IST daily
-export const CRON_WEEKLY = '30 13 * * 0' // 7:00 pm IST Sunday
+export const CRON_WEEKLY = '30 13 * * SUN' // 7:00 pm IST Sunday
 const MUTE_KEY = 'tg:muted'
 
 const RAW = 'https://raw.githubusercontent.com/Nathamuni/nathamuni-platform/main/sites/nathamuni-com/lib'
@@ -103,6 +105,113 @@ export function replyFor(text, data, today) {
   }
 }
 
+/** The "/" menu inside Telegram. Registered by /menu and on every 8 am run so it never goes stale. */
+export const MENU_COMMANDS = [
+  { command: 'next', description: 'What to post next' },
+  { command: 'today', description: 'Today’s report' },
+  { command: 'best', description: 'Top 5 reels, last 30 days' },
+  { command: 'when', description: 'Best time to post' },
+  { command: 'goal', description: 'Pace to 50k' },
+  { command: 'boost', description: 'Is anything worth boosting?' },
+  { command: 'reel', description: 'Stats for one reel (send the link)' },
+  { command: 'week', description: 'Weekly review' },
+  { command: 'ideas', description: '5 AI reel ideas' },
+  { command: 'idea', description: 'AI rates your idea' },
+  { command: 'dm', description: 'Comment → DM: create, pause, delete' },
+  { command: 'cancel', description: 'Stop a guided setup' },
+  { command: 'mute', description: 'Pause reminders' },
+  { command: 'unmute', description: 'Resume reminders' },
+  { command: 'help', description: 'All commands' },
+]
+
+export async function setMenu(env) {
+  if (!env.TELEGRAM_BOT_TOKEN) return false
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/setMyCommands`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ commands: MENU_COMMANDS }),
+  })
+  return res.ok
+}
+
+/**
+ * Make sure Telegram delivers button taps. A webhook registered with an allowed_updates list that
+ * lacks "callback_query" makes every button spin forever, so /menu re-registers it (same URL and
+ * secret) and reports what it found.
+ */
+export async function ensureWebhook(env) {
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_WEBHOOK_SECRET) return { ok: false }
+  const api = (m, body) =>
+    fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${m}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body || {}),
+    }).then((r) => r.json())
+  try {
+    const info = (await api('getWebhookInfo')).result || {}
+    if (!info.url) return { ok: false }
+    const allowed = info.allowed_updates
+    const res = await api('setWebhook', {
+      url: info.url,
+      secret_token: env.TELEGRAM_WEBHOOK_SECRET,
+      allowed_updates: ['message', 'callback_query'],
+    })
+    return { ok: !!res.ok, before: allowed?.length ? allowed.join(', ') : 'default', lastError: info.last_error_message || '' }
+  } catch {
+    return { ok: false }
+  }
+}
+
+async function tg(env, method, body) {
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) console.error(`telegram ${method} failed:`, res.status, (await res.text().catch(() => '')).slice(0, 200))
+  return res.ok
+}
+
+const markup = (buttons) =>
+  buttons?.length ? { inline_keyboard: buttons.map((row) => row.map((x) => ({ text: x.t, callback_data: x.d }))) } : undefined
+
+/** Send an outbox from dmui.mjs: optional thumbnail album, optional photo card, text with buttons. */
+export async function playOutbox(env, chatId, outbox) {
+  for (const m of outbox) {
+    if (m.album?.length >= 2) {
+      // A dead thumbnail link fails the whole album; the numbered text list still works without it.
+      await tg(env, 'sendMediaGroup', { chat_id: chatId, media: m.album.map((a) => ({ type: 'photo', media: a.url, caption: a.caption })) }).catch(() => false)
+      if (!m.text) continue
+    }
+    if (m.photo) {
+      const ok = await tg(env, 'sendPhoto', { chat_id: chatId, photo: m.photo, caption: m.text, parse_mode: 'HTML', reply_markup: markup(m.buttons) }).catch(() => false)
+      if (ok) continue
+    }
+    if (m.text) {
+      await tg(env, 'sendMessage', { chat_id: chatId, text: m.text, parse_mode: 'HTML', link_preview_options: { is_disabled: true }, reply_markup: markup(m.buttons) })
+    }
+  }
+}
+
+async function loadVideos() {
+  return (await loadData()).videos
+}
+
+async function handleCallback(env, cb) {
+  await tg(env, 'answerCallbackQuery', { callback_query_id: cb.id }).catch(() => false)
+  const chatId = cb.message?.chat?.id
+  if (String(chatId) !== String(env.TELEGRAM_CHAT_ID) || !String(cb.data || '').startsWith('dm:')) return
+  // Remove the buttons that were tapped so a second tap cannot repeat the action.
+  await tg(env, 'editMessageReplyMarkup', { chat_id: chatId, message_id: cb.message.message_id, reply_markup: { inline_keyboard: [] } }).catch(() => false)
+  try {
+    const out = await dmHandle(env, { kind: 'button', data: cb.data }, loadVideos)
+    if (out) await playOutbox(env, chatId, out)
+  } catch (err) {
+    console.error('telegram dm button error:', err.message)
+    await send(env, chatId, 'Something went wrong. Send /dm to start again.')
+  }
+}
+
 async function send(env, chatId, text) {
   await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
@@ -118,11 +227,26 @@ export async function handleTelegram(request, env) {
     return new Response('forbidden', { status: 403 })
   }
   const update = await request.json().catch(() => null)
+  if (update?.callback_query) {
+    await handleCallback(env, update.callback_query)
+    return new Response('ok')
+  }
   const msg = update?.message
   // Always 200 so Telegram does not retry; ignore non-text and other people's chats.
   if (!msg?.text) return new Response('ok')
   if (String(msg.chat.id) !== String(env.TELEGRAM_CHAT_ID)) {
     await send(env, msg.chat.id, 'This is a private bot.')
+    return new Response('ok')
+  }
+  try {
+    const guided = await dmHandle(env, { kind: 'text', text: msg.text }, loadVideos)
+    if (guided !== null) {
+      await playOutbox(env, msg.chat.id, guided)
+      return new Response('ok')
+    }
+  } catch (err) {
+    console.error('telegram dm error:', err.message)
+    await send(env, msg.chat.id, 'Something went wrong with /dm. Try again in a minute.')
     return new Response('ok')
   }
   const cmd = msg.text.trim().split(/\s+/)[0].toLowerCase().replace(/@\w+$/, '')
@@ -136,6 +260,21 @@ export async function handleTelegram(request, env) {
         ? '🔕 Reminders paused (5:45 pm + Sunday review). The 8 am report and commands still work. /unmute to resume.'
         : '🔔 Reminders back on: 5:45 pm posting nudge + Sunday 7 pm review.',
     )
+    return new Response('ok')
+  }
+  if (cmd === '/menu') {
+    const menuOk = await setMenu(env)
+    const hook = await ensureWebhook(env)
+    await send(
+      env,
+      msg.chat.id,
+      (menuOk ? '✅ Command menu updated. Close and reopen the chat if the “/” list looks old.' : '⚠️ Could not update the menu.') +
+        (hook.ok ? `\n✅ Buttons enabled (before: ${hook.before}${hook.lastError ? `; last error: ${esc(hook.lastError)}` : ''}).` : '\n⚠️ Could not check the button setting.'),
+    )
+    return new Response('ok')
+  }
+  if (cmd === '/dm') {
+    await send(env, msg.chat.id, await dmCommand(env, msg.text.trim().slice(rawCmdLength(msg.text))))
     return new Response('ok')
   }
   if (cmd === '/idea') {
@@ -221,7 +360,11 @@ export async function dispatchSync(env) {
 }
 
 export async function handleScheduled(controller, env) {
-  if (controller.cron === CRON_MORNING) return dispatchSync(env)
+  if (controller.cron === CRON_MORNING) {
+    await setMenu(env).catch(() => {})
+    await ensureWebhook(env).catch(() => {})
+    return dispatchSync(env)
+  }
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return
   if (await env.INBOX.get(MUTE_KEY)) return
   const text = scheduledMessage(controller.cron, await loadData(), istToday())
