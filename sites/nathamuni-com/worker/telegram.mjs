@@ -36,7 +36,7 @@ import {
   RATE_DAILY_CAP,
 } from '../scripts/ig-ai-core.mjs'
 import { geminiJson } from '../scripts/gemini.mjs'
-import { dmCommand } from './commentdm.mjs'
+import { dmCommand, dmWizardTurn } from './commentdm.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
 export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
@@ -124,6 +124,11 @@ export async function handleTelegram(request, env) {
   if (!msg?.text) return new Response('ok')
   if (String(msg.chat.id) !== String(env.TELEGRAM_CHAT_ID)) {
     await send(env, msg.chat.id, 'This is a private bot.')
+    return new Response('ok')
+  }
+  const guided = await dmWizardTurn(env, msg.text)
+  if (guided !== null) {
+    await send(env, msg.chat.id, guided)
     return new Response('ok')
   }
   const cmd = msg.text.trim().split(/\s+/)[0].toLowerCase().replace(/@\w+$/, '')

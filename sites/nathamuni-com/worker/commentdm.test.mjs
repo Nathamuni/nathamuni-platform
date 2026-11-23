@@ -5,6 +5,8 @@ import {
   shortcodeOf,
   applyDmCommand,
   dmCommand,
+  advanceDm,
+  dmWizardTurn,
   sanitizeSettings,
   verifySignature,
   extractComments,
@@ -243,5 +245,64 @@ describe('/dm Telegram command', () => {
     const reply = await dmCommand({ INBOX }, 'add <b>x</b> | y')
     expect(reply).toContain('&lt;b&gt;x')
     expect(JSON.parse(await INBOX.get('ig:rules')).rules).toHaveLength(1)
+  })
+})
+
+describe('guided /dm new setup', () => {
+  const kvWithTtl = () => {
+    const m = new Map()
+    return { get: async (k) => m.get(k) ?? null, put: async (k, v) => void m.set(k, v), delete: async (k) => void m.delete(k), _m: m }
+  }
+  it('ignores ordinary messages when no setup is running', async () => {
+    expect(await dmWizardTurn({ INBOX: kvWithTtl() }, 'hello')).toBeNull()
+    expect(await dmWizardTurn({ INBOX: kvWithTtl() }, '/dm')).toBeNull()
+  })
+  it('asks one question at a time and saves the rule after yes', async () => {
+    const env = { INBOX: kvWithTtl() }
+    expect(await dmWizardTurn(env, '/dm new')).toContain('Step 1/4')
+    expect(await dmWizardTurn(env, 'link, guide')).toContain('Step 2/4')
+    expect(await dmWizardTurn(env, 'Here you go https://drive.google.com/x')).toContain('Step 3/4')
+    expect(await dmWizardTurn(env, 'https://www.instagram.com/reel/ABC123/')).toContain('Step 4/4')
+    const sum = await dmWizardTurn(env, 'auto')
+    expect(sum).toContain('Ready to save')
+    expect(sum).toContain('ABC123')
+    expect(await dmWizardTurn(env, 'yes')).toContain('Saved as rule 1')
+    const saved = JSON.parse(await env.INBOX.get('ig:rules')).rules[0]
+    expect(saved).toMatchObject({ keywords: 'link, guide', dm: 'Here you go https://drive.google.com/x', reel: 'ABC123', noReply: false })
+    expect(await env.INBOX.get('tg:dm:flow')).toBeNull()
+  })
+  it('re-asks on bad input instead of moving on', async () => {
+    const env = { INBOX: kvWithTtl() }
+    await dmWizardTurn(env, '/dm new')
+    expect(await dmWizardTurn(env, '!!!')).toContain('at least one word')
+    await dmWizardTurn(env, 'link')
+    expect(await dmWizardTurn(env, 'த'.repeat(400))).toContain('limit is 1000')
+    await dmWizardTurn(env, 'hi')
+    expect(await dmWizardTurn(env, 'not a link')).toContain('does not look like')
+    expect(JSON.parse(await env.INBOX.get('tg:dm:flow')).step).toBe('reel')
+  })
+  it('supports all-reels, no public reply, custom wording and cancel', async () => {
+    const run = async (replyAnswer) => {
+      const env = { INBOX: kvWithTtl() }
+      for (const a of ['/dm add', 'link', 'hi', 'all', replyAnswer, 'yes']) await dmWizardTurn(env, a)
+      return JSON.parse(await env.INBOX.get('ig:rules')).rules[0]
+    }
+    expect(await run('none')).toMatchObject({ noReply: true, reel: '' })
+    expect(await run('Sent!')).toMatchObject({ noReply: false, publicReplies: ['Sent!'] })
+    const env = { INBOX: kvWithTtl() }
+    await dmWizardTurn(env, '/dm new')
+    expect(await dmWizardTurn(env, '/cancel')).toContain('Cancelled')
+    expect(await env.INBOX.get('ig:rules')).toBeNull()
+  })
+  it('lets other commands through mid-setup and keeps waiting', async () => {
+    const env = { INBOX: kvWithTtl() }
+    await dmWizardTurn(env, '/dm new')
+    expect(await dmWizardTurn(env, '/today')).toBeNull()
+    expect(JSON.parse(await env.INBOX.get('tg:dm:flow')).step).toBe('keywords')
+  })
+  it('answering no saves nothing', () => {
+    const out = advanceDm({ step: 'confirm', draft: { keywords: 'a', dm: 'b' } }, 'no')
+    expect(out.flow).toBeNull()
+    expect(out.save).toBeUndefined()
   })
 })
