@@ -23,10 +23,10 @@ Tests: 363 pass (`cd sites/nathamuni-com && npm test`). Lint and type-check are 
 - GitHub secrets: `IG_ACCESS_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `GEMINI_API_KEY`
 - GitHub repo variable: `TRANSCRIBE_ENABLED=true` (set `false` to stop speech-to-text)
 - Cloudflare Worker secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET`, `GEMINI_API_KEY`
-- **Missing:** Cloudflare secret `GH_DISPATCH_TOKEN` (see open item 1)
+- Cloudflare secret `GH_DISPATCH_TOKEN`: stored by the owner 2026-11-23 ~17:15 IST; first real use 2026-11-24 02:30 UTC (see open item 1)
 
 ## Open items, in order
-1. **8 AM trigger needs a token from the owner.** GitHub's cron started ~7.5 h late every day. The Worker cron
+1. **8 AM trigger: token now stored (2026-11-23); only the check below remains.** GitHub's cron started ~7.5 h late every day. The Worker cron
    (`dispatchSync` in `worker/telegram.mjs`) is deployed but does nothing without the token. Owner creates a
    fine-grained PAT at github.com/settings/personal-access-tokens/new: only repo `nathamuni-platform`, Actions Read
    and write, longest expiry. Store it with `printf '%s' "$TOKEN" | npx wrangler secret put GH_DISPATCH_TOKEN` in
