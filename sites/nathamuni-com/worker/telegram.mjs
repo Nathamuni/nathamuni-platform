@@ -36,7 +36,7 @@ import {
   RATE_DAILY_CAP,
 } from '../scripts/ig-ai-core.mjs'
 import { geminiJson } from '../scripts/gemini.mjs'
-import { dmCommand } from './commentdm.mjs'
+import { dmCommand, esc } from './commentdm.mjs'
 import { dmHandle } from './dmui.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
@@ -134,12 +134,41 @@ export async function setMenu(env) {
   return res.ok
 }
 
+/**
+ * Make sure Telegram delivers button taps. A webhook registered with an allowed_updates list that
+ * lacks "callback_query" makes every button spin forever, so /menu re-registers it (same URL and
+ * secret) and reports what it found.
+ */
+export async function ensureWebhook(env) {
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_WEBHOOK_SECRET) return { ok: false }
+  const api = (m, body) =>
+    fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${m}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body || {}),
+    }).then((r) => r.json())
+  try {
+    const info = (await api('getWebhookInfo')).result || {}
+    if (!info.url) return { ok: false }
+    const allowed = info.allowed_updates
+    const res = await api('setWebhook', {
+      url: info.url,
+      secret_token: env.TELEGRAM_WEBHOOK_SECRET,
+      allowed_updates: ['message', 'callback_query'],
+    })
+    return { ok: !!res.ok, before: allowed?.length ? allowed.join(', ') : 'default', lastError: info.last_error_message || '' }
+  } catch {
+    return { ok: false }
+  }
+}
+
 async function tg(env, method, body) {
   const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
   })
+  if (!res.ok) console.error(`telegram ${method} failed:`, res.status, (await res.text().catch(() => '')).slice(0, 200))
   return res.ok
 }
 
@@ -234,7 +263,14 @@ export async function handleTelegram(request, env) {
     return new Response('ok')
   }
   if (cmd === '/menu') {
-    await send(env, msg.chat.id, (await setMenu(env)) ? '✅ Command menu updated. Close and reopen the chat if the “/” list looks old.' : '⚠️ Could not update the menu.')
+    const menuOk = await setMenu(env)
+    const hook = await ensureWebhook(env)
+    await send(
+      env,
+      msg.chat.id,
+      (menuOk ? '✅ Command menu updated. Close and reopen the chat if the “/” list looks old.' : '⚠️ Could not update the menu.') +
+        (hook.ok ? `\n✅ Buttons enabled (before: ${hook.before}${hook.lastError ? `; last error: ${esc(hook.lastError)}` : ''}).` : '\n⚠️ Could not check the button setting.'),
+    )
     return new Response('ok')
   }
   if (cmd === '/dm') {
@@ -326,6 +362,7 @@ export async function dispatchSync(env) {
 export async function handleScheduled(controller, env) {
   if (controller.cron === CRON_MORNING) {
     await setMenu(env).catch(() => {})
+    await ensureWebhook(env).catch(() => {})
     return dispatchSync(env)
   }
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return

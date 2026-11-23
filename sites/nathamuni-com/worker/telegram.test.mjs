@@ -174,3 +174,20 @@ describe('/dm over Telegram (buttons)', () => {
     expect(await env.INBOX.get('ig:rules')).toBeNull()
   })
 })
+
+describe('ensureWebhook', () => {
+  it('re-registers the webhook so button taps are delivered', async () => {
+    const { ensureWebhook } = await import('./telegram.mjs')
+    const calls = []
+    vi.stubGlobal('fetch', async (u, o) => {
+      calls.push([String(u).split('/').pop(), o?.body])
+      return new Response(JSON.stringify({ ok: true, result: { url: 'https://nathamuni.com/api/telegram', allowed_updates: ['message'] } }))
+    })
+    const r = await ensureWebhook({ TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_WEBHOOK_SECRET: 's' })
+    expect(r.ok).toBe(true)
+    expect(r.before).toBe('message')
+    const set = calls.find((c) => c[0] === 'setWebhook')
+    expect(JSON.parse(set[1])).toMatchObject({ url: 'https://nathamuni.com/api/telegram', secret_token: 's', allowed_updates: ['message', 'callback_query'] })
+    vi.unstubAllGlobals()
+  })
+})
