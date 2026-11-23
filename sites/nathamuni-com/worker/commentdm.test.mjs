@@ -279,7 +279,7 @@ describe('guided /dm new setup', () => {
     await dmWizardTurn(env, 'link')
     expect(await dmWizardTurn(env, 'த'.repeat(400))).toContain('limit is 1000')
     await dmWizardTurn(env, 'hi')
-    expect(await dmWizardTurn(env, 'not a link')).toContain('does not look like')
+    expect(await dmWizardTurn(env, 'not a link')).toContain('could not find a reel link')
     expect(JSON.parse(await env.INBOX.get('tg:dm:flow')).step).toBe('reel')
   })
   it('supports all-reels, no public reply, custom wording and cancel', async () => {
