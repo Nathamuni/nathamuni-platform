@@ -11,6 +11,7 @@ import {
   processComment,
   handleWebhook,
   handleAdminApi,
+  DEFAULT_REPLIES,
   verifyAccess,
 } from './commentdm.mjs'
 
@@ -133,6 +134,19 @@ describe('processComment', () => {
     await processComment(env, { ...c, commentId: 'C2', parentId: 'P' })
     expect(f).not.toHaveBeenCalled()
   })
+  it('uses the automatic reply when a rule has no wordings, and none when switched off', async () => {
+    const { env, f } = await setup()
+    await env.INBOX.put('ig:rules', JSON.stringify({ enabled: true, rules: [{ ...rule, publicReplies: [] }] }))
+    await processComment(env, c)
+    const reply = f.mock.calls.find(([u]) => String(u).includes('/C1/replies'))
+    expect(DEFAULT_REPLIES).toContain(JSON.parse(reply[1].body).message)
+
+    const quiet = await setup()
+    await quiet.env.INBOX.put('ig:rules', JSON.stringify({ enabled: true, rules: [{ ...rule, publicReplies: [], noReply: true }] }))
+    await processComment(quiet.env, c)
+    expect(quiet.f.mock.calls.some(([u]) => String(u).includes('/replies'))).toBe(false)
+    expect(quiet.f.mock.calls.some(([u]) => String(u).includes('/messages'))).toBe(true)
+  })
   it('skips the public reply when the DM failed', async () => {
     const { env } = await setup()
     const f = vi.fn(async (url) => (String(url).includes('/messages') ? Response.json({ error: { message: 'blocked' } }, { status: 400 }) : Response.json({ ok: true })))
@@ -219,6 +233,7 @@ describe('/dm Telegram command', () => {
     expect(s.rules[0].publicReplies).toEqual(['Sent you a DM!'])
     s = applyDmCommand(s, 'reply 1 clear').settings
     expect(s.rules[0].publicReplies).toEqual([])
+    expect(applyDmCommand(s, 'reply 1 none').settings.rules[0].noReply).toBe(true)
     expect(applyDmCommand(s, 'off 1').settings.rules[0].enabled).toBe(false)
     expect(applyDmCommand(s, 'off').settings.enabled).toBe(false)
     expect(applyDmCommand(s, 'del 1').settings.rules).toHaveLength(0)

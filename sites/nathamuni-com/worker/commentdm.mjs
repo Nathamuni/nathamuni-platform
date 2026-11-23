@@ -35,6 +35,9 @@ const MAX_RULES = 50
 const MAX_DM_BYTES = 1000
 const MAX_PUBLIC_REPLY = 300
 
+// Used when a rule has no wordings of its own: the commenter is always told the DM is on its way.
+export const DEFAULT_REPLIES = ['Check your DM 📩', 'Sent you a DM 🙌', 'Just DMed you, check your inbox 📥']
+
 export const DEFAULT_SETTINGS = { enabled: true, rules: [] }
 
 const enc = new TextEncoder()
@@ -108,6 +111,7 @@ export function sanitizeSettings(input) {
       reel,
       dm,
       publicReplies,
+      noReply: r.noReply === true,
     }
   })
   return { enabled: input.enabled !== false, rules }
@@ -235,7 +239,8 @@ export async function processComment(env, c) {
       entry.dm = `failed: ${err.message}`.slice(0, 160)
     }
     // Only say "check your DM" when the DM really went out.
-    const variant = entry.dm === 'ok' ? pick(rule.publicReplies || []) : ''
+    const wordings = rule.publicReplies?.length ? rule.publicReplies : DEFAULT_REPLIES
+    const variant = entry.dm === 'ok' && !rule.noReply ? pick(wordings) : ''
     if (variant) {
       try {
         await graphPost(env, `/${c.commentId}/replies`, { message: variant })
@@ -402,19 +407,21 @@ function render(){
     const by=document.createElement('div');by.className='bytes';
     const upd=()=>{const n=bytes(dm.value);by.textContent=n+' / 1000 bytes';by.className='bytes'+(n>1000?' over':'')};
     dm.oninput=()=>{r.dm=dm.value;upd()};upd();
-    const pr=document.createElement('textarea');pr.value=(r.publicReplies||[]).join('\\n');pr.placeholder='One variant per line, e.g. Sent you a DM!';
+    const pr=document.createElement('textarea');pr.value=(r.publicReplies||[]).join('\\n');pr.placeholder='One per line. Empty = automatic "Check your DM" replies';
     pr.oninput=()=>r.publicReplies=pr.value.split('\\n');
     const md=document.createElement('input');md.type='text';md.value=r.reelUrl||'';md.placeholder='https://www.instagram.com/reel/… (empty = every reel and post)';md.oninput=()=>r.reelUrl=md.value;
     const en=document.createElement('input');en.type='checkbox';en.checked=r.enabled!==false;en.onchange=()=>r.enabled=en.checked;
     const enl=document.createElement('label');enl.append(en,' Rule on');
+    const nr=document.createElement('input');nr.type='checkbox';nr.checked=r.noReply===true;nr.onchange=()=>r.noReply=nr.checked;
+    const nrl=document.createElement('label');nrl.append(nr,' No public reply (DM only)');
     const del=document.createElement('button');del.className='d';del.textContent='Delete rule';del.onclick=()=>{settings.rules.splice(i,1);render()};
-    c.append(field('Keywords (comma separated)',kw),field('DM message (the link goes here)',dm),by,field('Public reply variants (optional)',pr),field('Only this reel or post link (optional)',md),enl,del);
+    c.append(field('Keywords (comma separated)',kw),field('DM message (the link goes here)',dm),by,field('Public reply wordings (optional)',pr),field('Only this reel or post link (optional)',md),enl,nrl,del);
     box.appendChild(c)})
 }
 function renderLog(log){const b=$('log');b.textContent='';(log||[]).forEach(e=>{const tr=document.createElement('tr');[new Date(e.at).toLocaleString(),e.user,e.rule,e.dm,e.reply].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});b.appendChild(tr)})}
 async function load(){const r=await fetch('/api/admin/ig-rules');if(!r.ok){msg('Could not load ('+r.status+')',true);return}const d=await r.json();settings=d.settings;render();renderLog(d.log)}
 $('on').onchange=()=>settings.enabled=$('on').checked;
-$('add').onclick=()=>{settings.rules.push({keywords:'',dm:'',publicReplies:[],reelUrl:'',enabled:true});render()};
+$('add').onclick=()=>{settings.rules.push({keywords:'',dm:'',publicReplies:[],reelUrl:'',enabled:true,noReply:false});render()};
 $('save').onclick=async()=>{
   const body={enabled:settings.enabled,rules:settings.rules.map(r=>({...r,publicReplies:(r.publicReplies||[]).map(x=>x.trim()).filter(Boolean)}))};
   const r=await fetch('/api/admin/ig-rules',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
@@ -430,8 +437,10 @@ export const DM_HELP = [
   '<b>💬 Comment → DM</b>',
   '/dm — list your rules',
   '/dm add keywords | message | reel link (link optional)',
-  '/dm reply 2 | Sent you a DM! — add a public-reply wording to rule 2',
-  '/dm reply 2 clear — remove them',
+  'Every comment gets the DM <i>and</i> a public reply (“Check your DM”) automatically.',
+  '/dm reply 2 | wording — use your own wording instead (add several)',
+  '/dm reply 2 clear — back to the automatic wording',
+  '/dm reply 2 none — DM only, no public reply',
   '/dm off 2 · /dm on 2 — switch one rule',
   '/dm off · /dm on — switch everything',
   '/dm del 2 — delete rule 2',
@@ -450,7 +459,7 @@ export function renderRules(s) {
     const dm = r.dm.length > 70 ? `${r.dm.slice(0, 70)}…` : r.dm
     lines.push(`${i + 1}. <b>${esc(r.keywords)}</b> → ${where}${r.enabled === false ? ' (off)' : ''}`)
     lines.push(`   “${esc(dm)}”`)
-    lines.push(`   ${r.publicReplies?.length || 0} public reply wording(s)`)
+    lines.push(`   public reply: ${r.noReply ? 'none (DM only)' : r.publicReplies?.length ? `${r.publicReplies.length} custom wording(s)` : 'automatic “Check your DM”'}`)
   })
   return lines.join('\n').slice(0, 3800)
 }
@@ -474,7 +483,7 @@ export function applyDmCommand(settings, argText) {
       const [keywords = '', dm = '', reelUrl = ''] = rest.split('|').map((x) => x.trim())
       const next = sanitizeSettings({ ...s, rules: [...s.rules, { keywords, dm, reelUrl }] })
       const r = next.rules[next.rules.length - 1]
-      return ok(next, `✅ Rule ${next.rules.length} added: <b>${esc(r.keywords)}</b> → ${r.reel ? `reel ${esc(r.reel)}` : 'every reel and post'}\nAdd public replies with /dm reply ${next.rules.length} | wording`)
+      return ok(next, `✅ Rule ${next.rules.length} added: <b>${esc(r.keywords)}</b> → ${r.reel ? `reel ${esc(r.reel)}` : 'every reel and post'}\nCommenters get the DM and an automatic “Check your DM” reply. Change it with /dm reply ${next.rules.length} | wording`)
     }
     if (sub === 'on' || sub === 'off') {
       if (!rest) return ok(sanitizeSettings({ ...s, enabled: sub === 'on' }), sub === 'on' ? '🟢 Comment → DM is ON.' : '🔴 Comment → DM is OFF. No DMs or replies will be sent.')
@@ -494,11 +503,15 @@ export function applyDmCommand(settings, argText) {
       if (i < 0) return fail('Say which rule, e.g. /dm reply 1 | Sent you a DM!')
       const body = rest.replace(/^\S+\s*\|?\s*/, '').trim()
       if (/^clear$/i.test(body)) {
-        s.rules[i] = { ...s.rules[i], publicReplies: [] }
-        return ok(sanitizeSettings(s), `Rule ${i + 1} will not reply publicly.`)
+        s.rules[i] = { ...s.rules[i], publicReplies: [], noReply: false }
+        return ok(sanitizeSettings(s), `Rule ${i + 1} uses the automatic “Check your DM” reply.`)
+      }
+      if (/^none$/i.test(body)) {
+        s.rules[i] = { ...s.rules[i], noReply: true }
+        return ok(sanitizeSettings(s), `Rule ${i + 1} sends the DM only, with no public reply.`)
       }
       if (!body) return fail('Write the wording after the |.')
-      s.rules[i] = { ...s.rules[i], publicReplies: [...(s.rules[i].publicReplies || []), body] }
+      s.rules[i] = { ...s.rules[i], noReply: false, publicReplies: [...(s.rules[i].publicReplies || []), body] }
       const n = sanitizeSettings(s).rules[i].publicReplies.length
       return ok(sanitizeSettings(s), `✅ Rule ${i + 1} now has ${n} public reply wording(s). One is picked at random.`)
     }
