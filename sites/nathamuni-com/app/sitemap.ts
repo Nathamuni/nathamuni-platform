@@ -4,6 +4,7 @@ import { getAllPosts } from '@/lib/blog'
 import { getAllCourses } from '@/lib/courses'
 import { getAllSessions } from '@/lib/sessions'
 import { SITE_URL } from '@/lib/site'
+import { getLatestDiet } from '@/lib/diet'
 
 export const dynamic = 'force-static'
 
@@ -23,6 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/ask`, priority: 0.6 },
     { url: `${SITE_URL}/courses`, priority: 0.8 },
     { url: `${SITE_URL}/sessions`, priority: 0.8 },
+    // Listed once a version is published; until then /diet is a placeholder.
+    ...(getLatestDiet() ? [{ url: `${SITE_URL}/diet`, priority: 0.7 }] : []),
   ]
   const courseRoutes: MetadataRoute.Sitemap = getAllCourses().map((course) => ({
     url: `${SITE_URL}/courses/${course.slug}`,

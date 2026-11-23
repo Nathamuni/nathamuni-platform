@@ -1,0 +1,150 @@
+{
+  "releases": [
+    {
+      "version": "1.3.0",
+      "date": "2026-11-23",
+      "name": "south-indian-satvahara",
+      "displayName": "South Indian Satvahara",
+      "developerName": "Nathamuni",
+      "shortDescription": "South Indian diet & nutrition",
+      "description": "A vegetarian-only, egg-free South Indian nutrition and lifestyle coach. Nathamuni is the AI companion identity, designed by Nathamuni. Supports flexible-duration meal plans, traditional foods, workout-aware nutrition, measurable nutrition analysis, eating-out discovery, progress reviews, and optional routine/reminder setup when supported by the host.",
+      "prompts": [
+        "Create a personalized meal plan for the duration I prefer, with South Indian vegetarian foods.",
+        "Build a practical meal routine around my wake-up and workout schedule, with optional reminders.",
+        "Analyze my meals and identify measurable nutritional gaps and improvements.",
+        "Help me find suitable vegetarian food when eating outside or ordering online."
+      ],
+      "hasSkill": true,
+      "file": "/downloads/diet/south-indian-satvahara-v1.3.0.zip",
+      "bytes": 52195,
+      "sha256": "b467120521284f835c2a7e7e79a611fc22d6b76a6157cdf5dc94c966c5ea6c91",
+      "files": [
+        {
+          "path": "plugin.json",
+          "bytes": 1791
+        },
+        {
+          "path": "README.md",
+          "bytes": 5173
+        },
+        {
+          "path": ".codex-plugin/plugin.json",
+          "bytes": 1324
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "bytes": 534
+        },
+        {
+          "path": "skills/nathamuni/SKILL.md",
+          "bytes": 44397
+        },
+        {
+          "path": "skills/nathamuni/references/challenge-reminder-handoff.md",
+          "bytes": 4890
+        },
+        {
+          "path": "skills/nathamuni/references/multilingual-natural-interaction.md",
+          "bytes": 3106
+        },
+        {
+          "path": "skills/nathamuni/references/master-coach-framework.md",
+          "bytes": 35804
+        },
+        {
+          "path": "skills/nathamuni/references/adaptive-food-solver.md",
+          "bytes": 1985
+        },
+        {
+          "path": "skills/nathamuni/references/south-indian-food-intelligence.md",
+          "bytes": 14664
+        },
+        {
+          "path": "skills/nathamuni/references/vegetarian-only-policy.md",
+          "bytes": 2424
+        },
+        {
+          "path": "skills/nathamuni/references/flexible-planner-routine.md",
+          "bytes": 4900
+        },
+        {
+          "path": "skills/nathamuni/references/planner-routine-acceptance-tests.md",
+          "bytes": 4282
+        }
+      ],
+      "notes": {
+        "title": "Flexible Planning & Routine Builder",
+        "text": "Adds user-selected plan duration (not limited to seven days), reusable meal rotations for longer horizons, flexible meal frequency, workout-aware scheduling, traditional South Indian food options, optional routine building, and consent-based timer/reminder/calendar handoff. The planner starts with a minimal useful plan, avoids repetitive long schedules, and never claims a notification was created without host confirmation.\n\nNew reference: `skills/nathamuni/references/flexible-planner-routine.md`.\n\nAcceptance tests: `skills/nathamuni/references/planner-routine-acceptance-tests.md`."
+      }
+    },
+    {
+      "version": "1.2.5",
+      "date": "2026-11-23",
+      "name": "south-indian-satvahara",
+      "displayName": "South Indian Satvahara",
+      "developerName": "Nathamuni",
+      "shortDescription": "South Indian diet & nutrition",
+      "description": "A vegetarian-only, egg-free multilingual South Indian diet and nutrition coach. Nathamuni is the AI companion identity, designed by Nathamuni. Supports global vegetarian options, personalized diet-quality analysis, adaptive challenges, daily check-ins, weekly reviews, and assisted ChatGPT reminder setup when supported by the host.",
+      "prompts": [
+        "Create a personalized egg-free vegetarian meal plan; I can explain my preferences in Tamil, Tanglish, or English.",
+        "Audit what I usually eat and identify practical improvements without banning familiar foods.",
+        "Help me improve protein, micronutrients, or fitness nutrition using foods I actually enjoy.",
+        "Turn my nutrition goal into a 7-day challenge and help me set up a gentle daily ChatGPT reminder."
+      ],
+      "hasSkill": true,
+      "file": "/downloads/diet/south-indian-satvahara-v1.2.5.zip",
+      "bytes": 43746,
+      "sha256": "fd786c174d98985c14d0ff1008f13e7c25cbc4ba2e45626949403fba276c2def",
+      "files": [
+        {
+          "path": "plugin.json",
+          "bytes": 1819
+        },
+        {
+          "path": "README.md",
+          "bytes": 4525
+        },
+        {
+          "path": ".codex-plugin/plugin.json",
+          "bytes": 1406
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "bytes": 592
+        },
+        {
+          "path": "skills/nathamuni/SKILL.md",
+          "bytes": 38377
+        },
+        {
+          "path": "skills/nathamuni/references/challenge-reminder-handoff.md",
+          "bytes": 4256
+        },
+        {
+          "path": "skills/nathamuni/references/multilingual-natural-interaction.md",
+          "bytes": 3106
+        },
+        {
+          "path": "skills/nathamuni/references/master-coach-framework.md",
+          "bytes": 32002
+        },
+        {
+          "path": "skills/nathamuni/references/adaptive-food-solver.md",
+          "bytes": 1985
+        },
+        {
+          "path": "skills/nathamuni/references/south-indian-food-intelligence.md",
+          "bytes": 14664
+        },
+        {
+          "path": "skills/nathamuni/references/vegetarian-only-policy.md",
+          "bytes": 2424
+        }
+      ],
+      "notes": {
+        "title": "South Indian Satvahara branding",
+        "text": "Updates the product name to South Indian Satvahara, uses Nathamuni as the skill/assistant identity, and adds consistent creator attribution and natural identity responses. The existing vegetarian-only, egg-free nutrition rules and safety framework remain in force."
+      }
+    }
+  ]
+}
