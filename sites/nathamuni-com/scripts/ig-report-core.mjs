@@ -235,6 +235,7 @@ export function renderHelp() {
     '/week — weekly review',
     '/ideas — 5 AI reel ideas (fresh each morning)',
     '/idea &lt;your idea&gt; — AI rates it + hook + caption',
+    '/dm new — set up a comment → DM rule step by step (/dm lists them)',
     '/mute · /unmute — pause or resume reminders',
     '',
     '<i>Data refreshes daily at 8 AM.</i>',

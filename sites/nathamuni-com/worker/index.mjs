@@ -13,7 +13,8 @@
  */
 
 import { handleAuth } from './auth.mjs'
-import { handleTelegram, handleScheduled } from './telegram.mjs'
+import { handleTelegram, handleScheduled, CRON_WEEKLY } from './telegram.mjs'
+import { handleWebhook, handleAdminApi, handleAdminPage, refreshToken } from './commentdm.mjs'
 import { handleDietLatest, DIET_LATEST_PATH } from './diet.mjs'
 
 const MODEL = '@cf/baai/bge-m3'
@@ -700,7 +701,7 @@ async function handleSearch(request, env) {
 }
 
 const worker = {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const { pathname } = new URL(request.url)
     if (pathname === '/api/videos') {
       return handleVideos(request, env)
@@ -736,6 +737,15 @@ const worker = {
     if (pathname === DIET_LATEST_PATH) {
       return handleDietLatest(request)
     }
+    if (pathname === '/api/ig/webhook') {
+      return handleWebhook(request, env, ctx)
+    }
+    if (pathname === '/api/admin/ig-rules') {
+      return handleAdminApi(request, env)
+    }
+    if (pathname === '/admin/comment-dm') {
+      return handleAdminPage(request, env)
+    }
     if (pathname === '/api/telegram') {
       return handleTelegram(request, env)
     }
@@ -752,6 +762,7 @@ const worker = {
   // Telegram push reminders (crons in wrangler.jsonc).
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(handleScheduled(controller, env))
+    if (controller.cron === CRON_WEEKLY) ctx.waitUntil(refreshToken(env))
   },
 }
 
