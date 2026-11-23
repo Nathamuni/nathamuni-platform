@@ -13,7 +13,8 @@
  */
 
 import { handleAuth } from './auth.mjs'
-import { handleTelegram, handleScheduled, CRON_WEEKLY } from './telegram.mjs'
+import { handleReport } from './report.mjs'
+import { handleTelegram, handleScheduled, loadVideos, CRON_WEEKLY } from './telegram.mjs'
 import { handleWebhook, handleAdminApi, handleAdminPage, refreshToken } from './commentdm.mjs'
 
 const MODEL = '@cf/baai/bge-m3'
@@ -741,6 +742,9 @@ const worker = {
     }
     if (pathname === '/admin/comment-dm') {
       return handleAdminPage(request, env)
+    }
+    if (pathname.startsWith('/report/')) {
+      return handleReport(request, env, loadVideos)
     }
     if (pathname === '/api/telegram') {
       return handleTelegram(request, env)
