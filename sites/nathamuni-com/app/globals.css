@@ -2096,123 +2096,507 @@ html[data-theme] .pg-head-stat.is-link:hover .pg-head-stat-label {
   color: var(--color-accent-tint);
 }
 
-/* ---------- /diet: the diet plugin download page ---------- */
+/* ---------- /diet: the diet plugin download page ----------
+   Readable first: every text block sits on a near-solid surface, not glass, because the
+   site backdrop moves behind it. The one authored motion is "flow": a light that travels
+   left to right along the install map (and down the step timeline), echoed by the
+   download button's colour stream. The button uses the site's fixed violet → pink so its
+   white label keeps ≥4.5:1 under every theme; the flow light follows the chosen theme. */
+.diet-page {
+  --diet-surface: color-mix(in srgb, var(--ground-solid) 92%, rgb(var(--lavender-rgb)) 8%);
+  --diet-surface-2: color-mix(in srgb, var(--ground-solid) 84%, rgb(var(--lavender-rgb)) 16%);
+  --diet-line: rgb(var(--lavender-rgb) / 0.22);
+  --diet-text: rgb(255 255 255 / 0.9);
+  --diet-soft: rgb(255 255 255 / 0.74);
+  --diet-stream: linear-gradient(110deg, #6d3fe0 0%, #a02fc0 25%, #d0287e 50%, #a02fc0 75%, #6d3fe0 100%);
+  --diet-light: linear-gradient(
+    90deg,
+    transparent,
+    rgb(var(--accent-rgb) / 0.9),
+    rgb(var(--cyan-rgb)),
+    rgb(var(--pink-rgb) / 0.9),
+    transparent
+  );
+  --diet-period: 5.6s;
+  color: var(--diet-text);
+}
+.diet-page ::selection {
+  background: rgb(var(--pink-rgb) / 0.45);
+  color: #fff;
+}
+.diet-page code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.88em;
+}
+
 @layer components {
+  /* ---- hero ---- */
+  .diet-hero {
+    @apply relative flex flex-col items-center text-center mx-auto pt-4 sm:pt-10 pb-4;
+    max-width: 52rem;
+    isolation: isolate;
+  }
+  .diet-hero::before {
+    content: '';
+    position: absolute;
+    inset: -2rem -10% -1rem;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 60% 55% at 50% 42%,
+      rgb(var(--ground-rgb) / 0.82),
+      rgb(var(--ground-rgb) / 0.55) 55%,
+      transparent 80%
+    );
+  }
+  .diet-title {
+    @apply font-display;
+    font-size: clamp(2.5rem, 7.5vw, 4.75rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    color: #fff;
+  }
+  .diet-tagline {
+    @apply mt-3 text-base sm:text-lg font-semibold;
+    color: var(--color-cyan-tint);
+  }
+  .diet-lede {
+    @apply mt-4 text-base sm:text-lg leading-relaxed;
+    max-width: 40rem;
+    color: var(--diet-soft);
+    text-wrap: pretty;
+  }
+
+  /* ---- the download button: a slow colour stream plus a glint ---- */
   .diet-cta {
-    @apply flex flex-wrap gap-3 mt-6;
+    @apply mt-8 flex flex-wrap items-center justify-center gap-3;
+  }
+  .diet-download {
+    @apply relative inline-flex items-center gap-2.5 rounded-full px-7 py-3.5 text-base font-semibold overflow-hidden;
+    color: #fff;
+    background: var(--diet-stream);
+    background-size: 300% 100%;
+    box-shadow:
+      0 12px 30px -12px rgb(208 40 126 / 0.65),
+      inset 0 1px 0 rgb(255 255 255 / 0.25);
+    animation: diet-stream 7s linear infinite;
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .diet-download::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.45) 50%, transparent 65%);
+    transform: translateX(-120%);
+    animation: diet-glint 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite 1s;
+    pointer-events: none;
+  }
+  .diet-download:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 18px 36px -12px rgb(208 40 126 / 0.75),
+      inset 0 1px 0 rgb(255 255 255 / 0.3);
+  }
+  .diet-download-icon {
+    @apply w-5 h-5 shrink-0;
+  }
+  .diet-secondary {
+    @apply rounded-full px-6 py-3.5 text-base font-semibold transition-colors;
+    color: #fff;
+    background: var(--diet-surface-2);
+    border: 1px solid var(--diet-line);
+  }
+  .diet-secondary:hover {
+    border-color: rgb(var(--cyan-rgb) / 0.6);
+  }
+
+  /* ---- facts and share link ---- */
+  .diet-facts {
+    @apply mt-8 grid grid-cols-2 gap-y-4 sm:flex sm:justify-center;
+  }
+  .diet-facts > div {
+    @apply px-5 flex flex-col items-center gap-0.5;
+  }
+  .diet-facts > div:nth-child(even) {
+    border-left: 1px solid var(--diet-line);
+  }
+  @media (min-width: 640px) {
+    .diet-facts > div + div {
+      border-left: 1px solid var(--diet-line);
+    }
+  }
+  .diet-facts dt {
+    @apply text-xs;
+    color: var(--diet-soft);
+  }
+  .diet-facts dd {
+    @apply font-display text-lg;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
   }
   .diet-stable {
-    @apply mt-5 flex flex-col gap-2 text-sm text-white/60;
+    @apply mt-7 flex flex-col items-center gap-2 text-sm;
+    color: var(--diet-soft);
   }
   .diet-stable-row,
   .diet-copyline {
-    @apply flex flex-wrap items-center gap-2;
+    @apply flex flex-wrap items-center justify-center gap-2;
   }
   .diet-stable code,
   .diet-copyline code {
-    @apply glass-card px-3 py-1.5 text-sm text-white/90 break-all;
-    font-family: ui-monospace, monospace;
-  }
-  .diet-copyline {
-    @apply mt-2;
+    @apply rounded-lg px-3 py-2 break-all;
+    color: #fff;
+    background: var(--diet-surface-2);
+    border: 1px solid var(--diet-line);
   }
   .diet-copy {
-    @apply glass-card px-3 py-1.5 text-xs font-semibold text-white/80 hover:text-white hover:border-white/40 transition-all;
-    min-height: 2rem;
+    @apply rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors;
+    min-height: 2.5rem;
+    color: #fff;
+    background: rgb(var(--accent-rgb) / 0.28);
+    border: 1px solid rgb(var(--accent-rgb) / 0.55);
   }
+  .diet-copy:hover {
+    background: rgb(var(--accent-rgb) / 0.42);
+  }
+
+  /* ---- section rhythm ---- */
   .diet-block {
-    @apply mt-12;
+    @apply mt-16 sm:mt-24;
+  }
+  .diet-h2 {
+    @apply font-display text-3xl sm:text-4xl text-center;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: #fff;
+  }
+  .diet-sub {
+    @apply mt-2 text-center text-base;
+    color: var(--diet-soft);
+  }
+  .diet-h3 {
+    @apply font-display text-xl mb-3 flex flex-col gap-1;
+    color: #fff;
+  }
+  .diet-h3 span {
+    @apply font-body text-sm font-semibold;
+    color: var(--color-cyan-tint);
   }
   .diet-muted {
-    @apply text-white/55 text-sm;
+    @apply text-sm;
+    color: var(--diet-soft);
   }
-  .diet-prompts {
-    @apply grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4;
+  .diet-center {
+    @apply text-center mt-6;
   }
-  .diet-prompts li {
-    @apply p-4 sm:p-5 text-white/85 text-sm leading-relaxed;
+  .diet-card {
+    @apply rounded-2xl p-5 sm:p-7;
+    background: var(--diet-surface);
+    border: 1px solid var(--diet-line);
+    box-shadow: 0 20px 50px -30px rgb(0 0 0 / 0.8);
   }
-  .diet-jump {
-    @apply flex flex-wrap gap-2 mt-3 mb-5;
+
+  /* ---- tabs ---- */
+  .diet-flow {
+    @apply mt-8 mx-auto;
+    max-width: 56rem;
   }
-  .diet-guide {
-    @apply p-5 sm:p-7 mb-5;
-    scroll-margin-top: 6rem;
+  .diet-tabs {
+    @apply mx-auto flex w-fit max-w-full gap-1 rounded-full p-1.5;
+    background: var(--diet-surface);
+    border: 1px solid var(--diet-line);
   }
-  .diet-guide h3 {
-    @apply font-display text-xl mb-1;
+  .diet-tab {
+    @apply rounded-full px-4 sm:px-6 py-2.5 text-sm sm:text-base font-semibold transition-colors;
+    min-height: 2.75rem;
+    color: var(--diet-soft);
   }
+  .diet-tab:hover {
+    color: #fff;
+  }
+  .diet-tab[aria-selected='true'] {
+    color: #fff;
+    background: var(--diet-stream);
+    background-size: 300% 100%;
+    box-shadow: 0 8px 20px -10px rgb(208 40 126 / 0.7);
+  }
+  .diet-panel {
+    @apply mt-6 rounded-3xl p-5 sm:p-9;
+    background: var(--diet-surface);
+    border: 1px solid var(--diet-line);
+    box-shadow: 0 30px 70px -40px rgb(0 0 0 / 0.9);
+  }
+  .diet-anchor {
+    display: block;
+    position: relative;
+    top: -8rem;
+  }
+  .diet-panel-intro {
+    @apply text-center text-base;
+    color: var(--diet-soft);
+  }
+
+  /* ---- the map: nodes on a track, a light runs along it ---- */
+  .diet-map {
+    @apply relative hidden sm:grid mt-8 mb-10;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  }
+  .diet-map::before,
+  .diet-map::after {
+    content: '';
+    position: absolute;
+    top: 1.75rem;
+    height: 2px;
+    left: calc(50% / var(--n));
+    right: calc(50% / var(--n));
+    border-radius: 2px;
+  }
+  .diet-map::before {
+    background: var(--diet-line);
+  }
+  .diet-map::after {
+    background: var(--diet-light) no-repeat;
+    background-size: 28% 100%;
+    background-position: 0% 0;
+    filter: drop-shadow(0 0 6px rgb(var(--cyan-rgb) / 0.8));
+    animation: diet-run var(--diet-period) linear infinite;
+  }
+  .diet-map li {
+    @apply relative z-10 flex flex-col items-center gap-2.5 text-center px-1;
+  }
+  .diet-map-node {
+    @apply grid place-items-center w-14 h-14 rounded-full;
+    color: #fff;
+    background: var(--diet-surface-2);
+    border: 1.5px solid rgb(var(--accent-rgb) / 0.55);
+    animation: diet-node var(--diet-period) ease-out infinite;
+    animation-delay: calc(var(--diet-period) * var(--i) / var(--n));
+  }
+  .diet-map-node svg {
+    @apply w-6 h-6;
+  }
+  .diet-map-label {
+    @apply text-sm font-semibold leading-tight;
+    color: #fff;
+  }
+
+  /* ---- the steps: a vertical timeline with the same light ---- */
   .diet-steps {
-    @apply mt-4 flex flex-col gap-4 list-decimal pl-5 text-white/85 text-[0.95rem] leading-relaxed;
+    @apply relative flex flex-col gap-7 mt-6 sm:mt-0;
   }
-  .diet-steps li::marker {
+  .diet-step {
+    @apply relative grid gap-4;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+  .diet-step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: calc(1.25rem - 1px);
+    top: 2.75rem;
+    bottom: -1.5rem;
+    width: 2px;
+    border-radius: 2px;
+    background:
+      linear-gradient(180deg, transparent, rgb(var(--cyan-rgb)), transparent) no-repeat,
+      var(--diet-line);
+    background-size:
+      100% 45%,
+      100% 100%;
+    animation: diet-drop calc(var(--diet-period) * 0.5) linear infinite;
+  }
+  .diet-step-node {
+    @apply grid place-items-center w-10 h-10 rounded-full font-display text-base font-semibold;
+    color: #fff;
+    background: var(--diet-stream);
+    background-size: 300% 100%;
+    box-shadow: 0 6px 16px -6px rgb(208 40 126 / 0.7);
+  }
+  .diet-step-body {
+    @apply pt-1.5 flex flex-col gap-2 min-w-0;
+  }
+  .diet-step-label {
+    @apply flex items-center gap-2 font-display text-lg;
+    color: #fff;
+  }
+  .diet-step-icon {
+    @apply w-5 h-5 shrink-0;
+    color: var(--color-cyan-tint);
+  }
+  .diet-step-body > p {
+    @apply text-base leading-relaxed;
+    color: var(--diet-text);
+    max-width: 65ch;
+  }
+  .diet-step strong {
     @apply font-semibold;
-    color: var(--color-accent-tint);
+    color: #fff;
   }
-  .diet-steps strong,
-  .diet-notes strong {
-    @apply text-white font-semibold;
-  }
-  .diet-steps code,
-  .diet-notes code {
-    @apply text-white/90 break-all;
-    font-family: ui-monospace, monospace;
-    font-size: 0.9em;
+  .diet-step .diet-copyline {
+    @apply justify-start;
   }
   .diet-shot {
-    @apply mt-3 w-full h-auto rounded-xl border border-white/15;
-    max-width: 44rem;
+    @apply mt-2 w-full h-auto rounded-xl;
+    max-width: 40rem;
+    border: 1px solid var(--diet-line);
+    box-shadow: 0 16px 40px -20px rgb(0 0 0 / 0.9);
+  }
+
+  /* ---- prompts as chat bubbles ---- */
+  .diet-prompts {
+    @apply mt-8 mx-auto flex flex-col gap-3;
+    max-width: 40rem;
+  }
+  .diet-prompts li {
+    @apply w-fit max-w-[92%] rounded-2xl px-5 py-3.5 text-base leading-relaxed;
+    color: #fff;
+    background: var(--diet-surface-2);
+    border: 1px solid var(--diet-line);
+    border-bottom-right-radius: 0.4rem;
+  }
+  .diet-prompts li:nth-child(odd) {
+    @apply self-end;
+  }
+  .diet-prompts li:nth-child(even) {
+    border-bottom-right-radius: 1rem;
+    border-bottom-left-radius: 0.4rem;
+  }
+
+  /* ---- what's new + versions ---- */
+  .diet-two {
+    @apply grid gap-5 md:grid-cols-2 items-start;
   }
   .diet-notes {
-    @apply flex flex-col gap-3 text-white/75 text-sm leading-relaxed mt-3;
-    max-width: 70ch;
+    @apply flex flex-col gap-3 text-base leading-relaxed;
+    color: var(--diet-text);
+  }
+  .diet-notes strong {
+    color: #fff;
   }
   .diet-versions {
-    @apply flex flex-col gap-3 mt-4;
+    @apply flex flex-col gap-3;
   }
   .diet-version {
-    @apply p-4 sm:p-5 flex flex-col gap-2;
+    @apply rounded-xl p-4 flex flex-col gap-1.5;
+    background: var(--diet-surface-2);
+    border: 1px solid var(--diet-line);
+  }
+  .diet-version.is-latest {
+    border-color: rgb(var(--pink-rgb) / 0.55);
   }
   .diet-version-head {
     @apply flex flex-wrap items-center gap-x-3 gap-y-1;
   }
   .diet-version-num {
     @apply font-display text-lg;
+    color: #fff;
   }
   .diet-badge {
-    @apply text-xs uppercase tracking-widest font-semibold px-2.5 py-0.5 rounded-full;
-    color: #1a1033;
-    background: var(--color-amber);
+    @apply text-xs font-semibold px-2.5 py-0.5 rounded-full;
+    color: #fff;
+    background: var(--diet-stream);
+    background-size: 300% 100%;
   }
   .diet-version-link {
     @apply ml-auto text-sm font-semibold underline underline-offset-4;
-    color: var(--color-accent-tint);
+    color: var(--color-cyan-tint);
   }
-  .diet-version-title {
-    @apply text-white/80 text-sm;
+  .diet-version-meta {
+    @apply text-sm;
+    color: var(--diet-soft);
   }
   .diet-version summary,
   .diet-inside summary {
-    @apply cursor-pointer text-sm text-white/70 hover:text-white;
+    @apply cursor-pointer text-sm font-semibold;
+    color: var(--diet-text);
   }
   .diet-hash {
-    @apply text-xs text-white/40 break-all;
-  }
-  .diet-hash code {
-    font-family: ui-monospace, monospace;
-  }
-  .diet-inside {
-    @apply p-5;
+    @apply text-xs break-all;
+    color: rgb(255 255 255 / 0.55);
   }
   .diet-inside ul {
-    @apply mt-3 flex flex-col gap-1 text-sm text-white/75;
+    @apply mt-3 flex flex-col gap-1 text-sm;
+    color: var(--diet-text);
   }
   .diet-inside code {
-    font-family: ui-monospace, monospace;
     @apply break-all;
   }
   .diet-disclaimer {
-    @apply mt-10 text-xs text-white/50 leading-relaxed;
-    max-width: 70ch;
+    @apply mt-10 mx-auto text-center text-sm leading-relaxed;
+    max-width: 62ch;
+    color: var(--diet-soft);
   }
+}
+
+@keyframes diet-stream {
+  to {
+    background-position: 300% 0;
+  }
+}
+@keyframes diet-glint {
+  0% {
+    transform: translateX(-120%);
+  }
+  40%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+@keyframes diet-run {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+@keyframes diet-drop {
+  from {
+    background-position:
+      0 -60%,
+      0 0;
+  }
+  to {
+    background-position:
+      0 160%,
+      0 0;
+  }
+}
+@keyframes diet-node {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--cyan-rgb) / 0);
+    border-color: rgb(var(--accent-rgb) / 0.55);
+  }
+  6% {
+    box-shadow: 0 0 0 6px rgb(var(--cyan-rgb) / 0.18), 0 8px 22px -6px rgb(var(--cyan-rgb) / 0.7);
+    border-color: rgb(var(--cyan-rgb));
+  }
+  22% {
+    box-shadow: 0 0 0 0 rgb(var(--cyan-rgb) / 0);
+    border-color: rgb(var(--accent-rgb) / 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diet-download,
+  .diet-download::after,
+  .diet-map::after,
+  .diet-map-node,
+  .diet-step::before {
+    animation: none !important;
+  }
+  .diet-download::after,
+  .diet-map::after {
+    display: none;
+  }
+}
+html[data-motion='still'] .diet-download,
+html[data-motion='still'] .diet-download::after,
+html[data-motion='still'] .diet-map::after,
+html[data-motion='still'] .diet-map-node,
+html[data-motion='still'] .diet-step::before {
+  animation: none;
 }

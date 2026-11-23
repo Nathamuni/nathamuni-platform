@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import { Fragment } from 'react'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { CopyButton } from '@/components/diet/CopyButton'
+import { Inline } from '@/components/diet/Inline'
+import { InstallFlow } from '@/components/diet/InstallFlow'
+import { StepGlyph } from '@/components/diet/StepGlyph'
 import {
   DIET_DISCLAIMER,
   DIET_LATEST_URL,
@@ -25,25 +26,6 @@ export const metadata: Metadata = {
   alternates: { canonical: '/diet' },
 }
 
-const HUE = 142 // green, food
-
-/** Renders the small Markdown subset used in steps and release notes: **bold**, `code`. */
-function Inline({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(/(\*\*[^*]+\*\*|`[^`]+`)/).map((part, i) =>
-        part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
-          <strong key={i}>{part.slice(2, -2)}</strong>
-        ) : part.startsWith('`') && part.endsWith('`') && part.length > 2 ? (
-          <code key={i}>{part.slice(1, -1)}</code>
-        ) : (
-          <Fragment key={i}>{part}</Fragment>
-        )
-      )}
-    </>
-  )
-}
-
 function Notes({ notes }: { notes: DietRelease['notes'] }) {
   if (!notes) return <p className="diet-muted">No release notes for this version.</p>
   return (
@@ -63,11 +45,10 @@ function Notes({ notes }: { notes: DietRelease['notes'] }) {
 function EmptyState() {
   return (
     <section className="section diet-page" data-testid="diet-page">
-      <PageHeader
-        title="Diet plugin"
-        lede="The first version is on its way. Check back soon."
-        accentHue={HUE}
-      />
+      <header className="diet-hero">
+        <h1 className="diet-title">Diet plugin</h1>
+        <p className="diet-lede">The first version is on its way. Check back soon.</p>
+      </header>
     </section>
   )
 }
@@ -99,141 +80,112 @@ export default function DietPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <PageHeader
-        title={latest.displayName}
-        lede={latest.description}
-        accentHue={HUE}
-        stats={[
-          { value: `v${latest.version}`, label: 'Latest version' },
-          { value: formatBytes(latest.bytes), label: 'Download size' },
-          { value: formatDietDate(latest.date), label: 'Updated' },
-        ]}
-      >
+
+      <header className="diet-hero">
+        <h1 className="diet-title">{latest.displayName}</h1>
+        {latest.shortDescription && <p className="diet-tagline">{latest.shortDescription}</p>}
+        <p className="diet-lede">{latest.description}</p>
+
         <div className="diet-cta">
-          <a
-            href={latest.file}
-            download
-            className="social-button social-button-primary detail-cta"
-            data-testid="diet-download"
-          >
-            Download v{latest.version} (.zip)
+          <a href={latest.file} download className="diet-download" data-testid="diet-download">
+            <StepGlyph icon="download" className="diet-download-icon" />
+            <span>Download v{latest.version}</span>
           </a>
-          <a href="#install" className="social-button detail-cta">
-            How to install
+          <a href="#install" className="diet-secondary">
+            See install steps
           </a>
         </div>
-        <p className="diet-stable">
-          <span>Link to share. It always downloads the newest version:</span>
+
+        <dl className="diet-facts">
+          <div>
+            <dt>Version</dt>
+            <dd>v{latest.version}</dd>
+          </div>
+          <div>
+            <dt>Size</dt>
+            <dd>{formatBytes(latest.bytes)}</dd>
+          </div>
+          <div>
+            <dt>Updated</dt>
+            <dd>{formatDietDate(latest.date)}</dd>
+          </div>
+          <div>
+            <dt>Works in</dt>
+            <dd>ChatGPT, Claude, any AI</dd>
+          </div>
+        </dl>
+
+        <div className="diet-stable">
+          <span>Share this link. It always downloads the newest version.</span>
           <span className="diet-stable-row">
             <code data-testid="diet-stable-url">{stableUrl}</code>
             <CopyButton text={`https://${stableUrl}`} label="Copy link" />
           </span>
-        </p>
-      </PageHeader>
-
-      {latest.prompts.length > 0 && (
-        <div className="diet-block" data-reveal>
-          <h2 className="section-title">Things you can ask it</h2>
-          <ul className="diet-prompts">
-            {latest.prompts.map((prompt) => (
-              <li key={prompt} className="glass-card">
-                {prompt}
-              </li>
-            ))}
-          </ul>
         </div>
-      )}
+      </header>
 
-      <div className="diet-block" id="install" data-reveal>
-        <h2 className="section-title">Install it</h2>
-        <nav className="diet-jump" aria-label="Choose your AI app">
-          {guides.map((g) => (
-            <a key={g.id} href={`#${g.id}`} className="detail-tag">
-              {g.label}
-            </a>
-          ))}
-        </nav>
-        {guides.map((guide) => (
-          <section
-            key={guide.id}
-            id={guide.id}
-            className="glass-card diet-guide"
-            aria-labelledby={`${guide.id}-title`}
-            data-testid={`diet-guide-${guide.id}`}
-          >
-            <h3 id={`${guide.id}-title`}>{guide.label}</h3>
-            <p className="diet-muted">{guide.intro}</p>
-            <ol className="diet-steps">
-              {guide.steps.map((step) => (
-                <li key={step.text}>
-                  <Inline text={step.text} />
-                  {step.copy && (
-                    <span className="diet-copyline">
-                      <code>{step.copy}</code>
-                      <CopyButton text={step.copy} />
-                    </span>
-                  )}
-                  {step.shot && (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={step.shot.src}
-                      alt={step.shot.alt}
-                      width={step.shot.width}
-                      height={step.shot.height}
-                      loading="lazy"
-                      className="diet-shot"
-                    />
-                  )}
-                </li>
-              ))}
-            </ol>
-          </section>
-        ))}
-        <p className="diet-muted">
+      <div className="diet-block diet-install" id="install">
+        <h2 className="diet-h2">Install it, step by step</h2>
+        <p className="diet-sub">Pick your AI app. Each step shows exactly where to click.</p>
+        <InstallFlow guides={guides} />
+        <p className="diet-muted diet-center">
           To update, download the newest version and add it the same way. Your chats stay where
           they are.
         </p>
       </div>
 
-      <div className="diet-block" data-reveal>
-        <h2 className="section-title">
-          What&apos;s new in v{latest.version}
-          {latest.notes?.title ? `: ${latest.notes.title}` : ''}
-        </h2>
-        <Notes notes={latest.notes} />
-      </div>
+      {latest.prompts.length > 0 && (
+        <div className="diet-block">
+          <h2 className="diet-h2">Then just ask</h2>
+          <ul className="diet-prompts">
+            {latest.prompts.map((prompt) => (
+              <li key={prompt}>{prompt}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      <div className="diet-block" data-reveal>
-        <h2 className="section-title">All versions</h2>
-        <ol className="diet-versions" data-testid="diet-versions">
-          {releases.map((r, i) => (
-            <li key={r.version} className="glass-card diet-version">
-              <div className="diet-version-head">
-                <span className="diet-version-num">v{r.version}</span>
-                {i === 0 && <span className="diet-badge">Latest</span>}
-                <span className="diet-muted">
+      <div className="diet-block diet-two">
+        <div className="diet-card">
+          <h2 className="diet-h3">
+            What&apos;s new in v{latest.version}
+            {latest.notes?.title ? <span>{latest.notes.title}</span> : null}
+          </h2>
+          <Notes notes={latest.notes} />
+        </div>
+
+        <div className="diet-card">
+          <h2 className="diet-h3">All versions</h2>
+          <ol className="diet-versions" data-testid="diet-versions">
+            {releases.map((r, i) => (
+              <li key={r.version} className={i === 0 ? 'diet-version is-latest' : 'diet-version'}>
+                <div className="diet-version-head">
+                  <span className="diet-version-num">v{r.version}</span>
+                  {i === 0 && <span className="diet-badge">Latest</span>}
+                  <a href={r.file} download className="diet-version-link">
+                    Download
+                  </a>
+                </div>
+                <p className="diet-version-meta">
                   {formatDietDate(r.date)}, {formatBytes(r.bytes)}
-                </span>
-                <a href={r.file} download className="diet-version-link">
-                  Download
-                </a>
-              </div>
-              {r.notes?.title && <p className="diet-version-title">{r.notes.title}</p>}
-              {i > 0 && (
-                <details>
-                  <summary>Release notes</summary>
-                  <Notes notes={r.notes} />
-                </details>
-              )}
-              <p className="diet-hash" title="SHA-256 of the zip, to check the download">
-                SHA-256 <code>{r.sha256}</code>
-              </p>
-            </li>
-          ))}
-        </ol>
+                  {r.notes?.title ? `. ${r.notes.title}` : ''}
+                </p>
+                {i > 0 && (
+                  <details>
+                    <summary>Release notes</summary>
+                    <Notes notes={r.notes} />
+                  </details>
+                )}
+                <p className="diet-hash" title="SHA-256 of the zip, to check the download">
+                  SHA-256 <code>{r.sha256}</code>
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
 
-      <details className="diet-block glass-card diet-inside" data-reveal>
+      <details className="diet-block diet-card diet-inside">
         <summary>What is inside the zip ({latest.files.length} files)</summary>
         <ul>
           {latest.files.map((f) => (
@@ -247,9 +199,7 @@ export default function DietPage() {
         )}
       </details>
 
-      <p className="diet-disclaimer" data-reveal>
-        {DIET_DISCLAIMER}
-      </p>
+      <p className="diet-disclaimer">{DIET_DISCLAIMER}</p>
     </section>
   )
 }
