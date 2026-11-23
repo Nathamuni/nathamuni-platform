@@ -2095,3 +2095,124 @@ html[data-theme] .pg-head-stat-value {
 html[data-theme] .pg-head-stat.is-link:hover .pg-head-stat-label {
   color: var(--color-accent-tint);
 }
+
+/* ---------- /diet: the diet plugin download page ---------- */
+@layer components {
+  .diet-cta {
+    @apply flex flex-wrap gap-3 mt-6;
+  }
+  .diet-stable {
+    @apply mt-5 flex flex-col gap-2 text-sm text-white/60;
+  }
+  .diet-stable-row,
+  .diet-copyline {
+    @apply flex flex-wrap items-center gap-2;
+  }
+  .diet-stable code,
+  .diet-copyline code {
+    @apply glass-card px-3 py-1.5 text-sm text-white/90 break-all;
+    font-family: ui-monospace, monospace;
+  }
+  .diet-copyline {
+    @apply mt-2;
+  }
+  .diet-copy {
+    @apply glass-card px-3 py-1.5 text-xs font-semibold text-white/80 hover:text-white hover:border-white/40 transition-all;
+    min-height: 2rem;
+  }
+  .diet-block {
+    @apply mt-12;
+  }
+  .diet-muted {
+    @apply text-white/55 text-sm;
+  }
+  .diet-prompts {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4;
+  }
+  .diet-prompts li {
+    @apply p-4 sm:p-5 text-white/85 text-sm leading-relaxed;
+  }
+  .diet-jump {
+    @apply flex flex-wrap gap-2 mt-3 mb-5;
+  }
+  .diet-guide {
+    @apply p-5 sm:p-7 mb-5;
+    scroll-margin-top: 6rem;
+  }
+  .diet-guide h3 {
+    @apply font-display text-xl mb-1;
+  }
+  .diet-steps {
+    @apply mt-4 flex flex-col gap-4 list-decimal pl-5 text-white/85 text-[0.95rem] leading-relaxed;
+  }
+  .diet-steps li::marker {
+    @apply font-semibold;
+    color: var(--color-accent-tint);
+  }
+  .diet-steps strong,
+  .diet-notes strong {
+    @apply text-white font-semibold;
+  }
+  .diet-steps code,
+  .diet-notes code {
+    @apply text-white/90 break-all;
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+  }
+  .diet-shot {
+    @apply mt-3 w-full h-auto rounded-xl border border-white/15;
+    max-width: 44rem;
+  }
+  .diet-notes {
+    @apply flex flex-col gap-3 text-white/75 text-sm leading-relaxed mt-3;
+    max-width: 70ch;
+  }
+  .diet-versions {
+    @apply flex flex-col gap-3 mt-4;
+  }
+  .diet-version {
+    @apply p-4 sm:p-5 flex flex-col gap-2;
+  }
+  .diet-version-head {
+    @apply flex flex-wrap items-center gap-x-3 gap-y-1;
+  }
+  .diet-version-num {
+    @apply font-display text-lg;
+  }
+  .diet-badge {
+    @apply text-xs uppercase tracking-widest font-semibold px-2.5 py-0.5 rounded-full;
+    color: #1a1033;
+    background: var(--color-amber);
+  }
+  .diet-version-link {
+    @apply ml-auto text-sm font-semibold underline underline-offset-4;
+    color: var(--color-accent-tint);
+  }
+  .diet-version-title {
+    @apply text-white/80 text-sm;
+  }
+  .diet-version summary,
+  .diet-inside summary {
+    @apply cursor-pointer text-sm text-white/70 hover:text-white;
+  }
+  .diet-hash {
+    @apply text-xs text-white/40 break-all;
+  }
+  .diet-hash code {
+    font-family: ui-monospace, monospace;
+  }
+  .diet-inside {
+    @apply p-5;
+  }
+  .diet-inside ul {
+    @apply mt-3 flex flex-col gap-1 text-sm text-white/75;
+  }
+  .diet-inside code {
+    font-family: ui-monospace, monospace;
+    @apply break-all;
+  }
+  .diet-disclaimer {
+    @apply mt-10 text-xs text-white/50 leading-relaxed;
+    max-width: 70ch;
+  }
+}

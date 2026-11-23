@@ -30,6 +30,12 @@ npm test           # vitest
   never deployed). `scripts/optimize-thumbnails.mjs` derives the served 540w
   `.webp`/`.jpg` into `public/images/thumbnails/`, which is generated and gitignored —
   do not put files there by hand, they will not be committed
+- **Diet plugin (/diet):** `npm run diet:release -- path/to/plugin.zip` copies the zip to
+  `public/downloads/diet/<name>-v<version>.zip` and prepends `lib/diet.json` (version, copy and
+  notes read from the zip's plugin.json + README). Released versions are immutable;
+  `/diet/latest.zip` (worker/diet.mjs) redirects to the newest. The script refuses zips that
+  contain an email address. Install-step screenshots live in `public/images/diet/`, cropped to
+  the main panel (no sidebar/chat history)
 - **Profile/bio copy:** `lib/profile.ts` — single source of truth for hero/about/metadata
 - **Hero:** a static portrait (`components/hero/HeroPortrait.tsx`, `public/images/generated/about-portrait.jpg`);
   the hero video was dropped in v9 and `public/video/` no longer exists

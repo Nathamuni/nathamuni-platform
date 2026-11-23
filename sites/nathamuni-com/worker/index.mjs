@@ -15,6 +15,7 @@
 import { handleAuth } from './auth.mjs'
 import { handleTelegram, handleScheduled, CRON_WEEKLY } from './telegram.mjs'
 import { handleWebhook, handleAdminApi, handleAdminPage, refreshToken } from './commentdm.mjs'
+import { handleDietLatest, DIET_LATEST_PATH } from './diet.mjs'
 
 const MODEL = '@cf/baai/bge-m3'
 const TOP_K = 12
@@ -732,6 +733,9 @@ const worker = {
         console.error('join token fatal:', err.message)
         return new Response('Something went wrong.', { status: 500 })
       }
+    }
+    if (pathname === DIET_LATEST_PATH) {
+      return handleDietLatest(request)
     }
     if (pathname === '/api/ig/webhook') {
       return handleWebhook(request, env, ctx)
