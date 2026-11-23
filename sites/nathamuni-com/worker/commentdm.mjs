@@ -60,8 +60,15 @@ export function matchesKeyword(comment, keyword) {
 
 /** Instagram reel/post link → shortcode ("DaczeEJRhpZ"), or "". Handles /<user>/reel/<code> too. */
 export function shortcodeOf(url) {
-  const m = String(url || '').match(/instagram\.com\/(?:[^/\s]+\/)?(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/)
+  // "/share/reel/<id>" links carry a different id, not the shortcode, so they are not accepted here.
+  const m = String(url || '').match(/instagram\.com\/(?:(?!share\/)[^/\s]+\/)?(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/)
   return m ? m[1] : ''
+}
+
+/** Pulls the Instagram link out of whatever was typed ("use it on https://… thanks" → the link). */
+export function extractInstagramUrl(text) {
+  const m = String(text || '').match(/(?:https?:\/\/)?(?:www\.)?instagram\.com\/[^\s<>"')]+/i)
+  return m ? m[0].replace(/[.,;:!?]+$/, '') : ''
 }
 
 /**
@@ -99,7 +106,8 @@ export function sanitizeSettings(input) {
       .slice(0, 8)
     const mediaId = String(r.mediaId ?? '').trim()
     if (mediaId && !/^\d{5,30}$/.test(mediaId)) throw new Error(`Rule ${i + 1}: media ID must be digits only`)
-    const reelUrl = String(r.reelUrl ?? '').trim().slice(0, 200)
+    const raw = String(r.reelUrl ?? '').trim()
+    const reelUrl = (extractInstagramUrl(raw) || raw).slice(0, 200)
     const reel = reelUrl ? shortcodeOf(reelUrl) : ''
     if (reelUrl && !reel) throw new Error(`Rule ${i + 1}: that is not an Instagram reel or post link`)
     return {
@@ -584,11 +592,14 @@ export function advanceDm(flow, input) {
       d.dm = text
       return { flow: { step: 'reel', draft: d }, reply: Q.reel }
     }
-    case 'reel':
-      if (/^(all|any|every\w*)$/i.test(text)) d.reelUrl = ''
-      else if (shortcodeOf(text)) d.reelUrl = text.split(/\s+/)[0]
-      else return stay('That does not look like an Instagram reel or post link. Paste the link, or send: all')
+    case 'reel': {
+      const url = extractInstagramUrl(text)
+      if (url && shortcodeOf(url)) d.reelUrl = url
+      else if (/instagram\.com\/share\//i.test(text)) return stay('That is an Instagram “share” link, which I cannot match to a reel. Open the reel, tap ⋯ → <b>Copy link</b>, and paste that one (it looks like instagram.com/reel/…).')
+      else if (/^(all|any|every)\b/i.test(text)) d.reelUrl = ''
+      else return stay('I could not find a reel link in that. Paste the link (instagram.com/reel/…), or send: all')
       return { flow: { step: 'reply', draft: d }, reply: Q.reply }
+    }
     case 'reply':
       if (!text) return stay('Send auto, none, or your own wording.')
       if (/^auto$/i.test(text)) Object.assign(d, { publicReplies: [], noReply: false })

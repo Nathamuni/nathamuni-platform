@@ -3,6 +3,7 @@ import {
   matchesKeyword,
   matchingRules,
   shortcodeOf,
+  extractInstagramUrl,
   applyDmCommand,
   dmCommand,
   advanceDm,
@@ -304,5 +305,30 @@ describe('guided /dm new setup', () => {
     const out = advanceDm({ step: 'confirm', draft: { keywords: 'a', dm: 'b' } }, 'no')
     expect(out.flow).toBeNull()
     expect(out.save).toBeUndefined()
+  })
+})
+
+describe('links typed in natural language', () => {
+  it('finds the link inside a sentence and drops trailing punctuation', () => {
+    expect(extractInstagramUrl('use it on this reel https://www.instagram.com/reel/ABC123/?igsh=xyz, thanks')).toBe('https://www.instagram.com/reel/ABC123/?igsh=xyz')
+    expect(extractInstagramUrl('instagram.com/reel/ABC123/.')).toBe('instagram.com/reel/ABC123/')
+    expect(extractInstagramUrl('no link here')).toBe('')
+  })
+  it('does not treat /share/ links as shortcodes', () => {
+    expect(shortcodeOf('https://www.instagram.com/share/reel/BAbcdef/')).toBe('')
+  })
+  it('guided setup accepts a sentence with a link and saves a clean link', async () => {
+    const m = new Map()
+    const env = { INBOX: { get: async (k) => m.get(k) ?? null, put: async (k, v) => void m.set(k, v), delete: async (k) => void m.delete(k) } }
+    for (const a of ['/dm new', 'link', 'hi there']) await dmWizardTurn(env, a)
+    expect(await dmWizardTurn(env, 'this one https://www.instagram.com/share/reel/BAbc/')).toContain('Copy link')
+    expect(await dmWizardTurn(env, 'please use it on https://www.instagram.com/reel/ABC123/?igsh=xyz thanks')).toContain('Step 4/4')
+    await dmWizardTurn(env, 'auto')
+    await dmWizardTurn(env, 'yes')
+    expect(JSON.parse(m.get('ig:rules')).rules[0]).toMatchObject({ reel: 'ABC123', reelUrl: 'https://www.instagram.com/reel/ABC123/?igsh=xyz' })
+  })
+  it('the one-line /dm add also copes with extra words around the link', () => {
+    const r = applyDmCommand({ enabled: true, rules: [] }, 'add link | hi | for this reel https://www.instagram.com/reel/ABC123/ ok')
+    expect(r.settings.rules[0].reel).toBe('ABC123')
   })
 })
