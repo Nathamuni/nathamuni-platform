@@ -133,6 +133,13 @@ describe('processComment', () => {
     await processComment(env, { ...c, commentId: 'C2', parentId: 'P' })
     expect(f).not.toHaveBeenCalled()
   })
+  it('skips the public reply when the DM failed', async () => {
+    const { env } = await setup()
+    const f = vi.fn(async (url) => (String(url).includes('/messages') ? Response.json({ error: { message: 'blocked' } }, { status: 400 }) : Response.json({ ok: true })))
+    vi.stubGlobal('fetch', f)
+    await processComment(env, c)
+    expect(f.mock.calls.some(([u]) => String(u).includes('/replies'))).toBe(false)
+  })
   it('records a failed DM in the log instead of throwing', async () => {
     const { env } = await setup()
     vi.stubGlobal('fetch', vi.fn(async () => Response.json({ error: { message: 'nope' } }, { status: 400 })))

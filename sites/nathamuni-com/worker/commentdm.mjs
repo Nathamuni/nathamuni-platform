@@ -234,7 +234,8 @@ export async function processComment(env, c) {
     } catch (err) {
       entry.dm = `failed: ${err.message}`.slice(0, 160)
     }
-    const variant = pick(rule.publicReplies || [])
+    // Only say "check your DM" when the DM really went out.
+    const variant = entry.dm === 'ok' ? pick(rule.publicReplies || []) : ''
     if (variant) {
       try {
         await graphPost(env, `/${c.commentId}/replies`, { message: variant })
