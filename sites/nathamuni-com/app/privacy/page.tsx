@@ -57,6 +57,12 @@ export default function PrivacyPage() {
               question text is kept. No name or account is attached to it.
             </li>
             <li>
+              <strong className="text-white/90">Instagram comment replies.</strong> If you
+              comment a keyword on one of @nathamuni_&apos;s posts, Instagram tells this site, which
+              sends you one automatic direct message (and may reply to your comment). A short log
+              of your username and comment text is kept for the most recent 50 such events.
+            </li>
+            <li>
               <strong className="text-white/90">Abuse protection.</strong> The Ask, sign-in and
               Join endpoints are rate-limited. That involves briefly keying a counter derived
               from your IP address; it is not stored as a record of your visit and is not used

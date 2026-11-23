@@ -45,7 +45,9 @@ npm test           # vitest
   PBKDF2-SHA256 password hashes and a per-user progress blob in the `INBOX` KV
   namespace, behind HMAC-signed HttpOnly cookies. Accounts are opt-in; signed out,
   progress stays in localStorage. Keep `app/privacy/page.tsx` honest about this.
-- The Instagram Graph API is touched only by the daily sync job, never by visitor traffic
+- The Instagram Graph API is touched by the daily sync job and by `worker/commentdm.mjs`
+  (Meta comment webhook → one DM + optional public reply; rules edited at `/admin/comment-dm`,
+  gated by Cloudflare Access). Never by visitor traffic. Setup: `docs/comment-to-dm.md`
 - Social links live in `lib/social.ts`; category colors in `lib/categoryMeta.ts`
 - Instagram is the primary social CTA; YouTube is secondary until that channel is prioritized
 - Mobile-first is mandatory; 3D/tilt effects are desktop-only and reduced-motion-safe
