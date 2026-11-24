@@ -38,7 +38,6 @@ import {
 import { geminiJson } from '../scripts/gemini.mjs'
 import { dmCommand, esc } from './commentdm.mjs'
 import { dmHandle } from './dmui.mjs'
-import { reportLink, SECTIONS } from './report.mjs'
 
 // Cron schedules (UTC) — must match "triggers.crons" in wrangler.jsonc.
 export const CRON_MORNING = '30 2 * * *' // 8:00 am IST daily — starts the GitHub sync
@@ -181,7 +180,7 @@ async function tg(env, method, body) {
 }
 
 const markup = (buttons) =>
-  buttons?.length ? { inline_keyboard: buttons.map((row) => row.map((x) => (x.u ? { text: x.t, url: x.u } : { text: x.t, callback_data: x.d }))) } : undefined
+  buttons?.length ? { inline_keyboard: buttons.map((row) => row.map((x) => ({ text: x.t, callback_data: x.d }))) } : undefined
 
 /** Send an outbox from dmui.mjs: optional thumbnail album, optional photo card, text with buttons. */
 export async function playOutbox(env, chatId, outbox) {
@@ -201,7 +200,7 @@ export async function playOutbox(env, chatId, outbox) {
   }
 }
 
-export async function loadVideos() {
+async function loadVideos() {
   return (await loadData()).videos
 }
 
@@ -303,12 +302,6 @@ export async function handleTelegram(request, env) {
   try {
     const data = await loadData()
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
-    // Commands that have a visual page get an "Open" button under the text reply.
-    const section = cmd.slice(1)
-    if (cmd.startsWith('/') && SECTIONS[section]) {
-      const link = await reportLink(env, section)
-      if (link) await playOutbox(env, msg.chat.id, [{ text: '📊 Want it as a chart?', buttons: [[{ t: '📊 Open visual report', u: link }]] }])
-    }
   } catch (err) {
     console.error('telegram error:', err.message)
     await send(env, msg.chat.id, 'Something went wrong reading the data. Try again in a minute.')
