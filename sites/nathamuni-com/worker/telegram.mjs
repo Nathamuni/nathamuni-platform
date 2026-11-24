@@ -202,6 +202,30 @@ export async function playOutbox(env, chatId, outbox) {
   }
 }
 
+const thumbOf = (v) => (v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbnail : `https://nathamuni.com${v.thumbnail}`) : '')
+
+/** Draw the /best chart and send it as a photo. Returns false when anything goes wrong. */
+async function sendBestChart(env, chatId, top) {
+  const { renderChart, toDataUri } = await import('./chart.mjs')
+  const thumbs = await Promise.all(top.map((v) => (thumbOf(v) ? toDataUri(thumbOf(v)) : '')))
+  const png = await renderChart({
+    title: 'Top reels',
+    subtitle: `Last 30 days · ${top.length} reels by views`,
+    rows: top.map((v, i) => ({
+      label: v.title || 'Reel',
+      value: v.views,
+      meta: `${fmt(v.views)} views · ${v.reach ? ((100 * v.shares) / v.reach).toFixed(1) : '–'}% shared · ${Number.isFinite(v.avgWatchTimeMs) ? (v.avgWatchTimeMs / 1000).toFixed(1) : '–'}s watched`,
+      thumb: thumbs[i] || '',
+    })),
+  })
+  const form = new FormData()
+  form.append('chat_id', String(chatId))
+  form.append('photo', new Blob([png], { type: 'image/png' }), 'best.png')
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form })
+  if (!res.ok) console.error('telegram sendPhoto failed:', res.status, (await res.text().catch(() => '')).slice(0, 200))
+  return res.ok
+}
+
 async function loadVideos() {
   return (await loadData()).videos
 }
@@ -304,11 +328,17 @@ export async function handleTelegram(request, env) {
   try {
     const data = await loadData()
     if (cmd === '/best') {
-      // Thumbnails of the top reels, shown right in the chat above the numbers.
-      const album = topReels(data.videos, istToday())
-        .map((v, i) => ({ url: v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbnail : `https://nathamuni.com${v.thumbnail}`) : '', caption: `${i + 1}. ${fmt(v.views)} views` }))
-        .filter((a) => a.url)
-      if (album.length >= 2) await playOutbox(env, msg.chat.id, [{ album }])
+      // One chart image (covers + bars + numbers) above the text; any failure falls back to the thumbnail album.
+      const top = topReels(data.videos, istToday())
+      if (top.length) {
+        const sent = await sendBestChart(env, msg.chat.id, top).catch((e) => (console.error('chart failed:', e.message), false))
+        if (!sent) {
+          const album = top
+            .map((v, i) => ({ url: thumbOf(v), caption: `${i + 1}. ${fmt(v.views)} views` }))
+            .filter((a) => a.url)
+          if (album.length >= 2) await playOutbox(env, msg.chat.id, [{ album }])
+        }
+      }
     }
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
   } catch (err) {

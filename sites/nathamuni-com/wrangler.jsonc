@@ -7,6 +7,8 @@
   "name": "nathamuni-platform",
   "compatibility_date": "2026-01-01",
   "main": "worker/index.mjs",
+  // Fonts for the Telegram chart image are bundled as raw bytes.
+  "rules": [{ "type": "Data", "globs": ["**/*.woff"], "fallthrough": true }],
   "assets": {
     "directory": "./out",
     "not_found_handling": "404-page",
