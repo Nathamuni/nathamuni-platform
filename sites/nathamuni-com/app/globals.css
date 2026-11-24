@@ -2234,6 +2234,66 @@ html[data-theme] .pg-head-stat.is-link:hover .pg-head-stat-label {
   .diet-download:active {
     transform: translateY(0) scale(0.98);
   }
+  /* ---- wide screens: use the side space. Hero splits into pitch (left) and a
+     release card (right); install map and prompts widen with it. ---- */
+  .diet-hero-main,
+  .diet-hero-side {
+    @apply flex flex-col items-center w-full;
+  }
+  @media (min-width: 1024px) {
+    .diet-hero {
+      @apply grid items-center text-left gap-12 pt-14;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      max-width: none;
+    }
+    .diet-hero-main {
+      @apply items-start;
+    }
+    .diet-hero-main .diet-cta {
+      @apply justify-start;
+    }
+    .diet-hero-side {
+      @apply rounded-3xl p-7;
+      background: rgb(255 255 255 / 0.04);
+      border: 1px solid rgb(255 255 255 / 0.12);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      box-shadow:
+        0 30px 60px -30px rgb(0 0 0 / 0.8),
+        inset 0 1px 0 rgb(255 255 255 / 0.12);
+    }
+    .diet-hero-side .diet-facts {
+      @apply mt-0 grid grid-cols-2 gap-y-6 w-full;
+    }
+    .diet-hero-side .diet-facts > div,
+    .diet-hero-side .diet-facts > div:nth-child(n) {
+      @apply items-start px-0;
+      border: 0;
+    }
+    .diet-hero-side .diet-stable {
+      @apply items-start w-full pt-6;
+      border-top: 1px solid rgb(255 255 255 / 0.1);
+    }
+    .diet-hero-side .diet-stable-row {
+      @apply justify-start;
+    }
+    .diet-flow {
+      max-width: 64rem;
+    }
+    .diet-prompts {
+      @apply grid grid-cols-2;
+      max-width: none;
+    }
+    .diet-prompts li {
+      @apply max-w-none w-auto;
+    }
+  }
+  .diet-stable-link {
+    @apply rounded-lg;
+  }
+  .diet-stable-link:hover code {
+    border-color: rgb(var(--cyan-rgb) / 0.6);
+  }
   .diet-download-icon {
     @apply w-5 h-5 shrink-0;
   }

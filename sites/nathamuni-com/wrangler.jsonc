@@ -10,7 +10,10 @@
   "assets": {
     "directory": "./out",
     "not_found_handling": "404-page",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    // Browser navigations are otherwise answered from ./out first (404 page) and never
+    // reach the worker; the stable download link must always hit its redirect.
+    "run_worker_first": ["/diet/latest.zip"]
   },
   // UTC crons, keep in sync with worker/telegram.mjs: 8:00 am IST starts the GitHub sync;
   // 5:45 pm IST daily posting nudge; 7 pm IST Sunday weekly review.
