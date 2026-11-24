@@ -69,7 +69,7 @@ export function ruleCards(settings, videos) {
     const buttons = [[b(r.enabled === false ? '▶️ Resume' : '⏸ Pause', `dm:t:${r.id}`), b('🗑 Delete', `dm:x:${r.id}`)]]
     out.push(v && thumbUrl(v) ? { photo: thumbUrl(v), text, buttons } : { text, buttons })
   })
-  if (settings.rules.length > 10) out.push({ text: `+${settings.rules.length - 10} more. Manage them at nathamuni.com/admin/comment-dm` })
+  if (settings.rules.length > 10) out.push({ text: `+${settings.rules.length - 10} more. Send /dm to list them.` })
   out.push({ text: 'What next?', buttons: [MENU_ROW, [b(on ? '🔴 Turn ALL OFF' : '🟢 Turn ALL ON', 'dm:g')]] })
   return out
 }

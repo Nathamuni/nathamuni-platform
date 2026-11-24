@@ -1,6 +1,10 @@
 "use client";
 
+import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
+
+// Free Cloudflare Turnstile bot check; the widget only appears once the site key is set at build time.
+const TURNSTILE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 type Status = "idle" | "sending" | "done";
 
@@ -67,6 +71,7 @@ export function DietGate() {
           name: form.get("name"),
           phone: form.get("phone"),
           website: form.get("website"),
+          turnstile: form.get("cf-turnstile-response"),
           file,
         }),
       });
@@ -157,6 +162,12 @@ export function DietGate() {
               aria-hidden="true"
               className="diet-gate-trap"
             />
+            {TURNSTILE_KEY && (
+              <>
+                <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+                <div className="cf-turnstile" data-sitekey={TURNSTILE_KEY} data-theme="light" />
+              </>
+            )}
             {error && (
               <p role="alert" className="diet-gate-error" data-testid="diet-gate-error">
                 {error}

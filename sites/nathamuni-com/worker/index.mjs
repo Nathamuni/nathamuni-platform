@@ -14,7 +14,7 @@
 
 import { handleAuth } from './auth.mjs'
 import { handleTelegram, handleScheduled, CRON_WEEKLY } from './telegram.mjs'
-import { handleWebhook, handleAdminApi, handleAdminPage, refreshToken } from './commentdm.mjs'
+import { handleWebhook, refreshToken } from './commentdm.mjs'
 import {
   handleDietLatest,
   handleDietFile,
@@ -757,12 +757,6 @@ const worker = {
     }
     if (pathname === '/api/ig/webhook') {
       return handleWebhook(request, env, ctx)
-    }
-    if (pathname === '/api/admin/ig-rules') {
-      return handleAdminApi(request, env)
-    }
-    if (pathname === '/admin/comment-dm') {
-      return handleAdminPage(request, env)
     }
     if (pathname === '/api/telegram') {
       return handleTelegram(request, env)

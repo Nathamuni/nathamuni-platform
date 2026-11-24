@@ -7,8 +7,6 @@
  *
  * Routes (wired in index.mjs):
  *   GET/POST /api/ig/webhook      Meta webhook (verify handshake + signed events)
- *   GET/PUT  /api/admin/ig-rules  rules editor API   ┐ both gated by Cloudflare Access;
- *   GET      /admin/comment-dm    rules editor page  ┘ fail closed if Access is not configured
  *
  * Secrets (wrangler secret put):
  *   IG_ACCESS_TOKEN      Instagram-login token with instagram_business_manage_comments + _manage_messages
@@ -391,76 +389,6 @@ export async function handleAdminApi(request, env) {
   return json({ error: 'Method not allowed' }, 405)
 }
 
-export async function handleAdminPage(request, env) {
-  if (!(await verifyAccess(request, env))) return new Response('Not allowed', { status: 403 })
-  return new Response(ADMIN_HTML, {
-    headers: {
-      'content-type': 'text/html; charset=utf-8',
-      'cache-control': 'no-store',
-      'x-robots-tag': 'noindex',
-      'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'",
-    },
-  })
-}
-
-const ADMIN_HTML = `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>Comment → DM rules</title>
-<style>
-:root{--bg:#faf8f4;--ink:#1d1b18;--mute:#6b665e;--line:#e4dfd6;--card:#fff;--accent:#1f5f4a;--bad:#a3261b}
-@media(prefers-color-scheme:dark){:root{--bg:#161513;--ink:#eee9e0;--mute:#9a948a;--line:#34312c;--card:#1f1d1a;--accent:#6fcfa8;--bad:#ff8a7e}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;padding:16px}
-main{max-width:760px;margin:0 auto}h1{font-size:1.4rem;margin:.2em 0}p.s{color:var(--mute);margin:.2em 0 1em}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0}
-label{display:block;font-size:.85rem;color:var(--mute);margin:10px 0 3px}
-input[type=text],textarea{width:100%;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
-textarea{min-height:90px}button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer}
-button.p{background:var(--accent);color:var(--bg);border-color:var(--accent)}button.d{color:var(--bad)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.bytes{font-size:.8rem;color:var(--mute)}.bytes.over{color:var(--bad)}
-#msg{min-height:1.4em}#msg.err{color:var(--bad)}table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-</style></head><body><main>
-<h1>Comment → DM rules</h1>
-<p class="s">When a comment contains a keyword, the person gets one DM and (optionally) a public reply. Keywords match whole words, any case.</p>
-<div class="row"><label style="margin:0"><input type="checkbox" id="on"> Automation on</label></div>
-<div id="rules"></div>
-<div class="row"><button id="add">+ Add rule</button><button class="p" id="save">Save</button><span id="msg"></span></div>
-<h2 style="font-size:1.05rem;margin-top:28px">Recent activity</h2>
-<div class="card"><table><thead><tr><th>When</th><th>User</th><th>Rule</th><th>DM</th><th>Reply</th></tr></thead><tbody id="log"></tbody></table></div>
-<script>
-const $=(i)=>document.getElementById(i);let settings={enabled:true,rules:[]};
-const bytes=(s)=>new TextEncoder().encode(s).length;
-function msg(t,err){const m=$('msg');m.textContent=t;m.className=err?'err':''}
-function field(label,el){const l=document.createElement('label');l.textContent=label;l.appendChild(el);return l}
-function render(){
-  $('on').checked=settings.enabled;const box=$('rules');box.textContent='';
-  settings.rules.forEach((r,i)=>{
-    const c=document.createElement('div');c.className='card';
-    const kw=document.createElement('input');kw.type='text';kw.value=r.keywords;kw.placeholder='link, guide';kw.oninput=()=>r.keywords=kw.value;
-    const dm=document.createElement('textarea');dm.value=r.dm;dm.placeholder='Here is the link: https://…';
-    const by=document.createElement('div');by.className='bytes';
-    const upd=()=>{const n=bytes(dm.value);by.textContent=n+' / 1000 bytes';by.className='bytes'+(n>1000?' over':'')};
-    dm.oninput=()=>{r.dm=dm.value;upd()};upd();
-    const pr=document.createElement('textarea');pr.value=(r.publicReplies||[]).join('\\n');pr.placeholder='One per line. Empty = automatic "Check your DM" replies';
-    pr.oninput=()=>r.publicReplies=pr.value.split('\\n');
-    const md=document.createElement('input');md.type='text';md.value=r.reelUrl||'';md.placeholder='https://www.instagram.com/reel/… (empty = every reel and post)';md.oninput=()=>r.reelUrl=md.value;
-    const en=document.createElement('input');en.type='checkbox';en.checked=r.enabled!==false;en.onchange=()=>r.enabled=en.checked;
-    const enl=document.createElement('label');enl.append(en,' Rule on');
-    const nr=document.createElement('input');nr.type='checkbox';nr.checked=r.noReply===true;nr.onchange=()=>r.noReply=nr.checked;
-    const nrl=document.createElement('label');nrl.append(nr,' No public reply (DM only)');
-    const del=document.createElement('button');del.className='d';del.textContent='Delete rule';del.onclick=()=>{settings.rules.splice(i,1);render()};
-    c.append(field('Keywords (comma separated)',kw),field('DM message (the link goes here)',dm),by,field('Public reply wordings (optional)',pr),field('Only this reel or post link (optional)',md),enl,nrl,del);
-    box.appendChild(c)})
-}
-function renderLog(log){const b=$('log');b.textContent='';(log||[]).forEach(e=>{const tr=document.createElement('tr');[new Date(e.at).toLocaleString(),e.user,e.rule,e.dm,e.reply].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});b.appendChild(tr)})}
-async function load(){const r=await fetch('/api/admin/ig-rules');if(!r.ok){msg('Could not load ('+r.status+')',true);return}const d=await r.json();settings=d.settings;render();renderLog(d.log)}
-$('on').onchange=()=>settings.enabled=$('on').checked;
-$('add').onclick=()=>{settings.rules.push({keywords:'',dm:'',publicReplies:[],reelUrl:'',enabled:true,noReply:false});render()};
-$('save').onclick=async()=>{
-  const body={enabled:settings.enabled,rules:settings.rules.map(r=>({...r,publicReplies:(r.publicReplies||[]).map(x=>x.trim()).filter(Boolean)}))};
-  const r=await fetch('/api/admin/ig-rules',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json();if(!r.ok){msg(d.error||'Save failed',true);return}settings=d.settings;render();msg('Saved ✓')};
-load();
-</script></main></body></html>`
 
 // ── Telegram: /dm command (owner chat only; gated in telegram.mjs) ──────────
 

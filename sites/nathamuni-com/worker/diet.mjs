@@ -153,6 +153,19 @@ export async function handleDietFile(request, env) {
   return new Response(res.body, { status: res.status, headers })
 }
 
+async function turnstileOk(secret, token, ip) {
+  if (typeof token !== 'string' || !token) return false
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: new URLSearchParams({ secret, response: token, remoteip: ip }),
+    })
+    return !!(await res.json()).success
+  } catch {
+    return false
+  }
+}
+
 /** POST /api/diet/lead {name, phone, file?, website(honeypot)} -> {ok, url} */
 export async function handleDietLead(request, env, data = manifest) {
   if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405)
@@ -172,6 +185,11 @@ export async function handleDietLead(request, env, data = manifest) {
   }
   // Honeypot: bots fill every field. Pretend success, issue nothing, store nothing.
   if (String(body?.website ?? '').trim() !== '') return json({ ok: true })
+
+  // Turnstile (free): checked only once TURNSTILE_SECRET is set, so the form keeps working before the keys exist.
+  if (env.TURNSTILE_SECRET && !(await turnstileOk(env.TURNSTILE_SECRET, body?.turnstile, clientIp(request)))) {
+    return json({ error: 'Please complete the check and try again.' }, 400)
+  }
 
   const name = normaliseName(body?.name)
   const phone = normalisePhone(body?.phone)
