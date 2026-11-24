@@ -248,9 +248,11 @@ export function renderBest(videos, today, transcripts = {}) {
     .slice(0, 5)
   if (!top.length) return 'No reels with stats in the last 30 days yet.'
   const lines = ['<b>🏆 Top 5 — last 30 days</b>', '']
+  const max = top[0].views || 1
   top.forEach((v, i) => {
     lines.push(`${i + 1}. ${link(v)}`)
-    lines.push(`   ${fmt(v.views)} views · ${pct(v.reach ? v.shares / v.reach : NaN)} shared · ${secs(v.avgWatchTimeMs)} watched`)
+    lines.push(`   <code>${'█'.repeat(Math.max(1, Math.round((10 * v.views) / max)))}</code> ${fmt(v.views)} views`)
+    lines.push(`   ${pct(v.reach ? v.shares / v.reach : NaN)} shared · ${secs(v.avgWatchTimeMs)} watched`)
     const hook = transcripts[sc(v.instagramUrl)]?.hook
     if (hook) lines.push(`   🎙 “${escapeHtml(hook.slice(0, 90))}”`)
   })
