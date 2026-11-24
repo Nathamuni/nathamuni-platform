@@ -8,8 +8,8 @@
  *
  * Without OTP the number is not proven, so the controls are: strict validation, a honeypot,
  * a same-origin check, a per-IP hourly limit, and an HMAC token (10 min, bound to the
- * requester's IP and to nothing else) verified on every zip request. Leads go to the INBOX
- * KV as `lead:diet:<iso time>:<random>` (one write per lead; KV free tier is 1,000 writes
+ * requester's IP and to nothing else) verified on every zip request. Leads go to D1 table
+ * `diet_leads` (KV `lead:diet:*` only as a fallback if DB is unbound; KV free tier is 1,000 writes
  * a day, which is the ceiling on leads/day). The token is stateless, so it costs no write.
  *
  * Secret: DIET_TOKEN_SECRET (Worker secret). Absent => the gate fails closed.
@@ -156,7 +156,7 @@ export async function handleDietFile(request, env) {
 /** POST /api/diet/lead {name, phone, file?, website(honeypot)} -> {ok, url} */
 export async function handleDietLead(request, env, data = manifest) {
   if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405)
-  if (!env.INBOX || !env.DIET_TOKEN_SECRET) {
+  if (!(env.DB || env.INBOX) || !env.DIET_TOKEN_SECRET) {
     return json({ error: 'Downloads are being set up. Please try again soon.' }, 503)
   }
   const origin = request.headers.get('origin')
@@ -194,17 +194,16 @@ export async function handleDietLead(request, env, data = manifest) {
 
   const at = new Date().toISOString()
   const id = toB64url(crypto.getRandomValues(new Uint8Array(6)))
-  await env.INBOX.put(
-    `lead:diet:${at}:${id}`,
-    JSON.stringify({
-      name,
-      phone,
-      at,
-      file,
-      ipHash: await ipHash(env.DIET_TOKEN_SECRET, ip),
-      ua: (request.headers.get('user-agent') ?? '').slice(0, 200),
-    })
-  )
+  const ipH = await ipHash(env.DIET_TOKEN_SECRET, ip)
+  const ua = (request.headers.get('user-agent') ?? '').slice(0, 200)
+  if (env.DB) {
+    // D1: 100k writes/day free, queryable. Keeps the 1,000/day KV quota for the bot.
+    await env.DB.prepare('INSERT INTO diet_leads (id, at, name, phone, file, ip_hash, ua) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .bind(id, at, name, phone, file ?? null, ipH, ua)
+      .run()
+  } else {
+    await env.INBOX.put(`lead:diet:${at}:${id}`, JSON.stringify({ name, phone, at, file, ipHash: ipH, ua }))
+  }
 
   const token = await signDownloadToken(env.DIET_TOKEN_SECRET, ip)
   return json({ ok: true, url: `${file}?t=${token}` })
