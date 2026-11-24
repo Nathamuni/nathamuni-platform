@@ -202,7 +202,26 @@ export async function resolveShortcode(env, mediaId) {
   }
 }
 
+/** First sighting of a comment? D1 when bound (100k writes/day free); KV fallback keeps tests and old deploys working. */
+async function markSeen(env, commentId, kvKey) {
+  if (env.DB) {
+    const now = Math.floor(Date.now() / 1000)
+    const res = await env.DB.prepare('INSERT OR IGNORE INTO ig_seen (comment_id, at) VALUES (?, ?)').bind(String(commentId), now).run()
+    if (Math.random() < 0.02) await env.DB.prepare('DELETE FROM ig_seen WHERE at < ?').bind(now - SEEN_TTL).run().catch(() => {})
+    return (res.meta?.changes ?? 0) > 0
+  }
+  if (await env.INBOX.get(kvKey)) return false
+  await env.INBOX.put(kvKey, '1', { expirationTtl: SEEN_TTL })
+  return true
+}
+
 async function appendLog(env, entry) {
+  if (env.DB) {
+    const at = new Date().toISOString()
+    await env.DB.prepare('INSERT INTO dm_log (at, entry) VALUES (?, ?)').bind(at, JSON.stringify(entry)).run()
+    await env.DB.prepare('DELETE FROM dm_log WHERE id <= (SELECT MAX(id) FROM dm_log) - ?').bind(LOG_MAX).run().catch(() => {})
+    return
+  }
   let log = []
   try {
     log = JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
@@ -211,6 +230,19 @@ async function appendLog(env, entry) {
   }
   log.unshift({ at: new Date().toISOString(), ...entry })
   await env.INBOX.put(LOG_KEY, JSON.stringify(log.slice(0, LOG_MAX)))
+}
+
+/** Recent events, newest first (D1 when bound, else the KV list). */
+async function readLog(env) {
+  if (env.DB) {
+    const { results } = await env.DB.prepare('SELECT at, entry FROM dm_log ORDER BY id DESC LIMIT ?').bind(LOG_MAX).all()
+    return (results ?? []).map((r) => ({ at: r.at, ...JSON.parse(r.entry) }))
+  }
+  try {
+    return JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
+  } catch {
+    return []
+  }
 }
 
 export async function loadSettings(env) {
@@ -237,8 +269,7 @@ export async function processComment(env, c) {
     }
     if (!rule) return
     const seenKey = `ig:seen:${c.commentId}`
-    if (await env.INBOX.get(seenKey)) return // Meta retries webhooks
-    await env.INBOX.put(seenKey, '1', { expirationTtl: SEEN_TTL })
+    if (!(await markSeen(env, c.commentId, seenKey))) return // Meta retries webhooks
 
     const entry = { user: c.username, comment: c.text.slice(0, 120), rule: rule.keywords, dm: 'ok', reply: 'off' }
     try {
@@ -345,13 +376,7 @@ export async function verifyAccess(request, env, fetchImpl = fetch, nowSec = Mat
 export async function handleAdminApi(request, env) {
   if (!(await verifyAccess(request, env))) return json({ error: 'Not allowed' }, 403)
   if (request.method === 'GET') {
-    let log = []
-    try {
-      log = JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
-    } catch {
-      /* empty */
-    }
-    return json({ settings: await loadSettings(env), log })
+    return json({ settings: await loadSettings(env), log: await readLog(env) })
   }
   if (request.method === 'PUT') {
     let clean
@@ -538,12 +563,7 @@ export function applyDmCommand(settings, argText) {
 /** Telegram entry point: load rules, apply the command, save if changed, return the reply. */
 /** Last 5 events as Telegram HTML. */
 export async function dmLog(env) {
-  let log = []
-  try {
-    log = JSON.parse((await env.INBOX.get(LOG_KEY)) || '[]')
-  } catch {
-    /* empty */
-  }
+  const log = await readLog(env)
   if (!log.length) return 'No comment → DM events yet.'
   return ['<b>Last events</b>', '', ...log.slice(0, 5).map((e) => `• @${esc(e.user)} — “${esc(e.comment)}” → DM ${esc(e.dm)}, reply ${esc(e.reply)}`)].join('\n').slice(0, 3800)
 }

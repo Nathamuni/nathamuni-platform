@@ -26,6 +26,10 @@
     "binding": "AI"
   },
   // Anonymous question log + newsletter list ("nathamuni-inbox" KV).
+  // High-frequency notes (comment-to-DM dedupe + activity) live in D1: 100k writes/day free vs KV 1,000.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "nathamuni-db", "database_id": "aa57360a-254d-4cab-9841-55e3e6125be3", "migrations_dir": "migrations" }
+  ],
   "kv_namespaces": [
     {
       "binding": "INBOX",
