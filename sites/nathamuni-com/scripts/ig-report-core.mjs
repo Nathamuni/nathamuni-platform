@@ -242,10 +242,15 @@ export function renderHelp() {
   ].join('\n')
 }
 
-export function renderBest(videos, today, transcripts = {}) {
-  const top = scored(videos, today, 30)
+/** Top reels by views in the last 30 days (shared by the text reply and the thumbnail album). */
+export function topReels(videos, today, n = 5) {
+  return scored(videos, today, 30)
     .sort((a, b) => b.views - a.views)
-    .slice(0, 5)
+    .slice(0, n)
+}
+
+export function renderBest(videos, today, transcripts = {}) {
+  const top = topReels(videos, today)
   if (!top.length) return 'No reels with stats in the last 30 days yet.'
   const lines = ['<b>🏆 Top 5 — last 30 days</b>', '']
   const max = top[0].views || 1
