@@ -70,6 +70,7 @@ export function DietGate() {
         body: JSON.stringify({
           name: form.get("name"),
           phone: form.get("phone"),
+          country: form.get("country"),
           website: form.get("website"),
           turnstile: form.get("cf-turnstile-response"),
           file,
@@ -143,6 +144,12 @@ export function DietGate() {
             </label>
             <label>
               <span>Mobile number</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <select name="country" defaultValue="91" aria-label="Country code" data-testid="diet-gate-country" style={{ flex: "0 0 96px" }}>
+                  {[["91", "IN +91"], ["1", "US +1"], ["44", "UK +44"], ["971", "UAE +971"], ["65", "SG +65"], ["60", "MY +60"], ["61", "AU +61"], ["94", "LK +94"], ["966", "SA +966"], ["974", "QA +974"]].map(([v, l]) => (
+                    <option key={v} value={v}>{l}</option>
+                  ))}
+                </select>
               <input
                 name="phone"
                 type="tel"
@@ -153,6 +160,7 @@ export function DietGate() {
                 maxLength={16}
                 data-testid="diet-gate-phone"
               />
+              </div>
             </label>
             {/* Honeypot: invisible to people, tempting to bots. */}
             <input

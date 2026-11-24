@@ -40,16 +40,26 @@ export function normaliseName(raw) {
   return name
 }
 
-/** Indian mobile -> 10 digits (6-9 first), accepting +91 / 91 / 0 prefixes. null if invalid. */
-export function normalisePhone(raw) {
+export const COUNTRY_CODES = ['91', '1', '44', '971', '65', '60', '61', '94', '966', '974']
+
+/** Phone + country code -> "+<cc><number>" or null. India (91) needs a 10-digit mobile starting 6-9;
+ * other countries accept 6-14 digits. A +91 / 91 / 0 prefix typed into the box is tolerated. */
+export function normalisePhone(raw, cc = '91') {
+  cc = String(cc ?? '91').replace(/\D/g, '')
+  if (!COUNTRY_CODES.includes(cc)) return null
   let digits = String(raw ?? '').replace(/[\s\-().]/g, '')
   if (/[^\d+]/.test(digits) || digits.indexOf('+') > 0) return null
   digits = digits.replace(/^\+/, '')
-  if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2)
-  else if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1)
-  if (!/^[6-9]\d{9}$/.test(digits)) return null
-  if (/^(\d)\1{9}$/.test(digits)) return null // 9999999999
-  return digits
+  if (cc === '91') {
+    if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2)
+    else if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1)
+    if (!/^[6-9]\d{9}$/.test(digits)) return null
+  } else {
+    digits = digits.replace(/^0+/, '')
+    if (!/^\d{6,14}$/.test(digits)) return null
+  }
+  if (/^(\d)\1+$/.test(digits)) return null // 9999999999
+  return `+${cc}${digits}`
 }
 
 // ---------- crypto ----------
@@ -192,9 +202,9 @@ export async function handleDietLead(request, env, data = manifest) {
   }
 
   const name = normaliseName(body?.name)
-  const phone = normalisePhone(body?.phone)
+  const phone = normalisePhone(body?.phone, body?.country)
   if (!name) return json({ error: 'Please enter your name (letters only).', field: 'name' }, 400)
-  if (!phone) return json({ error: 'Please enter a valid 10-digit Indian mobile number.', field: 'phone' }, 400)
+  if (!phone) return json({ error: 'Please enter a valid mobile number for the selected country.', field: 'phone' }, 400)
 
   const files = releaseFiles(data)
   const file = body?.file == null || body.file === '' ? files[0] : files.find((f) => f === body.file)

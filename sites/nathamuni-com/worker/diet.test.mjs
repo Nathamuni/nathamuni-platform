@@ -51,8 +51,14 @@ beforeEach(() => {
 describe('validation', () => {
   it('normalises Indian mobiles to 10 digits', () => {
     for (const raw of ['9876543210', '+91 98765-43210', '919876543210', '09876543210', ' 98765 43210 ']) {
-      expect(normalisePhone(raw)).toBe('9876543210')
+      expect(normalisePhone(raw)).toBe('+919876543210')
     }
+  })
+  it('accepts other countries with their code, rejects unknown codes', () => {
+    expect(normalisePhone('415 555 2671', '1')).toBe('+14155552671')
+    expect(normalisePhone('7911 123456', '44')).toBe('+447911123456')
+    expect(normalisePhone('9876543210', '999')).toBeNull()
+    expect(normalisePhone('12345', '1')).toBeNull()
   })
   it('rejects bad numbers', () => {
     for (const raw of ['', '12345', '5876543210', '9999999999', '98765432101', 'abcdefghij', '98765+43210', '+1 9876543210']) {
@@ -81,7 +87,7 @@ describe('POST /api/diet/lead', () => {
     expect(key).toMatch(/^lead:diet:/)
     const lead = JSON.parse(value)
     expect(lead.name).toBe('Asha Raman')
-    expect(lead.phone).toBe('9876543210')
+    expect(lead.phone).toBe('+919876543210')
     expect(lead.ipHash).toBeTruthy()
     expect(JSON.stringify(lead)).not.toContain(IP)
   })
