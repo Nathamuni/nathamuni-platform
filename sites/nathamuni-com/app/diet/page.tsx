@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CopyButton } from "@/components/diet/CopyButton";
+import { DietGate } from "@/components/diet/DietGate";
 import { Inline } from "@/components/diet/Inline";
 import { InstallFlow } from "@/components/diet/InstallFlow";
 import { StepGlyph } from "@/components/diet/StepGlyph";
@@ -100,6 +101,8 @@ export default function DietPage() {
             <a
               href={latest.file}
               download
+              data-diet-gate
+              data-diet-file={latest.file}
               className="diet-download"
               data-testid="diet-download"
             >
@@ -140,6 +143,8 @@ export default function DietPage() {
               <a
                 href={`https://${stableUrl}`}
                 download
+                data-diet-gate
+                data-diet-file={latest.file}
                 className="diet-stable-link"
               >
                 <code data-testid="diet-stable-url">{stableUrl}</code>
@@ -193,7 +198,13 @@ export default function DietPage() {
                 <div className="diet-version-head">
                   <span className="diet-version-num">v{r.version}</span>
                   {i === 0 && <span className="diet-badge">Latest</span>}
-                  <a href={r.file} download className="diet-version-link">
+                  <a
+                    href={r.file}
+                    download
+                    data-diet-gate
+                    data-diet-file={r.file}
+                    className="diet-version-link"
+                  >
                     Download
                   </a>
                 </div>
@@ -237,6 +248,7 @@ export default function DietPage() {
       </details>
 
       <p className="diet-disclaimer">{DIET_DISCLAIMER}</p>
+      <DietGate />
     </section>
   );
 }

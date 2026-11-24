@@ -14,8 +14,9 @@
     "not_found_handling": "404-page",
     "binding": "ASSETS",
     // Browser navigations are otherwise answered from ./out first (404 page) and never
-    // reach the worker; the stable download link must always hit its redirect.
-    "run_worker_first": ["/diet/latest.zip"]
+    // reach the worker. The stable download link and every released zip must hit the worker:
+    // it only serves them with a token issued after the name + mobile form (worker/diet.mjs).
+    "run_worker_first": ["/diet/latest.zip", "/downloads/diet/*"]
   },
   // UTC crons, keep in sync with worker/telegram.mjs: 8:00 am IST starts the GitHub sync;
   // 5:45 pm IST daily posting nudge; 7 pm IST Sunday weekly review.
