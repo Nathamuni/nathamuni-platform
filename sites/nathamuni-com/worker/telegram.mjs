@@ -34,6 +34,9 @@ import {
   renderIdeas,
   renderIdeaTeaser,
   RATING_SCHEMA,
+  CAPTION_SCHEMA,
+  captionPrompt,
+  renderCaptions,
   RATE_MODEL,
   RATE_DAILY_CAP,
 } from '../scripts/ig-ai-core.mjs'
@@ -119,6 +122,7 @@ export const MENU_COMMANDS = [
   { command: 'week', description: 'Weekly review' },
   { command: 'ideas', description: '5 AI reel ideas' },
   { command: 'idea', description: 'AI rates your idea' },
+  { command: 'caption', description: 'AI captions + hashtags for a video' },
   { command: 'dm', description: 'Comment → DM: create, pause, delete' },
   { command: 'cancel', description: 'Stop a guided setup' },
   { command: 'mute', description: 'Pause reminders' },
@@ -321,6 +325,10 @@ export async function handleTelegram(request, env) {
     await send(env, msg.chat.id, await dmCommand(env, msg.text.trim().slice(rawCmdLength(msg.text))))
     return new Response('ok')
   }
+  if (cmd === '/caption') {
+    await send(env, msg.chat.id, await captionFor(env, msg.text.trim().slice(rawCmdLength(msg.text)).trim()))
+    return new Response('ok')
+  }
   if (cmd === '/idea') {
     await send(env, msg.chat.id, await rateIdea(env, msg.text.trim().slice(rawCmdLength(msg.text)).trim()))
     return new Response('ok')
@@ -349,6 +357,32 @@ export async function handleTelegram(request, env) {
 }
 
 const rawCmdLength = (text) => text.trim().split(/\s+/)[0].length
+
+/** Top-3 captions + 5 hashtags for a described video. Shares the /idea daily AI cap. */
+export async function captionFor(env, details) {
+  if (details.length < 8) return 'Describe the video after the command, e.g.\n/caption 3 high-protein Chennai breakfasts under ₹100, Tamil voiceover'
+  if (!env.GEMINI_API_KEY) return 'AI captions are not configured yet.'
+  const today = istToday()
+  const key = `tg:ai:${today}`
+  const used = Number((await env.INBOX.get(key)) ?? 0)
+  if (used >= RATE_DAILY_CAP) return `Daily AI limit reached (${RATE_DAILY_CAP}/day, keeps you on the free tier). Resets at midnight.`
+  await env.INBOX.put(key, String(used + 1), { expirationTtl: 2 * 86400 })
+  try {
+    const { videos, history, transcripts } = await loadData()
+    const r = await geminiJson({
+      key: env.GEMINI_API_KEY,
+      model: RATE_MODEL,
+      prompt: captionPrompt(accountContext(videos, transcripts, history, today), details),
+      schema: CAPTION_SCHEMA,
+      temperature: 0.8,
+      retries: 1,
+    })
+    return `${renderCaptions(r, details)}\n\n<i>${RATE_DAILY_CAP - used - 1} AI uses left today</i>`
+  } catch (err) {
+    console.error('caption error:', err.message)
+    return err.quota ? 'Gemini’s free daily limit is used up. Try again tomorrow.' : 'AI is busy right now. Try again in a minute.'
+  }
+}
 
 /** Live AI rating of the owner's idea, capped per day so the free Gemini quota is never exceeded. */
 export async function rateIdea(env, idea) {
