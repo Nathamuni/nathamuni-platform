@@ -15,7 +15,14 @@
 import { handleAuth } from './auth.mjs'
 import { handleTelegram, handleScheduled, CRON_WEEKLY } from './telegram.mjs'
 import { handleWebhook, handleAdminApi, handleAdminPage, refreshToken } from './commentdm.mjs'
-import { handleDietLatest, DIET_LATEST_PATH } from './diet.mjs'
+import {
+  handleDietLatest,
+  handleDietFile,
+  handleDietLead,
+  DIET_LATEST_PATH,
+  DIET_LEAD_PATH,
+  DIET_FILES_PREFIX,
+} from './diet.mjs'
 
 const MODEL = '@cf/baai/bge-m3'
 const TOP_K = 12
@@ -735,7 +742,18 @@ const worker = {
       }
     }
     if (pathname === DIET_LATEST_PATH) {
-      return handleDietLatest(request)
+      return handleDietLatest(request, env)
+    }
+    if (pathname === DIET_LEAD_PATH) {
+      try {
+        return await handleDietLead(request, env)
+      } catch (err) {
+        console.error('diet lead fatal:', err.message)
+        return Response.json({ error: 'Could not continue just now. Try again.' }, { status: 500 })
+      }
+    }
+    if (pathname.startsWith(DIET_FILES_PREFIX) && pathname.endsWith('.zip')) {
+      return handleDietFile(request, env)
     }
     if (pathname === '/api/ig/webhook') {
       return handleWebhook(request, env, ctx)

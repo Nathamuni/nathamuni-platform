@@ -34,7 +34,10 @@ npm test           # vitest
   `public/downloads/diet/<name>-v<version>.zip` and prepends `lib/diet.json` (version, copy and
   notes read from the zip's plugin.json + README). Released versions are immutable;
   `/diet/latest.zip` (worker/diet.mjs) redirects to the newest. The script refuses zips that
-  contain an email address. Install-step screenshots live in `public/images/diet/`, cropped to
+  contain an email address. Downloads are gated: a name + Indian mobile form (`components/diet/DietGate.tsx`)
+  POSTs `/api/diet/lead`, which stores the lead in INBOX KV (`lead:diet:*`) and returns a 10-minute
+  IP-bound HMAC token (secret `DIET_TOKEN_SECRET`); the worker serves `/downloads/diet/*.zip` and
+  `/diet/latest.zip` only with that token, else redirects to `/diet?get=1` Install-step screenshots live in `public/images/diet/`, cropped to
   the main panel (no sidebar/chat history)
 - **Profile/bio copy:** `lib/profile.ts` — single source of truth for hero/about/metadata
 - **Hero:** a static portrait (`components/hero/HeroPortrait.tsx`, `public/images/generated/about-portrait.jpg`);
