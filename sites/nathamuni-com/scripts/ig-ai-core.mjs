@@ -119,6 +119,38 @@ Rate it for THIS account (score 1-10) based on the data above: will it get share
 - caption: Tamil line + English line, under 220 characters.`
 }
 
+export const CAPTION_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    captions: { type: 'ARRAY', items: { type: 'STRING' } },
+    hashtags: { type: 'ARRAY', items: { type: 'STRING' } },
+  },
+  required: ['captions', 'hashtags'],
+}
+
+export function captionPrompt(context, details) {
+  return `You write Instagram captions for this Tamil fitness creator (Chennai, diet, workout, Tamil calisthenics). Match his voice: Tamil + English (Tanglish), plain, punchy, no corporate tone.
+
+${context}
+
+Details of the video he is posting:
+"""${details.slice(0, 800)}"""
+
+- captions: exactly 3 different captions, best first. Each under 220 characters: a strong hook line, then one line of value or a call to action (save / share / comment). Vary the angle (curiosity, relatable, direct). Emojis sparingly.
+- hashtags: exactly 5, without the # sign. Mix 1-2 trending fitness tags with niche ones that fit THIS video (Chennai, Tamil, diet, calisthenics, workout). No banned or spammy tags.`
+}
+
+export function renderCaptions(r, details) {
+  const caps = (r.captions ?? []).slice(0, 3)
+  const tags = (r.hashtags ?? []).slice(0, 5).map((h) => '#' + escapeHtml(String(h).replace(/^#/, '').replace(/\s+/g, '')))
+  return [
+    `<b>✍️ Captions</b> <i>${escapeHtml(details.slice(0, 60))}</i>`,
+    ...caps.flatMap((c, i) => ['', `<b>${i + 1}.</b> ${escapeHtml(c)}`]),
+    '',
+    `#️⃣ ${tags.join(' ')}`,
+  ].join('\n')
+}
+
 export function renderIdeas(pack) {
   if (!pack?.ideas?.length) return 'No ideas yet — the first pack arrives with the next morning sync.'
   const lines = [`<b>💡 Reel ideas</b> <i>(${escapeHtml(pack.date ?? '')})</i>`]
