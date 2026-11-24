@@ -16,6 +16,8 @@ import {
   renderTelegram,
   renderHelp,
   renderBest,
+  topReels,
+  fmt,
   renderWhen,
   renderGoal,
   renderBoost,
@@ -301,6 +303,13 @@ export async function handleTelegram(request, env) {
   }
   try {
     const data = await loadData()
+    if (cmd === '/best') {
+      // Thumbnails of the top reels, shown right in the chat above the numbers.
+      const album = topReels(data.videos, istToday())
+        .map((v, i) => ({ url: v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbnail : `https://nathamuni.com${v.thumbnail}`) : '', caption: `${i + 1}. ${fmt(v.views)} views` }))
+        .filter((a) => a.url)
+      if (album.length >= 2) await playOutbox(env, msg.chat.id, [{ album }])
+    }
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
   } catch (err) {
     console.error('telegram error:', err.message)
