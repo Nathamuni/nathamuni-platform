@@ -1,6 +1,87 @@
 {
   "releases": [
     {
+      "version": "1.3.1",
+      "date": "2026-11-24",
+      "name": "south-indian-satvahara",
+      "displayName": "South Indian Satvahara",
+      "developerName": "Nathamuni",
+      "shortDescription": "South Indian diet & nutrition",
+      "description": "A vegetarian-only, egg-free South Indian nutrition and lifestyle coach. Nathamuni is the AI companion identity, designed by Nathamuni. Supports flexible-duration meal plans, traditional foods, workout-aware nutrition, measurable nutrition analysis, eating-out discovery, progress reviews, and optional routine/reminder setup when supported by the host.",
+      "prompts": [
+        "Create a personalized meal plan for the duration I prefer, with South Indian vegetarian foods.",
+        "Build a practical meal routine around my wake-up and workout schedule, with optional reminders.",
+        "Analyze my meals and identify measurable nutritional gaps and improvements.",
+        "Help me find suitable vegetarian food when eating outside or ordering online."
+      ],
+      "hasSkill": true,
+      "file": "/downloads/diet/south-indian-satvahara-v1.3.1.zip",
+      "bytes": 57016,
+      "sha256": "d39693d210136617a072802007e0e639e24d66d25fcd701dc4d03bdf87e88040",
+      "files": [
+        {
+          "path": "plugin.json",
+          "bytes": 1791
+        },
+        {
+          "path": "README.md",
+          "bytes": 5675
+        },
+        {
+          "path": ".codex-plugin/plugin.json",
+          "bytes": 1324
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "bytes": 535
+        },
+        {
+          "path": "skills/nathamuni/SKILL.md",
+          "bytes": 47877
+        },
+        {
+          "path": "skills/nathamuni/references/challenge-reminder-handoff.md",
+          "bytes": 4890
+        },
+        {
+          "path": "skills/nathamuni/references/multilingual-natural-interaction.md",
+          "bytes": 3106
+        },
+        {
+          "path": "skills/nathamuni/references/adaptive-food-solver.md",
+          "bytes": 1985
+        },
+        {
+          "path": "skills/nathamuni/references/vegetarian-only-policy.md",
+          "bytes": 2424
+        },
+        {
+          "path": "skills/nathamuni/references/master-coach-framework.md",
+          "bytes": 35804
+        },
+        {
+          "path": "skills/nathamuni/references/flexible-planner-routine.md",
+          "bytes": 4900
+        },
+        {
+          "path": "skills/nathamuni/references/south-indian-food-intelligence.md",
+          "bytes": 14664
+        },
+        {
+          "path": "skills/nathamuni/references/planner-routine-acceptance-tests.md",
+          "bytes": 4282
+        },
+        {
+          "path": "skills/nathamuni/references/v1.3.1-adversarial-acceptance-tests.md",
+          "bytes": 3605
+        }
+      ],
+      "notes": {
+        "title": "Enforcement & Input Validation Hardening",
+        "text": "Strengthens the highest-priority vegetarian-and-egg-free output firewall, adds handling for prompt injection and conflicting instructions, and defines a response gate for incomplete or contradictory user inputs. Adds a mandatory final nutrition-output audit to catch prohibited foods, accidental swaps, exclusion violations, and unsupported precision.\n\nNew reference: `skills/nathamuni/references/v1.3.1-adversarial-acceptance-tests.md`."
+      }
+    },
+    {
       "version": "1.3.0",
       "date": "2026-11-23",
       "name": "south-indian-satvahara",
