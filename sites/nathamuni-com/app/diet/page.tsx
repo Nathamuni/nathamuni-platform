@@ -89,6 +89,17 @@ export default function DietPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {latest.version === "1.3.1" && (
+        <aside className="diet-update" data-testid="diet-update" aria-label="What is new in v1.3.1">
+          <strong className="diet-update-tag">New in v1.3.1</strong>
+          <p>
+            Gives a real diet only when it has enough information. If it has to assume something
+            (what you eat, your routine), it says so. Strictly vegetarian and egg-free: no
+            non-veg suggestion, even when you ask for conflicting things.
+          </p>
+        </aside>
+      )}
+
       <header className="diet-hero">
         <div className="diet-hero-main">
           <h1 className="diet-title">{latest.displayName}</h1>
