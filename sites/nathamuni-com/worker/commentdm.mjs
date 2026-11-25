@@ -531,6 +531,36 @@ export async function saveSettings(env, settings) {
 export const toggleRule = (s, id) => ({ ...s, rules: s.rules.map((r) => (r.id === id ? { ...r, enabled: r.enabled === false } : r)) })
 export const deleteRule = (s, id) => ({ ...s, rules: s.rules.filter((r) => r.id !== id) })
 
+const EDIT_FIELDS = { d: 'dm', r: 'reply', k: 'keywords' }
+export { EDIT_FIELDS }
+
+/**
+ * Pure: change ONE field of ONE rule, everything else untouched. field: 'dm' | 'reply' | 'keywords'.
+ * For 'reply', text 'auto' / 'none' pick the automatic reply or no public reply.
+ * Returns { settings } or { error }. The webhook reads rules live, so the change applies to the next comment.
+ */
+export function editRule(settings, id, field, input) {
+  const text = String(input || '').trim()
+  const r = (settings.rules || []).find((x) => x.id === id)
+  if (!r) return { error: 'That DM no longer exists.' }
+  const next = { ...r }
+  if (field === 'dm') {
+    const n = enc.encode(text).length
+    if (!text) return { error: 'The message is empty. Send the new DM text.' }
+    if (n > MAX_DM_BYTES) return { error: `That is ${n} bytes and the limit is ${MAX_DM_BYTES} (a Tamil letter counts as 3). Send a shorter message.` }
+    next.dm = text
+  } else if (field === 'keywords') {
+    if (!tokens(text).length) return { error: 'Send at least one word, for example: link' }
+    next.keywords = text.slice(0, 200)
+  } else if (field === 'reply') {
+    if (!text) return { error: 'Send the new wording, or tap a button.' }
+    if (/^auto$/i.test(text)) Object.assign(next, { publicReplies: [], noReply: false })
+    else if (/^none$/i.test(text)) Object.assign(next, { publicReplies: [], noReply: true })
+    else Object.assign(next, { publicReplies: [text.slice(0, MAX_PUBLIC_REPLY)], noReply: false })
+  } else return { error: 'Unknown field.' }
+  return { settings: { ...settings, rules: settings.rules.map((x) => (x.id === id ? next : x)) } }
+}
+
 export async function saveRule(env, draft) {
   try {
     const cur = await loadSettings(env)
