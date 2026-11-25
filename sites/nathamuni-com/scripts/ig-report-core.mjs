@@ -238,6 +238,7 @@ export function renderHelp() {
     '/caption &lt;video details&gt; — top 3 captions + 5 hashtags',
     '/dm new — set up a comment → DM rule step by step (/dm lists them)',
     '/mute · /unmute — pause or resume reminders',
+    '/cancel — stop a guided setup · /menu — refresh this command list',
     '',
     '<i>Data refreshes daily at 8 AM.</i>',
   ].join('\n')
