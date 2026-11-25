@@ -17,6 +17,16 @@ const load = async () => VIDEOS
 const text = (out) => out.map((m) => m.text || '').join('\n')
 const dataOf = (out) => out.flatMap((m) => (m.buttons || []).flat().map((x) => x.d))
 
+describe('plain /dm with saved DMs', () => {
+  it('lists them with Edit buttons, no /dm list needed', async () => {
+    const env = { INBOX: kv() }
+    await env.INBOX.put('ig:rules', JSON.stringify({ enabled: true, rules: [{ id: 'a', keywords: 'link', dm: 'hello', publicReplies: [], noReply: false }] }))
+    const out = await dmHandle(env, { kind: 'text', text: '/dm' }, load)
+    expect(text(out)).toContain('Your DMs')
+    expect(dataOf(out)).toContain('dm:e:a')
+  })
+})
+
 describe('/dm menu', () => {
   it('shows buttons for create, list, turn off, activity', async () => {
     const out = await dmHandle({ INBOX: kv() }, { kind: 'text', text: '/dm' }, load)

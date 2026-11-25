@@ -72,7 +72,7 @@ export function ruleCards(settings, videos) {
     out.push(v && thumbUrl(v) ? { photo: thumbUrl(v), text, buttons } : { text, buttons })
   })
   if (settings.rules.length > 10) out.push({ text: `+${settings.rules.length - 10} more. Send /dm to list them.` })
-  out.push({ text: 'What next?', buttons: [MENU_ROW, [b(on ? '🔴 Turn ALL OFF' : '🟢 Turn ALL ON', 'dm:g')]] })
+  out.push({ text: 'What next?', buttons: [MENU_ROW, [b(on ? '🔴 Turn ALL OFF' : '🟢 Turn ALL ON', 'dm:g'), b('📜 Activity', 'dm:log')]] })
   return out
 }
 
@@ -302,7 +302,11 @@ export async function dmHandle(env, input, loadVideos) {
   if (input.kind === 'button') return onButton(env, String(input.data || ''), videos)
 
   const t = String(input.text || '').trim()
-  if (/^\/dm(@\w+)?$/i.test(t)) return [homeMsg(await loadSettings(env))]
+  if (/^\/dm(@\w+)?$/i.test(t)) {
+    // Plain /dm shows every saved DM with its Edit / Pause / Delete buttons; the home menu only when there are none.
+    const s = await loadSettings(env)
+    return s.rules.length ? ruleCards(s, await videos()) : [homeMsg(s)]
+  }
   if (/^\/dm(@\w+)?\s+list\s*$/i.test(t)) return ruleCards(await loadSettings(env), await videos())
   if (/^\/dm(@\w+)?\s+(new|add)\s*$/i.test(t)) return startFlow(env, videos)
 
