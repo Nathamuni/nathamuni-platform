@@ -100,7 +100,7 @@ export function replyFor(text, data, today) {
     case '/next':
       return renderNext(report(), videos, today, transcripts)
     case '/week':
-      return renderWeekly(videos, history, today, transcripts)
+      return renderWeekly(videos, history, today, transcripts, data.ideas)
     case '/ideas':
       return renderIdeas(data.ideas)
     default:
@@ -231,6 +231,19 @@ async function sendBestChart(env, chatId, top, opts = {}) {
   return res.ok
 }
 
+/** Send a chart; if it cannot be drawn or sent, say why in one line instead of failing silently. */
+async function chartOrNote(env, chatId, top, opts) {
+  let why = ''
+  try {
+    if (await sendBestChart(env, chatId, top, opts)) return
+    why = 'Telegram refused the image'
+  } catch (e) {
+    console.error('chart failed:', e.message)
+    why = String(e.message || e).slice(0, 160)
+  }
+  await send(env, chatId, `📊 Chart could not be drawn (${esc(why)}). The text below is complete.`).catch(() => {})
+}
+
 async function loadVideos() {
   return (await loadData()).videos
 }
@@ -353,7 +366,7 @@ export async function handleTelegram(request, env) {
       const today = istToday()
       const cut = new Date(Date.parse(today) - 7 * 86400000).toISOString().slice(0, 10)
       const wk = data.videos.filter((v) => v.publishedDate > cut && Number.isFinite(v.views)).sort((a, b) => b.views - a.views).slice(0, 5)
-      if (wk.length) await sendBestChart(env, msg.chat.id, wk, { title: 'This week', subtitle: `Last 7 days · ${wk.length} reels by views` }).catch((e) => console.error('chart failed:', e.message))
+      if (wk.length) await chartOrNote(env, msg.chat.id, wk, { title: 'This week', subtitle: `Last 7 days · ${wk.length} reels by views` })
     }
     if (cmd === '/goal') {
       const g = goalStats(data.history)
@@ -362,7 +375,7 @@ export async function handleTelegram(request, env) {
           { label: 'Followers now', value: g.now, meta: `${((g.now / 50000) * 100).toFixed(1)}% of the way · ${g.perDay >= 0 ? '+' : ''}${g.perDay.toFixed(0)}/day`, thumb: '' },
           { label: 'Goal', value: 50000, meta: g.eta ? `At this pace: ${g.eta}` : 'Pace is flat', thumb: '' },
         ]
-        await sendBestChart(env, msg.chat.id, [], { title: 'Road to 50k', subtitle: `${g.remaining.toLocaleString('en-IN')} to go`, rows }).catch((e) => console.error('chart failed:', e.message))
+        await chartOrNote(env, msg.chat.id, [], { title: 'Road to 50k', subtitle: `${g.remaining.toLocaleString('en-IN')} to go`, rows })
       }
     }
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
@@ -435,7 +448,7 @@ export function scheduledMessage(cron, data, today) {
     const teaser = renderIdeaTeaser(data.ideas)
     return nudge && teaser ? `${nudge}\n\n${teaser}` : nudge
   }
-  if (cron === CRON_WEEKLY) return renderWeekly(videos, history, today, transcripts)
+  if (cron === CRON_WEEKLY) return renderWeekly(videos, history, today, transcripts, data.ideas)
   return null
 }
 
