@@ -411,7 +411,7 @@ function weekStats(videos, today, fromAge, toAge) {
     .filter((v) => v.age >= fromAge && v.age < toAge)
 }
 
-export function renderWeekly(videos, history, today, transcripts = {}) {
+export function renderWeekly(videos, history, today, transcripts = {}, ideas = null) {
   const thisWeek = weekStats(videos, today, 0, 7)
   const lastWeek = weekStats(videos, today, 7, 14)
   const h = [...history].sort((a, b) => a.date.localeCompare(b.date))
@@ -462,5 +462,13 @@ export function renderWeekly(videos, history, today, transcripts = {}) {
   if (gap && gap.d > 0) lines.push(`• Add more ${escapeHtml(gap.cat)} (${gap.d} short of target)`)
   if (byShare) lines.push(`• Most shared was ${escapeHtml(byShare.category ?? 'it')} — make one more like “${escapeHtml(byShare.title)}”`)
   if (!thisWeek.length) lines.push('• No posts this week — aim for 1 a day, 6–9 pm')
+  // One concrete reel for the biggest gap, in the owner's voice.
+  if (gap && gap.d > 0) {
+    const idea = (ideas?.ideas ?? []).find((i) => i.category === gap.cat)
+    lines.push('', `💡 <b>Make one ${escapeHtml(gap.cat)} reel</b>`)
+    if (idea) lines.push(`• ${escapeHtml(idea.title)}`, `  🎙 “${escapeHtml(idea.hook_tanglish)}”`)
+    else lines.push('• Pick one idea from /ideas, or send yours to /idea')
+    lines.push('  <i>Voice: I lift. I eat. I experiment. I share what makes sense.</i>')
+  }
   return lines.join('\n')
 }
