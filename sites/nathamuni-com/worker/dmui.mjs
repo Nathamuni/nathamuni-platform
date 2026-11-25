@@ -15,6 +15,8 @@ import {
   toggleRule,
   deleteRule,
   advanceDm,
+  editRule,
+  EDIT_FIELDS,
   flowGet,
   flowPut,
   flowDel,
@@ -66,7 +68,7 @@ export function ruleCards(settings, videos) {
       `DM: “${esc(short(r.dm, 90))}”`,
       `Public reply: ${replyLabel(r)}`,
     ].join('\n')
-    const buttons = [[b(r.enabled === false ? '▶️ Resume' : '⏸ Pause', `dm:t:${r.id}`), b('🗑 Delete', `dm:x:${r.id}`)]]
+    const buttons = [[b('✏️ Edit', `dm:e:${r.id}`), b(r.enabled === false ? '▶️ Resume' : '⏸ Pause', `dm:t:${r.id}`), b('🗑 Delete', `dm:x:${r.id}`)]]
     out.push(v && thumbUrl(v) ? { photo: thumbUrl(v), text, buttons } : { text, buttons })
   })
   if (settings.rules.length > 10) out.push({ text: `+${settings.rules.length - 10} more. Send /dm to list them.` })
@@ -141,6 +143,7 @@ async function startFlow(env, videos) {
 }
 
 async function advance(env, flow, input, videos) {
+  if (flow.step === 'edit') return applyEdit(env, flow, input)
   const out = advanceDm(flow, input)
   if (out.error) return [{ text: `⚠️ ${out.error}`, buttons: [[CANCEL]] }]
   if (out.cancel) {
@@ -162,10 +165,56 @@ async function advance(env, flow, input, videos) {
   return promptFor(out.flow, await videos())
 }
 
+const FIELD_NAME = { dm: 'DM text', reply: 'public reply', keywords: 'keyword' }
+
+async function applyEdit(env, flow, input) {
+  const cur = await loadSettings(env)
+  const out = editRule(cur, flow.ruleId, flow.field, input)
+  if (out.error) return [{ text: `⚠️ ${out.error}`, buttons: [[CANCEL]] }]
+  await flowDel(env)
+  const saved = await saveSettings(env, out.settings)
+  const r = saved.rules.find((x) => x.id === flow.ruleId)
+  const now = flow.field === 'dm' ? r.dm : flow.field === 'keywords' ? r.keywords : r.noReply ? 'no public reply' : r.publicReplies?.[0] || 'automatic “Check your DM”'
+  return [
+    {
+      text: `✅ Updated the ${FIELD_NAME[flow.field]} for <b>${esc(r.keywords)}</b>. Only that changed; it applies to the next comment (DMs and replies already sent stay as they are).\n\nNow: ${esc(now)}`,
+      buttons: [[b('📋 My DMs', 'dm:list'), b('✏️ Edit more', `dm:e:${r.id}`)]],
+    },
+  ]
+}
+
+async function editMenu(env, id) {
+  const r = (await loadSettings(env)).rules.find((x) => x.id === id)
+  if (!r) return [{ text: 'That DM no longer exists.', buttons: [MENU_ROW] }]
+  return [
+    {
+      text: `<b>✏️ Edit: ${esc(r.keywords)}</b>\nWhat do you want to change? Nothing else will be touched.\n\nDM: “${esc(short(r.dm, 120))}”\nPublic reply: ${replyLabel(r)}`,
+      buttons: [
+        [b('✏️ DM text', `dm:ef:d:${id}`), b('💬 Public reply', `dm:ef:r:${id}`)],
+        [b('🔑 Keyword', `dm:ef:k:${id}`), b('⬅️ Back', 'dm:list')],
+      ],
+    },
+  ]
+}
+
+async function startEdit(env, code, id) {
+  const field = EDIT_FIELDS[code]
+  const r = (await loadSettings(env)).rules.find((x) => x.id === id)
+  if (!field || !r) return [{ text: 'That DM no longer exists.', buttons: [MENU_ROW] }]
+  await flowPut(env, { step: 'edit', field, ruleId: id, draft: {} })
+  const ask = {
+    dm: `Send the <b>new DM text</b> (max 1000 bytes; a Tamil letter counts as 3).\n\nCurrent:\n${esc(r.dm)}`,
+    keywords: `Send the <b>new keyword(s)</b>, separated by commas.\n\nCurrent: ${esc(r.keywords)}`,
+    reply: `Send the <b>new public reply</b> wording, or tap a button.\n\nCurrent: ${replyLabel(r)}`,
+  }[field]
+  const rows = field === 'reply' ? [[b('✅ Auto: “Check your DM 📩”', 'dm:er:auto'), b('🚫 No reply', 'dm:er:none')], [CANCEL]] : [[CANCEL]]
+  return [{ text: ask, buttons: rows }]
+}
+
 const expired = [{ text: 'That setup expired. Tap below to start again.', buttons: [MENU_ROW] }]
 
 async function onButton(env, data, videos) {
-  const [, action, arg] = data.split(':')
+  const [, action, arg, arg2] = data.split(':')
   const settings = async () => loadSettings(env)
   switch (action) {
     case 'home':
@@ -207,6 +256,14 @@ async function onButton(env, data, videos) {
       if (!r) return [{ text: 'Already deleted.', buttons: [MENU_ROW] }]
       await saveSettings(env, deleteRule(s, arg))
       return [{ text: `🗑 Deleted: <b>${esc(r.keywords)}</b>`, buttons: [[b('📋 My DMs', 'dm:list'), b('🏠 Menu', 'dm:home')]] }]
+    }
+    case 'e':
+      return editMenu(env, arg)
+    case 'ef':
+      return startEdit(env, arg, arg2)
+    case 'er': {
+      const f = await flowGet(env)
+      return f?.step === 'edit' ? applyEdit(env, f, arg) : expired
     }
     case 'log':
       return [{ text: await dmLog(env), buttons: [[b('🏠 Menu', 'dm:home')]] }]
