@@ -212,14 +212,14 @@ const thumbOf = (v) => (v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbn
 /** Draw the /best chart and send it as a photo. Returns false when anything goes wrong. */
 async function sendBestChart(env, chatId, top, opts = {}) {
   const { renderChart, toDataUri } = await import('./chart.mjs')
-  const thumbs = await Promise.all(top.map((v) => (thumbOf(v) ? toDataUri(thumbOf(v)) : '')))
+  const thumbs = await Promise.all(top.map((v) => (thumbOf(v) ? toDataUri(thumbOf(v), env) : '')))
   const png = await renderChart({
     title: opts.title || 'Top reels',
     subtitle: opts.subtitle || `Last 30 days · ${top.length} reels by views`,
     rows: opts.rows || top.map((v, i) => ({
       label: v.title || 'Reel',
       value: v.views,
-      meta: `${fmt(v.views)} views · ${v.reach ? ((100 * v.shares) / v.reach).toFixed(1) : '–'}% shared · ${Number.isFinite(v.avgWatchTimeMs) ? (v.avgWatchTimeMs / 1000).toFixed(1) : '–'}s watched`,
+      meta: `${fmt(v.views)} views · ${v.reach ? ((100 * v.shares) / v.reach).toFixed(1) : '–'}% shared ${Number.isFinite(v.avgWatchTimeMs) ? `· ${(v.avgWatchTimeMs / 1000).toFixed(1)}s watched` : ''}`.trim(),
       thumb: thumbs[i] || '',
     })),
   })

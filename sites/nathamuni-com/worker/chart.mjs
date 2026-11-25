@@ -30,9 +30,10 @@ const esc = (s) =>
     .replace(/"/g, '&quot;')
 
 /** Fetch a thumbnail as a data URI; '' when it cannot be loaded so one bad image never fails the chart. */
-export async function toDataUri(url) {
+export async function toDataUri(url, env) {
   try {
-    const res = await fetch(url)
+    // Our own covers come straight from the bundled assets; a Worker fetching its own domain can fail.
+    const res = env?.ASSETS && url.startsWith('https://nathamuni.com/') ? await env.ASSETS.fetch(new Request(url)) : await fetch(url)
     if (!res.ok) return ''
     const buf = new Uint8Array(await res.arrayBuffer())
     let bin = ''
@@ -41,6 +42,12 @@ export async function toDataUri(url) {
   } catch {
     return ''
   }
+}
+
+// Emoji have no glyph in the bundled fonts and draw as empty boxes, so drop them; cut long titles with an ellipsis.
+const clean = (s, n) => {
+  const t = String(s ?? '').replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\u200d\ufe0f]/gu, '').replace(/\s+/g, ' ').trim()
+  return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t
 }
 
 /** Pure: spec → SVG text. Exported for tests. */
@@ -59,7 +66,7 @@ export function chartSvg({ title, subtitle, rows }) {
         r.thumb
           ? `<clipPath id="c${i}"><rect x="72" y="${y + 14}" width="78" height="104" rx="10"/></clipPath><image href="${esc(r.thumb)}" x="72" y="${y + 14}" width="78" height="104" preserveAspectRatio="xMidYMid slice" clip-path="url(#c${i})"/>`
           : `<rect x="72" y="${y + 14}" width="78" height="104" rx="10" fill="#e9e5dc"/>`,
-        text(168, y + 40, 24, 700, '#23282e', String(r.label).slice(0, 48)),
+        text(168, y + 40, 24, 700, '#23282e', clean(r.label, 46)),
         `<rect x="168" y="${y + 54}" width="560" height="16" rx="8" fill="#e9e5dc"/>`,
         `<rect x="168" y="${y + 54}" width="${bar}" height="16" rx="8" fill="#c2410c"/>`,
         text(168, y + 100, 20, 400, '#4a525c', r.meta || ''),
