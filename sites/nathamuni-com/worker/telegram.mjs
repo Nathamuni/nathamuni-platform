@@ -20,6 +20,7 @@ import {
   fmt,
   renderWhen,
   renderGoal,
+  goalStats,
   renderBoost,
   renderReel,
   renderNext,
@@ -209,13 +210,13 @@ export async function playOutbox(env, chatId, outbox) {
 const thumbOf = (v) => (v.thumbnail ? (v.thumbnail.startsWith('http') ? v.thumbnail : `https://nathamuni.com${v.thumbnail}`) : '')
 
 /** Draw the /best chart and send it as a photo. Returns false when anything goes wrong. */
-async function sendBestChart(env, chatId, top) {
+async function sendBestChart(env, chatId, top, opts = {}) {
   const { renderChart, toDataUri } = await import('./chart.mjs')
   const thumbs = await Promise.all(top.map((v) => (thumbOf(v) ? toDataUri(thumbOf(v)) : '')))
   const png = await renderChart({
-    title: 'Top reels',
-    subtitle: `Last 30 days · ${top.length} reels by views`,
-    rows: top.map((v, i) => ({
+    title: opts.title || 'Top reels',
+    subtitle: opts.subtitle || `Last 30 days · ${top.length} reels by views`,
+    rows: opts.rows || top.map((v, i) => ({
       label: v.title || 'Reel',
       value: v.views,
       meta: `${fmt(v.views)} views · ${v.reach ? ((100 * v.shares) / v.reach).toFixed(1) : '–'}% shared · ${Number.isFinite(v.avgWatchTimeMs) ? (v.avgWatchTimeMs / 1000).toFixed(1) : '–'}s watched`,
@@ -224,7 +225,7 @@ async function sendBestChart(env, chatId, top) {
   })
   const form = new FormData()
   form.append('chat_id', String(chatId))
-  form.append('photo', new Blob([png], { type: 'image/png' }), 'best.png')
+  form.append('photo', new Blob([png], { type: 'image/png' }), 'chart.png')
   const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: 'POST', body: form })
   if (!res.ok) console.error('telegram sendPhoto failed:', res.status, (await res.text().catch(() => '')).slice(0, 200))
   return res.ok
@@ -346,6 +347,22 @@ export async function handleTelegram(request, env) {
             .filter((a) => a.url)
           if (album.length >= 2) await playOutbox(env, msg.chat.id, [{ album }])
         }
+      }
+    }
+    if (cmd === '/week') {
+      const today = istToday()
+      const cut = new Date(Date.parse(today) - 7 * 86400000).toISOString().slice(0, 10)
+      const wk = data.videos.filter((v) => v.publishedDate > cut && Number.isFinite(v.views)).sort((a, b) => b.views - a.views).slice(0, 5)
+      if (wk.length) await sendBestChart(env, msg.chat.id, wk, { title: 'This week', subtitle: `Last 7 days · ${wk.length} reels by views` }).catch((e) => console.error('chart failed:', e.message))
+    }
+    if (cmd === '/goal') {
+      const g = goalStats(data.history)
+      if (g) {
+        const rows = [
+          { label: 'Followers now', value: g.now, meta: `${((g.now / 50000) * 100).toFixed(1)}% of the way · ${g.perDay >= 0 ? '+' : ''}${g.perDay.toFixed(0)}/day`, thumb: '' },
+          { label: 'Goal', value: 50000, meta: g.eta ? `At this pace: ${g.eta}` : 'Pace is flat', thumb: '' },
+        ]
+        await sendBestChart(env, msg.chat.id, [], { title: 'Road to 50k', subtitle: `${g.remaining.toLocaleString('en-IN')} to go`, rows }).catch((e) => console.error('chart failed:', e.message))
       }
     }
     await send(env, msg.chat.id, replyFor(msg.text, data, istToday()))
